@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Quill</title>
+<link rel="manifest" href="#" id="manifest-link">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="onboard-card">
+    <div class="onboard-logo">Quill ✦</div>
+    <p class="onboard-sub">Notes management dengan AI yang mengenal kamu.</p>
+    <div class="step-dots">
+      <div class="step-dot active" id="d0"></div>
+      <div class="step-dot" id="d1"></div>
+      <div class="step-dot" id="d2"></div>
+    </div>
+
+    <div class="onboard-step active" id="s0">
+      <div class="step-label">Langkah 1 · Persona</div>
+      <div class="form-group">
+        <label class="form-label">Nama kamu</label>
+        <input class="form-input" id="p-name" placeholder="e.g. Naufal..." type="text" autocomplete="given-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role / Pekerjaan</label>
+        <input class="form-input" id="p-role" placeholder="e.g. Business Analyst, Mahasiswa...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tentang kamu (opsional)</label>
+        <textarea class="form-textarea" id="p-about" placeholder="Keahlian, fokus kerja, atau hal lain yang relevan..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="nextStep()">Lanjut →</button>
+    </div>
+
+    <div class="onboard-step" id="s1">
+      <div class="step-label">Langkah 2 · Preferensi AI</div>
+      <div class="form-group">
+        <label class="form-label">Gaya komunikasi AI</label>
+        <select class="form-select" id="p-style">
+          <option value="casual">Santai & Friendly</option>
+          <option value="professional">Profesional & Formal</option>
+          <option value="concise">Singkat & To the Point</option>
+          <option value="detailed">Detail & Komprehensif</option>
+          <option value="creative">Kreatif & Eksploratif</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bahasa</label>
+        <select class="form-select" id="p-lang">
+          <option value="id">Bahasa Indonesia</option>
+          <option value="en">English</option>
+          <option value="mixed">Mixed (Campur)</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="nextStep()">Lanjut →</button>
+      <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
+    </div>
+
+    <div class="onboard-step" id="s2">
+      <div class="step-label">Langkah 3 · Setup AI</div>
+      <div class="form-group">
+        <label class="form-label">Provider AI</label>
+        <div class="provider-grid">
+          <button class="provider-btn active" onclick="pickProvider('google',this)">🤖 Google Gemini<br><small style="opacity:.6">Gratis di AI Studio</small></button>
+          <button class="provider-btn" onclick="pickProvider('anthropic',this)">🔮 Claude<br><small style="opacity:.6">Anthropic</small></button>
+          <button class="provider-btn" onclick="pickProvider('groq',this)">⚡ Groq<br><small style="opacity:.6">Llama gratis</small></button>
+          <button class="provider-btn" onclick="pickProvider('nvidia',this)">🟢 NVIDIA NIM<br><small style="opacity:.6">Free credits</small></button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">API Key</label>
+        <input class="form-input" id="p-apikey" type="password" placeholder="Masukkan API key..." autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Model</label>
+        <select class="form-select" id="p-model"></select>
+      </div>
+      <button class="btn-primary" onclick="finishOnboarding()">Mulai Quill ✦</button>
+      <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <!-- Sidebar overlay (mobile) -->
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">Quill ✦</div>
+      <div class="sidebar-actions">
+        <button class="icon-btn" onclick="openNewFolder()" title="Folder baru" style="font-size:16px">📁</button>
+        <button class="icon-btn" onclick="newNote()" title="Note baru" style="font-size:20px">+</button>
+        <button class="icon-btn" onclick="openSettings()" title="Settings">⚙</button>
+      </div>
+    </div>
+    <div class="sidebar-search">
+      <input class="search-input" id="search-input" placeholder="Cari notes..." oninput="renderSidebar()">
+    </div>
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" onclick="switchTab('notes',this)">Notes</button>
+      <button class="sidebar-tab" onclick="switchTab('templates',this)">Template</button>
+    </div>
+    <div class="sidebar-content" id="sidebar-content"></div>
+    <div class="persona-badge" id="persona-badge">
+      <div class="persona-avatar" id="p-avatar">?</div>
+      <div>
+        <div class="persona-name" id="p-name-badge">-</div>
+        <div class="persona-role" id="p-role-badge">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN EDITOR -->
+  <div id="main">
+    <!-- Empty state -->
+    <div id="empty-state">
+      <div class="empty-icon">✦</div>
+      <div class="empty-title">Pilih atau buat note baru</div>
+      <p class="empty-sub">Tap tombol + untuk mulai menulis dengan bantuan AI.</p>
+    </div>
+
+    <!-- Editor view -->
+    <div id="editor-view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+
+      <!-- TOOLBAR (scrollable horizontal) -->
+      <div id="toolbar">
+        <button class="tb" onclick="fmt('bold')" title="Bold"><b>B</b></button>
+        <button class="tb" onclick="fmt('italic')" title="Italic"><i>I</i></button>
+        <button class="tb" onclick="fmt('underline')" title="Underline"><u>U</u></button>
+        <button class="tb" onclick="fmt('strikeThrough')" title="Strikethrough"><s>S</s></button>
+        <div class="tb-sep"></div>
+        <button class="tb" onclick="fmtBlock('h1')">H1</button>
+        <button class="tb" onclick="fmtBlock('h2')">H2</button>
+        <button class="tb" onclick="fmtBlock('h3')">H3</button>
+        <div class="tb-sep"></div>
+        <button class="tb" onclick="fmt('insertUnorderedList')" title="Bullet list">≡</button>
+        <button class="tb" onclick="fmt('insertOrderedList')" title="Numbered list">1.</button>
+        <button class="tb" onclick="insertChecklist()" title="Checklist">☑</button>
+        <button class="tb" onclick="listIndent()" title="Indent (nested list)">→</button>
+        <button class="tb" onclick="listOutdent()" title="Outdent">←</button>
+        <div class="tb-sep"></div>
+        <button class="tb" onclick="fmtBlock('blockquote')" title="Blockquote">❝</button>
+        <button class="tb" onclick="insertCode()" title="Code">&lt;/&gt;</button>
+        <button class="tb" onclick="insertTable()" title="Tabel">⊞</button>
+        <button class="tb" onclick="insertHR()" title="Divider">—</button>
+        <div class="tb-sep"></div>
+        <button class="tb" onclick="saveAsTemplate()" title="Simpan template">📋</button>
+        <!-- Desktop: chat toggle & AI fill -->
+        <button class="tb desktop-only" onclick="toggleChat()" title="AI Chat" id="chat-toggle-btn">💬</button>
+        <div class="ai-drop desktop-only">
+          <button class="ai-btn" onclick="toggleAIMenu(event)">✦ AI Fill ▾</button>
+          <div class="ai-menu" id="ai-menu">
+            <button class="ai-item" onclick="aiAction('write');closeAIMenu()"><span class="ic">✍</span>Tulis dari judul</button>
+            <button class="ai-item" onclick="aiAction('continue');closeAIMenu()"><span class="ic">→</span>Lanjutkan</button>
+            <button class="ai-item" onclick="aiAction('improve');closeAIMenu()"><span class="ic">✨</span>Perbaiki</button>
+            <button class="ai-item" onclick="aiAction('summarize');closeAIMenu()"><span class="ic">📝</span>Ringkas</button>
+            <button class="ai-item" onclick="aiAction('expand');closeAIMenu()"><span class="ic">↔</span>Perluas</button>
+            <button class="ai-item" onclick="aiAction('bullets');closeAIMenu()"><span class="ic">≡</span>Jadikan bullets</button>
+            <button class="ai-item" onclick="aiAction('table');closeAIMenu()"><span class="ic">⊞</span>Jadikan tabel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Note header -->
+      <div id="note-header">
+        <input id="note-title" placeholder="Judul note..." oninput="scheduleAutoSave()">
+        <div class="meta-bar">
+          <div class="meta-item">🕐 <span id="meta-time">-</span></div>
+          <div class="meta-item">📅 <span id="meta-date">-</span></div>
+          <div class="meta-item">✦ <span id="meta-words">0 kata</span></div>
+          <span id="meta-saved"></span>
+        </div>
+      </div>
+
+      <!-- Editor body -->
+      <div id="editor-wrap">
+        <div id="editor" contenteditable="true"
+          onkeydown="onEditorKey(event)"
+          oninput="onEditorInput()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESKTOP CHAT PANEL -->
+  <div id="chat-panel" class="hidden">
+    <div class="chat-header">
+      <div class="chat-title-row"><span class="chat-dot"></span>AI Chat</div>
+      <button class="icon-btn" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="chat-ctx" id="chat-ctx">📝 <span id="chat-ctx-txt">Pilih note</span></div>
+    <div id="chat-messages">
+      <div id="chat-empty" style="text-align:center;padding:32px 16px;color:var(--text3);font-size:12px;line-height:1.7;">Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chat-input" placeholder="Tanya tentang note ini..." rows="1"
+          onkeydown="onChatKey(event)"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+        <button class="chat-send" id="chat-send-btn" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE BOTTOM BAR -->
+  <div id="bottom-bar">
+    <button class="bb-btn" onclick="toggleSidebar()"><span class="bb-icon">☰</span>Notes</button>
+    <button class="bb-btn" onclick="openMobileAI()"><span class="bb-icon">✦</span>AI Fill</button>
+    <button class="bb-new" onclick="newNote()">+</button>
+    <button class="bb-btn" onclick="openMobileChat()"><span class="bb-icon">💬</span>Chat</button>
+    <button class="bb-btn" onclick="openSettings()"><span class="bb-icon">⚙</span>Settings</button>
+  </div>
+</div>
+
+<!-- MOBILE CHAT SHEET -->
+<div id="chat-sheet">
+  <div id="chat-sheet-bg" onclick="closeMobileChat()"></div>
+  <div id="chat-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="chat-title-row"><span class="chat-dot"></span>AI Chat</div>
+      <button class="icon-btn" onclick="closeMobileChat()">✕</button>
+    </div>
+    <div class="chat-ctx" id="chat-ctx-m">📝 <span id="chat-ctx-txt-m">Pilih note</span></div>
+    <div id="chat-messages-m" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:120px;max-height:40vh;"></div>
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chat-input-m" placeholder="Tanya tentang note ini..." rows="1"
+          onkeydown="onChatKeyM(event)"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
+        <button class="chat-send" id="chat-send-btn-m" onclick="sendChatM()">↑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE AI SHEET -->
+<div id="ai-sheet">
+  <div id="ai-sheet-bg" onclick="closeMobileAI()"></div>
+  <div id="ai-sheet-panel">
+    <div class="ai-sheet-handle"></div>
+    <div class="ai-sheet-title">✦ AI Fill</div>
+    <div class="ai-sheet-grid">
+      <button class="ai-sheet-btn" onclick="aiAction('write');closeMobileAI()"><span class="ic">✍</span>Tulis dari judul</button>
+      <button class="ai-sheet-btn" onclick="aiAction('continue');closeMobileAI()"><span class="ic">→</span>Lanjutkan</button>
+      <button class="ai-sheet-btn" onclick="aiAction('improve');closeMobileAI()"><span class="ic">✨</span>Perbaiki</button>
+      <button class="ai-sheet-btn" onclick="aiAction('summarize');closeMobileAI()"><span class="ic">📝</span>Ringkas</button>
+      <button class="ai-sheet-btn" onclick="aiAction('expand');closeMobileAI()"><span class="ic">↔</span>Perluas</button>
+      <button class="ai-sheet-btn" onclick="aiAction('bullets');closeMobileAI()"><span class="ic">≡</span>Jadikan bullets</button>
+      <button class="ai-sheet-btn" onclick="aiAction('table');closeMobileAI()"><span class="ic">⊞</span>Jadikan tabel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal" style="display:none" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Settings</div>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Persona</div>
+        <div class="form-group"><label class="form-label">Nama</label><input class="form-input" id="s-name"></div>
+        <div class="form-group"><label class="form-label">Role</label><input class="form-input" id="s-role"></div>
+        <div class="form-group"><label class="form-label">Tentang</label><textarea class="form-textarea" id="s-about"></textarea></div>
+        <div class="form-group"><label class="form-label">Gaya AI</label>
+          <select class="form-select" id="s-style">
+            <option value="casual">Santai & Friendly</option>
+            <option value="professional">Profesional & Formal</option>
+            <option value="concise">Singkat & To the Point</option>
+            <option value="detailed">Detail & Komprehensif</option>
+            <option value="creative">Kreatif & Eksploratif</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Bahasa</label>
+          <select class="form-select" id="s-lang">
+            <option value="id">Bahasa Indonesia</option>
+            <option value="en">English</option>
+            <option value="mixed">Mixed</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">AI Provider</div>
+        <div class="provider-grid">
+          <button class="provider-btn" id="sp-google" onclick="settingProvider('google')">🤖 Google Gemini</button>
+          <button class="provider-btn" id="sp-anthropic" onclick="settingProvider('anthropic')">🔮 Claude</button>
+          <button class="provider-btn" id="sp-groq" onclick="settingProvider('groq')">⚡ Groq</button>
+          <button class="provider-btn" id="sp-nvidia" onclick="settingProvider('nvidia')">🟢 NVIDIA NIM</button>
+        </div>
+        <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="s-apikey" type="password"></div>
+        <div class="form-group"><label class="form-label">Model</label><select class="form-select" id="s-model"></select></div>
+      </div>
+      <button class="btn-primary" onclick="saveSettings()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOLDER MODAL -->
+<div class="modal-overlay" id="folder-modal" style="display:none" onclick="if(event.target===this)closeFolderModal()">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-header">
+      <div class="modal-title">Folder Baru</div>
+      <button class="modal-close" onclick="closeFolderModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nama Folder</label>
+        <input class="form-input" id="folder-name-input" placeholder="e.g. Kerja, Personal, Ideas...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji (opsional)</label>
+        <input class="form-input" id="folder-emoji-input" placeholder="📁" maxlength="2" style="font-size:20px;text-align:center;">
+      </div>
+      <button class="btn-primary" onclick="confirmNewFolder()">Buat Folder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOVE TO FOLDER MODAL -->
+<div class="modal-overlay" id="move-modal" style="display:none" onclick="if(event.target===this)document.getElementById('move-modal').style.display='none'">
+  <div class="modal" style="max-width:320px">
+    <div class="modal-header">
+      <div class="modal-title">Pindah ke Folder</div>
+      <button class="modal-close" onclick="document.getElementById('move-modal').style.display='none'">✕</button>
+    </div>
+    <div class="modal-body" id="move-modal-body"></div>
+  </div>
+</div>
+
+<!-- TEMPLATE MODAL -->
+<div class="modal-overlay" id="tmpl-modal" style="display:none" onclick="if(event.target===this)closeTmplModal()">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title">Simpan Template</div>
+      <button class="modal-close" onclick="closeTmplModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nama Template</label><input class="form-input" id="tmpl-name" placeholder="e.g. Meeting Notes..."></div>
+      <div class="form-group"><label class="form-label">Deskripsi (opsional)</label><input class="form-input" id="tmpl-desc" placeholder="Deskripsi singkat..."></div>
+      <button class="btn-primary" onclick="confirmSaveTemplate()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Overlay -->
+<div id="ai-overlay"><div class="ai-loader"><div class="ai-spinner"></div><div class="ai-loader-txt" id="ai-ltxt">AI sedang menulis...</div></div></div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
