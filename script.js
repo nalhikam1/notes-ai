@@ -30,13 +30,13 @@ const MODELS = {
 const ST = {
   projects:[], folders:[], notes:[], templates:[], 
   activeId:null, activeProjectId:null, openNodes:{},
-  persona:null, ai:{provider:'google',apiKey:'',model:'gemini-2.0-flash'},
+  persona:null, ai:{provider:'nvidia',apiKey:'',model:'openai/gpt-oss-120b'},
   viewType:'dashboard', // dashboard, project, editor
   projectView:'list', // list, kanban
   rsTab:'chat', // chat, toc, info
   chatHistory:{}, saveTimer:null
 };
-let onbStep=0, onbProvider='google';
+let onbStep=0, onbProvider='nvidia';
 
 // ===== ONBOARDING =====
 function nextStep(){
@@ -504,8 +504,13 @@ function delTemplate(id){
 let tempPId = null, tempFId = null;
 function openNewFolder(projectId = null, parentId = null, e = null){
   if(e) e.stopPropagation();
-  tempPId = projectId || ST.activeProjectId || ST.projects[0].id;
+  tempPId = projectId || ST.activeProjectId || (ST.projects[0] ? ST.projects[0].id : null);
   tempFId = parentId;
+  
+  // Set modal title dynamically
+  const isCreatingFolder = !!tempPId && !!e; // Explicitly passed an event from sidebar plus button
+  document.querySelector('#folder-modal .modal-title').textContent = isCreatingFolder ? 'New Folder' : 'New Project';
+  
   document.getElementById('f-name').value='';
   document.getElementById('f-emoji').value='';
   document.getElementById('folder-modal').style.display='flex';
@@ -1166,7 +1171,13 @@ function appendChatMsg(container,role,content){
   const div=document.createElement('div');
   div.className=`chat-msg ${role}`;
   const ts=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-  const rendered=role==='ai'?marked.parse(content):escHtml(content).replace(/\n/g,'<br>');
+  let rendered='';
+  if(role==='ai'){
+    // Ensure all markdown goes into the single bubble nicely
+    rendered=marked.parse(content);
+  } else {
+    rendered=escHtml(content).replace(/\n/g,'<br>');
+  }
   div.innerHTML=`<div class="chat-bubble">${rendered}</div><div class="chat-time">${ts}</div>`;
   container.appendChild(div);
   container.scrollTop=container.scrollHeight;
