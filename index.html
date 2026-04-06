@@ -115,11 +115,13 @@
       <button class="sidebar-item" onclick="openNewFolder()">📁 Projects</button>
     </div>
     <div class="sidebar-content" id="sidebar-content"></div>
-    <div class="persona-badge" id="persona-badge">
-      <div class="persona-avatar" id="p-avatar">?</div>
-      <div>
-        <div class="persona-name" id="p-name-badge">-</div>
-        <div class="persona-role" id="p-role-badge">-</div>
+    <div class="sidebar-footer">
+      <div class="persona-badge" id="persona-badge">
+        <div class="persona-avatar" id="p-avatar">?</div>
+        <div>
+          <div class="persona-name" id="p-name-badge">-</div>
+          <div class="persona-role" id="p-role-badge">-</div>
+        </div>
       </div>
     </div>
   </div>
@@ -257,7 +259,6 @@
     <div class="rs-tabs">
       <button class="rs-tab active" onclick="setRSTab('chat',this)" title="Assistant">💬</button>
       <button class="rs-tab" onclick="setRSTab('toc',this)" title="Table of Contents">≡</button>
-      <button class="rs-tab" onclick="setRSTab('info',this)" title="Note info">ℹ</button>
       <button class="rs-tab-close" onclick="toggleChat()">✕</button>
     </div>
 
@@ -266,6 +267,9 @@
       <div class="chat-header">
         <div class="chat-title-row"><span class="chat-dot"></span>Assistant <span class="badge">beta</span></div>
         <button class="icon-btn" onclick="clearChat()">+ New</button>
+      </div>
+      <div class="model-picker-wrap">
+        <select id="rs-model-picker" class="model-select" onchange="updateSelectedModel(this.value)"></select>
       </div>
       <div id="chat-messages">
         <div id="chat-empty">Hi 👋. Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>
@@ -279,9 +283,6 @@
         <div class="chat-input-row">
           <textarea class="chat-input" id="chat-input" placeholder="Ask anything..." rows="1" oninput="autoResizeChat(this)"></textarea>
           <button class="chat-send" onclick="sendChat()">↑</button>
-        </div>
-        <div class="model-picker-wrap">
-          <select id="rs-model-picker" class="model-select" onchange="updateSelectedModel(this.value)"></select>
         </div>
       </div>
     </div>

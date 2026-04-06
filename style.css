@@ -154,15 +154,53 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .tmpl-use-btn:hover{background:var(--accent2);}
 .tmpl-del-btn{width:28px;height:28px;background:none;border:none;color:var(--text3);cursor:pointer;border-radius:4px;font-size:14px;display:flex;align-items:center;justify-content:center;}
 .tmpl-del-btn:hover{color:var(--red);}
-/* SIDEBAR ITEMS */
-.sidebar-menu { padding: 10px; border-bottom: 1px solid var(--border); }
+/* ===== SIDEBAR ITEMS ===== */
+.sidebar-menu { padding: 10px; border-bottom: 1px solid var(--border); overflow-y: auto; flex: 1; }
 .sidebar-item {
-  width:100%; padding: 10px 12px; background: none; border: none; border-radius: var(--r);
-  color: var(--text2); text-align: left; cursor: pointer; font-family: inherit; font-size: 14px;
-  display: flex; align-items: center; gap: 10px; transition: all .2s;
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 12px; background: none; border: none; font-size: 13px;
+  color: var(--text2); cursor: pointer; border-radius: var(--r); text-align: left;
+  transition: all .2s; margin-bottom: 2px;
 }
 .sidebar-item:hover { background: var(--bg3); color: var(--text); }
-.sidebar-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
+.sidebar-item.active { background: var(--accent-dim); color: var(--accent); }
+
+/* Folder & Tree Styles */
+.tree-item { margin-bottom: 2px; }
+.tree-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 12px; font-size: 13px; color: var(--text2); cursor: pointer;
+  border-radius: var(--r); transition: background .2s;
+}
+.tree-row:hover { background: var(--bg3); color: var(--text); }
+.tree-row.active { background: var(--accent-dim); color: var(--accent); }
+.tree-arrow { width: 16px; font-size: 10px; opacity: .5; transition: transform .2s; display: inline-block; text-align: center; }
+.tree-arrow.open { transform: rotate(90deg); }
+.tree-children { padding-left: 12px; display: none; }
+.tree-children.open { display: block; }
+.tree-icon { opacity: .7; }
+
+/* Note Menu Button */
+.note-menu-btn {
+  background: none; border: none; color: var(--text3); opacity: 0; cursor: pointer; padding: 2px 6px; border-radius: 4px;
+}
+.tree-row:hover .note-menu-btn { opacity: 1; }
+.note-menu-btn:hover { background: var(--bg2); color: var(--text); }
+
+/* Sidebar Footer & Persona Badge */
+.sidebar-footer { padding: 10px; border-top: 1px solid var(--border); }
+.persona-badge {
+  padding: 8px; background: var(--accent-dim2); border: 1px solid rgba(212,168,83,.12);
+  border-radius: var(--r); font-size: 11px; color: var(--text2);
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.persona-avatar {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #0f0f0f; flex-shrink: 0;
+}
+.persona-name { font-weight: 600; color: var(--text); font-size: 12px; }
+.persona-role { color: var(--text3); font-size: 10px; }
 
 /* ===== MAIN ===== */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
@@ -371,10 +409,10 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 }
 .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim2); }
 
-.model-picker-wrap { margin-top: 10px; padding: 0 10px 10px; }
+.model-picker-wrap { border-bottom: 1px solid var(--border); padding: 8px; background: var(--bg2); }
 .model-select { 
-  width: 100%; border: none; background: var(--bg3); color: var(--text3); font-size: 11px; 
-  font-family: inherit; border-radius: 6px; padding: 4px 8px; outline: none; cursor: pointer;
+  width: 100%; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 12px; 
+  font-family: inherit; border-radius: 6px; padding: 6px 8px; outline: none; cursor: pointer;
 }
 
 /* ===== STATUS BAR ===== */

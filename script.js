@@ -28,7 +28,8 @@ const MODELS = {
 
 // ===== STATE =====
 const ST = {
-  projects:[], notes:[], templates:[], activeId:null, activeProjectId:null,
+  projects:[], folders:[], notes:[], templates:[], 
+  activeId:null, activeProjectId:null, openNodes:{},
   persona:null, ai:{provider:'google',apiKey:'',model:'gemini-2.0-flash'},
   viewType:'dashboard', // dashboard, project, editor
   projectView:'list', // list, kanban
@@ -95,20 +96,25 @@ function initApp(){
   showDashboard();
 }
 function migrateOldData(){
-  // If we have 'folders' but no 'projects', migrate
+  // V3 Architecture Hard Reset for Ghost Files
+  if(!localStorage.getItem('quill_v3')){
+    localStorage.removeItem('quill_state');
+    localStorage.setItem('quill_v3','1');
+  }
   const data=localStorage.getItem('quill_state');
   if(data){
     const old=JSON.parse(data);
     if(old.folders && !old.projects){
       ST.projects = old.folders.map(f=>({id:f.id, name:f.name, emoji:f.emoji||'📁', color:'#d4a853'}));
-      delete ST.folders;
-      saveState();
     }
   }
   // Ensure default project if none
-  if(!ST.projects.length) ST.projects.push({id:'p-general',name:'General',emoji:'📦',color:'#d4a853'});
-}
-function updatePersonaBadge(){
+  if(!ST.projects || !ST.projects.length) {
+    ST.projects = [{id:'p-general',name:'General',emoji:'📦',color:'#d4a853'}];
+  }
+  if(!ST.folders) ST.folders = [];
+  if(!ST.openNodes) ST.openNodes = {};
+}function updatePersonaBadge(){
   const p=ST.persona; if(!p) return;
   document.getElementById('p-avatar').textContent=p.name.charAt(0).toUpperCase();
   document.getElementById('p-name-badge').textContent=p.name;
@@ -167,21 +173,6 @@ function updateBreadcrumbs(){
 
 // ===== NOTES CRUD =====
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
-
-function newNote(content='', title=''){
-  const projId = ST.activeProjectId || (ST.projects[0] ? ST.projects[0].id : 'p-general');
-  const n={
-    id:uid(), title, content, 
-    projectId:projId, 
-    status:'To Do',
-    createdAt:new Date().toISOString(), 
-    updatedAt:new Date().toISOString()
-  };
-  ST.notes.unshift(n);
-  saveState();
-  openNote(n.id);
-  renderSidebar();
-}
 
 function openNote(id){
   ST.activeId=id;
@@ -376,40 +367,76 @@ function setProjectView(v,btn){
   renderProjectDashboard();
 }
 
+function toggleNode(id, e){
+  if(e) e.stopPropagation();
+  ST.openNodes[id] = !ST.openNodes[id];
+  renderSidebar();
+}
+
+function renderTree(projectId, parentId, q) {
+  let html = '';
+  const folders = ST.folders.filter(f => f.projectId === projectId && (f.parentId || null) === parentId);
+  const notes = ST.notes.filter(n => n.projectId === projectId && (n.folderId || null) === parentId);
+
+  folders.forEach(f => {
+    const isOpen = ST.openNodes[f.id];
+    html += `
+      <div class="tree-row" onclick="toggleNode('${f.id}')">
+        <div style="display:flex;align-items:center;">
+          <span class="tree-arrow ${isOpen ? 'open' : ''}">▶</span>
+          <span class="tree-icon">${f.emoji || '📁'}</span>&nbsp;
+          <span>${escHtml(f.name)}</span>
+        </div>
+        <button class="note-menu-btn" onclick="openNewFolder('${projectId}','${f.id}', event)" title="Sub-folder">+</button>
+      </div>
+      <div class="tree-children ${isOpen ? 'open' : ''}">
+        ${isOpen ? renderTree(projectId, f.id, q) : ''}
+      </div>
+    `;
+  });
+
+  notes.forEach(n => {
+    if(q && !(n.title||'').toLowerCase().includes(q) && !(n.content||'').toLowerCase().includes(q)) return;
+    html += `
+      <div class="tree-item sidebar-item ${n.id === ST.activeId ? 'active' : ''}" onclick="openNote('${n.id}')">
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📝 ${escHtml(n.title)||'Untitled'}</span>
+      </div>
+    `;
+  });
+
+  if(!parentId && !folders.length && !notes.length && !q){
+    html += `<div style="padding:4px 12px;font-size:11px;color:var(--text3);">Empty project</div>`;
+  }
+
+  return html;
+}
+
 function renderSidebar(){
-  const el=document.getElementById('sidebar-content');
-  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  const el = document.getElementById('sidebar-content');
+  if(!el) return;
+  const q = (document.getElementById('search-input').value||'').toLowerCase();
   
-  // Group notes by project for the sidebar
   let html = '';
   ST.projects.forEach(p => {
-    const pNotes = ST.notes.filter(n => n.projectId === p.id);
-    const filtered = q ? pNotes.filter(n => n.title.toLowerCase().includes(q) || n.content.replace(/<[^>]*>/g,'').toLowerCase().includes(q)) : pNotes;
-    
-    if (q && !filtered.length) return;
-
-    const isActive = ST.activeProjectId === p.id;
+    const isOpen = ST.openNodes[p.id] || ST.activeProjectId === p.id;
     html += `
-      <div class="folder-item ${isActive ? 'open' : ''}" onclick="openProject('${p.id}')">
-        <span class="folder-icon-arrow">▶</span>
-        <span class="folder-emoji">${p.emoji || '📁'}</span>
-        <span class="folder-name">${escHtml(p.name)}</span>
-        <span class="folder-count">${pNotes.length}</span>
+      <div class="tree-row ${ST.activeProjectId === p.id && !ST.activeId ? 'active' : ''}" onclick="openProject('${p.id}')">
+        <div style="display:flex;align-items:center;" onclick="toggleNode('${p.id}', event)">
+          <span class="tree-arrow ${isOpen ? 'open' : ''}">▶</span>
+          <span class="tree-icon">${p.emoji || '📦'}</span>&nbsp;
+          <span style="font-weight:600;">${escHtml(p.name)}</span>
+        </div>
+        <button class="note-menu-btn" onclick="newNote('${p.id}'); event.stopPropagation();" title="New Note">📝</button>
       </div>
-      <div class="folder-notes ${isActive ? 'open' : ''}">
-        ${filtered.map(n => `
-          <div class="note-item ${n.id === ST.activeId ? 'active' : ''}" onclick="openNote('${n.id}'); event.stopPropagation();">
-            <div class="note-item-title">${escHtml(n.title) || 'Untitled'}</div>
-          </div>
-        `).join('')}
-        <button class="folder-add-btn" onclick="ST.activeProjectId='${p.id}'; newNote(); event.stopPropagation();">+ New Document</button>
+      <div class="tree-children ${isOpen ? 'open' : ''}">
+        ${isOpen ? renderTree(p.id, null, q) : ''}
       </div>
     `;
   });
   el.innerHTML = html;
 
-  // Sync active states in sidebar menu
-  document.getElementById('menu-home').classList.toggle('active', ST.viewType === 'dashboard');
+  const btnHome = document.getElementById('menu-home');
+  if(btnHome) btnHome.classList.toggle('active', ST.viewType === 'dashboard');
 }
 
 function renderNoteItem(n){
@@ -474,35 +501,50 @@ function delTemplate(id){
 }
 
 // ===== FOLDER FUNCTIONS =====
-function openNewFolder(){
-  document.getElementById('folder-name-input').value='';
-  document.getElementById('folder-emoji-input').value='';
+let tempPId = null, tempFId = null;
+function openNewFolder(projectId = null, parentId = null, e = null){
+  if(e) e.stopPropagation();
+  tempPId = projectId || ST.activeProjectId || ST.projects[0].id;
+  tempFId = parentId;
+  document.getElementById('f-name').value='';
+  document.getElementById('f-emoji').value='';
   document.getElementById('folder-modal').style.display='flex';
-  setTimeout(()=>document.getElementById('folder-name-input').focus(),100);
+  setTimeout(()=>document.getElementById('f-name').focus(),100);
 }
 function closeFolderModal(){document.getElementById('folder-modal').style.display='none';}
-function confirmNewFolder(){
-  const name=document.getElementById('folder-name-input').value.trim();
-  if(!name){showToast('Nama folder kosong','error');return;}
-  const emoji=document.getElementById('folder-emoji-input').value.trim()||'📁';
-  ST.folders.push({id:uid(),name,emoji});
+
+// This function creates either a Project or a Folder based on current context
+function saveFolder(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){showToast('Name is empty','error');return;}
+  const emoji=document.getElementById('f-emoji').value.trim()||'📁';
+  
+  // If tempPId is somehow forcing a folder via recursion
+  if(tempPId && document.querySelector('#folder-modal .modal-title').textContent !== 'New Project') {
+    ST.folders.push({id:uid(), name, emoji, projectId:tempPId, parentId:tempFId});
+    ST.openNodes[tempFId || tempPId] = true;
+    showToast(`Folder "${name}" created ✓`,'success');
+  } else {
+    // Top level project
+    ST.projects.push({id:uid(), name, emoji, color:'#d4a853'});
+    showToast(`Project "${name}" created ✓`,'success');
+  }
   saveState(); closeFolderModal(); renderSidebar();
-  showToast(`Folder "${name}" dibuat ✓`,'success');
 }
-function toggleFolder(id){
-  ST.openFolders[id]=!ST.openFolders[id];
-  renderSidebar();
-}
-function deleteFolder(id,e){
-  e.stopPropagation();
-  const f=ST.folders.find(x=>x.id===id);
-  if(!confirm(`Hapus folder "${f?.name}"?\nNotes di dalamnya tidak akan ikut terhapus.`)) return;
-  // Unassign notes from this folder
-  ST.notes.forEach(n=>{if(n.folderId===id) delete n.folderId;});
-  ST.folders=ST.folders.filter(x=>x.id!==id);
-  delete ST.openFolders[id];
-  saveState(); renderSidebar();
-  showToast('Folder dihapus');
+
+function newNote(projectId = null){
+  const projId = projectId || ST.activeProjectId || (ST.projects[0] ? ST.projects[0].id : 'p-general');
+  const n={
+    id:uid(), title:'', content:'', 
+    projectId:projId, folderId:null, // Root note in project by default
+    status:'To Do',
+    createdAt:new Date().toISOString(), 
+    updatedAt:new Date().toISOString()
+  };
+  ST.notes.unshift(n);
+  ST.openNodes[projId] = true;
+  saveState();
+  openNote(n.id);
 }
 
 // ===== NOTE OPTIONS MENU (⋯) =====
@@ -666,6 +708,18 @@ function reattachChecklistListeners(){
 }
 
 // KEY HANDLER
+// ===== EDITOR EVENTS =====
+function onEditorInput() {
+  scheduleAutoSave();
+  updateWordCount();
+  updateStatusBar();
+  if(ST.rsTab === 'toc') {
+    // Only update directly if TOC is active to save resources
+    clearTimeout(window._tocTimer);
+    window._tocTimer = setTimeout(updateTOC, 1000);
+  }
+}
+
 function onEditorKey(e){
   const editor=document.getElementById('editor');
   const sel=window.getSelection();
@@ -1080,7 +1134,8 @@ async function sendChat(){
   
   const typing=appendTyping(msgsEl);
   const note=ST.notes.find(n=>n.id===noteId);
-  const ctx=`Konteks note aktif:\nJudul: "${note?.title||'Untitled'}"\nIsi:\n${(note?.content||'').replace(/<[^>]*>/g,'').substring(0,2000)}\n---\n`;
+  const liveText = document.getElementById('editor').innerText || '';
+  const ctx=`Konteks note aktif:\nJudul: "${note?.title||'Untitled'}"\nIsi:\n${liveText.substring(0,3000)}\n---\n`;
   const hist=ST.chatHistory[noteId];
   const apiMsgs=hist.length===1
     ?[{role:'user',content:ctx+msg}]
