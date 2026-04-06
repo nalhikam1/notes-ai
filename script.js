@@ -16,7 +16,8 @@ const MODELS = {
     {v:'mixtral-8x7b-32768',l:'Mixtral 8x7B'}
   ],
   nvidia:[
-    {v:'nvidia/llama-3.3-nemotron-super-49b-v1',l:'Nemotron Super 49B (Recommended)'},
+    {v:'openai/gpt-oss-120b',l:'GPT-OSS 120B ⚡ (Recommended)'},
+    {v:'nvidia/llama-3.3-nemotron-super-49b-v1',l:'Nemotron Super 49B'},
     {v:'nvidia/llama-3.1-nemotron-ultra-253b-v1',l:'Nemotron Ultra 253B'},
     {v:'mistralai/mistral-large-2-instruct',l:'Mistral Large 2 (~123B)'},
     {v:'meta/llama-3.1-405b-instruct',l:'Llama 3.1 405B'},
