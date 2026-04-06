@@ -28,10 +28,12 @@ const MODELS = {
 
 // ===== STATE =====
 const ST = {
-  notes:[], templates:[], folders:[], activeId:null,
+  projects:[], notes:[], templates:[], activeId:null, activeProjectId:null,
   persona:null, ai:{provider:'google',apiKey:'',model:'gemini-2.0-flash'},
-  tab:'notes', chatHistory:{}, saveTimer:null,
-  openFolders:{} // track which folders are expanded
+  viewType:'dashboard', // dashboard, project, editor
+  projectView:'list', // list, kanban
+  rsTab:'chat', // chat, toc, info
+  chatHistory:{}, saveTimer:null
 };
 let onbStep=0, onbProvider='google';
 
@@ -87,9 +89,24 @@ function finishOnboarding(){
 
 // ===== INIT =====
 function initApp(){
+  migrateOldData();
   updatePersonaBadge();
   renderSidebar();
-  if(ST.notes.length===0) newNote();
+  showDashboard();
+}
+function migrateOldData(){
+  // If we have 'folders' but no 'projects', migrate
+  const data=localStorage.getItem('quill_state');
+  if(data){
+    const old=JSON.parse(data);
+    if(old.folders && !old.projects){
+      ST.projects = old.folders.map(f=>({id:f.id, name:f.name, emoji:f.emoji||'📁', color:'#d4a853'}));
+      delete ST.folders;
+      saveState();
+    }
+  }
+  // Ensure default project if none
+  if(!ST.projects.length) ST.projects.push({id:'p-general',name:'General',emoji:'📦',color:'#d4a853'});
 }
 function updatePersonaBadge(){
   const p=ST.persona; if(!p) return;
@@ -98,32 +115,89 @@ function updatePersonaBadge(){
   document.getElementById('p-role-badge').textContent=p.role||'No role';
 }
 
+// ===== NAVIGATION & VIEWS =====
+function showView(v){
+  ST.viewType=v;
+  document.querySelectorAll('.view').forEach(el=>el.style.display='none');
+  document.getElementById(`${v}-view`).style.display='flex';
+  updateBreadcrumbs();
+}
+
+function showDashboard(){
+  ST.activeProjectId=null;
+  ST.activeId=null;
+  showView('dashboard');
+  renderGlobalDashboard();
+  document.getElementById('menu-home').classList.add('active');
+}
+
+function openProject(id){
+  ST.activeProjectId=id;
+  ST.activeId=null;
+  showView('project');
+  renderProjectDashboard();
+  renderSidebar();
+}
+
+function updateBreadcrumbs(){
+  const bcProj=document.getElementById('bc-project');
+  const bcNote=document.getElementById('bc-note');
+  const bcSep=document.getElementById('bc-note-sep');
+  
+  if(ST.activeProjectId){
+    const p=ST.projects.find(x=>x.id===ST.activeProjectId);
+    bcProj.textContent=p?p.name:'Project';
+    bcProj.style.display='inline';
+    document.querySelector('.bc-sep').style.display='inline';
+  } else {
+    bcProj.style.display='none';
+    document.querySelector('.bc-sep').style.display='none';
+  }
+
+  if(ST.activeId){
+    const n=ST.notes.find(x=>x.id===ST.activeId);
+    bcNote.textContent=n?n.title||'Untitled':'Untitled';
+    bcNote.style.display='inline';
+    bcSep.style.display='inline';
+  } else {
+    bcNote.style.display='none';
+    bcSep.style.display='none';
+  }
+}
+
 // ===== NOTES CRUD =====
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 
-function newNote(content=''){
-  const n={id:uid(),title:'',content,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+function newNote(content='', title=''){
+  const projId = ST.activeProjectId || (ST.projects[0] ? ST.projects[0].id : 'p-general');
+  const n={
+    id:uid(), title, content, 
+    projectId:projId, 
+    status:'To Do',
+    createdAt:new Date().toISOString(), 
+    updatedAt:new Date().toISOString()
+  };
   ST.notes.unshift(n);
   saveState();
   openNote(n.id);
   renderSidebar();
-  closeSidebar(); // auto close sidebar on mobile after creating note
 }
 
 function openNote(id){
   ST.activeId=id;
   const n=ST.notes.find(x=>x.id===id); if(!n) return;
-  document.getElementById('empty-state').style.display='none';
-  const ev=document.getElementById('editor-view');
-  ev.style.display='flex';
+  ST.activeProjectId = n.projectId;
+  
+  showView('editor');
   document.getElementById('note-title').value=n.title;
   document.getElementById('editor').innerHTML=n.content;
+  
   reattachChecklistListeners();
   updateMeta(n);
   updateWordCount();
   updateChatCtx();
+  updateStatusBar();
   renderSidebar();
-  closeSidebar();
 }
 
 function deleteNote(id,e){
@@ -188,65 +262,154 @@ function autoSave(){
   setTimeout(()=>{ms.textContent='';},2000);
 }
 
+// ===== DASHBOARD RENDERING =====
+function renderGlobalDashboard(){
+  const el=document.getElementById('projects-grid');
+  document.getElementById('stats-projects').textContent=ST.projects.length;
+  document.getElementById('stats-docs').textContent=ST.notes.length;
+  let totalW=0; ST.notes.forEach(n=>{totalW+=((n.content||'').replace(/<[^>]*>/g,'').trim().split(/\s+/).filter(x=>x).length);});
+  document.getElementById('stats-words').textContent=totalW;
+
+  el.innerHTML=ST.projects.map(p=>{
+    const pNotes=ST.notes.filter(n=>n.projectId===p.id);
+    let pWords=0; pNotes.forEach(n=>{pWords+=((n.content||'').replace(/<[^>]*>/g,'').trim().split(/\s+/).filter(x=>x).length);});
+    return `
+      <div class="project-card" onclick="openProject('${p.id}')">
+        <div class="pc-header" style="background:${p.color||'var(--accent)'}">
+          <div class="pc-title">${p.emoji||'📁'} ${escHtml(p.name)}</div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-meta">
+            <span>${pNotes.length} docs</span>
+            <span>${pWords} words</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderProjectDashboard(){
+  const p=ST.projects.find(x=>x.id===ST.activeProjectId); if(!p) return;
+  document.getElementById('pv-title').textContent=p.name;
+  const pNotes=ST.notes.filter(n=>n.projectId===p.id);
+  document.getElementById('pv-files').textContent=pNotes.length;
+  let pWords=0; pNotes.forEach(n=>{pWords+=((n.content||'').replace(/<[^>]*>/g,'').trim().split(/\s+/).filter(x=>x).length);});
+  document.getElementById('pv-words').textContent=pWords;
+
+  const content=document.getElementById('project-content');
+  if(ST.projectView==='kanban'){
+    renderKanban(pNotes);
+  } else {
+    renderProjectList(pNotes);
+  }
+}
+
+function renderProjectList(notes){
+  const el=document.getElementById('project-content');
+  if(!notes.length){el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text3)">No documents yet. <button class="btn-primary" onclick="newNote()" style="width:auto;margin-top:10px;">+ Create one</button></div>`;return;}
+  
+  let html=`<table class="project-table" style="width:100%;border-collapse:collapse;margin-top:20px;">
+    <thead><tr style="text-align:left;color:var(--text3);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);">
+      <th style="padding:10px;">Title</th><th style="padding:10px;">Status</th><th style="padding:10px;">Words</th><th style="padding:10px;text-align:right;">Updated</th>
+    </tr></thead><tbody>`;
+  
+  html+=notes.map(n=>{
+    const ts=fmtTS(n.updatedAt);
+    const words=((n.content||'').replace(/<[^>]*>/g,'').trim().split(/\s+/).filter(x=>x).length);
+    return `<tr onclick="openNote('${n.id}')" style="cursor:pointer;border-bottom:1px solid var(--border2);transition:background .2s;">
+      <td style="padding:12px 10px;">${escHtml(n.title)||'Untitled'}</td>
+      <td style="padding:12px 10px;"><span class="status-badge" style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:10px;">${n.status||'No status'}</span></td>
+      <td style="padding:12px 10px;font-family:monospace;font-size:11px;">${words}</td>
+      <td style="padding:12px 10px;text-align:right;color:var(--text3);font-size:11px;">${ts.rel}</td>
+    </tr>`;
+  }).join('');
+  html+=`</tbody></table>`;
+  el.innerHTML=html;
+}
+
+function renderKanban(notes){
+  const el=document.getElementById('project-content');
+  const columns=['To Do','In Progress','Review','Done'];
+  let html=`<div class="kanban-board">`;
+  
+  columns.forEach(col=>{
+    const colNotes=notes.filter(n=>(n.status||'To Do')===col);
+    html+=`<div class="kanban-col">
+      <div class="col-header">
+        <span class="col-title">${col}</span>
+        <span class="col-count">${colNotes.length}</span>
+      </div>
+      <div class="kanban-cards">
+        ${colNotes.map(n=>`
+          <div class="note-card" onclick="openNote('${n.id}')">
+            <div class="note-card-title">${escHtml(n.title)||'Untitled'}</div>
+            <div class="note-card-preview">${(n.content||'').replace(/<[^>]*>/g,'').substring(0,60)}...</div>
+            <div class="note-card-footer" style="margin-top:8px;display:flex;justify-content:flex-end;">
+              <select class="status-select" onclick="event.stopPropagation()" onchange="updateNoteStatus('${n.id}', this.value); event.stopPropagation();" style="font-size:10px;background:var(--bg3);color:var(--text3);border:none;border-radius:4px;padding:2px 4px;">
+                ${columns.map(c=>`<option value="${c}" ${n.status===c?'selected':''}>${c}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  });
+  
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
+function updateNoteStatus(id, status){
+  const n=ST.notes.find(x=>x.id===id); if(!n) return;
+  n.status=status;
+  n.updatedAt=new Date().toISOString();
+  saveState();
+  renderProjectDashboard();
+  showToast(`Status updated to ${status}`,'success');
+}
+
+function setProjectView(v,btn){
+  ST.projectView=v;
+  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProjectDashboard();
+}
+
 function renderSidebar(){
   const el=document.getElementById('sidebar-content');
-  if(ST.tab==='notes'){
-    const q=(document.getElementById('search-input').value||'').toLowerCase();
-    let notes=ST.notes;
-    if(q) notes=notes.filter(n=>n.title.toLowerCase().includes(q)||n.content.replace(/<[^>]*>/g,'').toLowerCase().includes(q));
-    if(!notes.length){el.innerHTML=`<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:12px;">${q?'Tidak ditemukan':'Belum ada notes'}</div>`;return;}
+  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  
+  // Group notes by project for the sidebar
+  let html = '';
+  ST.projects.forEach(p => {
+    const pNotes = ST.notes.filter(n => n.projectId === p.id);
+    const filtered = q ? pNotes.filter(n => n.title.toLowerCase().includes(q) || n.content.replace(/<[^>]*>/g,'').toLowerCase().includes(q)) : pNotes;
+    
+    if (q && !filtered.length) return;
 
-    let html='';
-    if(!q && ST.folders.length){
-      // Render folders first
-      ST.folders.forEach(f=>{
-        const folderNotes=notes.filter(n=>n.folderId===f.id);
-        const isOpen=ST.openFolders[f.id];
-        html+=`<div class="folder-item${isOpen?' open':''}" onclick="toggleFolder('${f.id}')">
-          <span class="folder-icon-arrow">▶</span>
-          <span class="folder-emoji">${f.emoji||'📁'}</span>
-          <span class="folder-name">${escHtml(f.name)}</span>
-          <span class="folder-count">${folderNotes.length}</span>
-          <button class="folder-del" onclick="deleteFolder('${f.id}',event)" title="Hapus folder">🗑</button>
-        </div>`;
-        if(isOpen){
-          html+=`<div class="folder-notes${isOpen?' open':''}">`;
-          if(folderNotes.length){
-            html+=folderNotes.map(n=>renderNoteItem(n)).join('');
-          } else {
-            html+=`<div style="padding:8px 10px;font-size:11px;color:var(--text3);">Folder kosong</div>`;
-          }
-          html+=`</div>`;
-        }
-      });
-      // Ungrouped notes
-      const ungrouped=notes.filter(n=>!n.folderId);
-      if(ungrouped.length){
-        if(ST.folders.length) html+=`<div class="ungrouped-label">Lainnya</div>`;
-        html+=ungrouped.map(n=>renderNoteItem(n)).join('');
-      }
-    } else {
-      html=notes.map(n=>renderNoteItem(n)).join('');
-    }
-    el.innerHTML=html;
-  } else {
-    // Templates tab
-    if(!ST.templates.length){
-      el.innerHTML=`<div style="text-align:center;padding:32px 12px;color:var(--text3);font-size:12px;">Belum ada template.<br><br>Simpan note aktif sebagai template<br>lewat tombol 📋 di toolbar.</div>`;
-      return;
-    }
-    el.innerHTML=ST.templates.map(t=>`
-      <div class="template-item">
-        <div class="template-info">
-          <div class="template-name">${escHtml(t.name)}</div>
-          <div class="template-desc">${escHtml(t.desc||'Tidak ada deskripsi')}</div>
-        </div>
-        <div class="template-actions">
-          <button class="tmpl-use-btn" onclick="useTemplate('${t.id}')">Pakai</button>
-          <button class="tmpl-del-btn" onclick="delTemplate('${t.id}')" title="Hapus">🗑</button>
-        </div>
-      </div>`).join('');
-  }
+    const isActive = ST.activeProjectId === p.id;
+    html += `
+      <div class="folder-item ${isActive ? 'open' : ''}" onclick="openProject('${p.id}')">
+        <span class="folder-icon-arrow">▶</span>
+        <span class="folder-emoji">${p.emoji || '📁'}</span>
+        <span class="folder-name">${escHtml(p.name)}</span>
+        <span class="folder-count">${pNotes.length}</span>
+      </div>
+      <div class="folder-notes ${isActive ? 'open' : ''}">
+        ${filtered.map(n => `
+          <div class="note-item ${n.id === ST.activeId ? 'active' : ''}" onclick="openNote('${n.id}'); event.stopPropagation();">
+            <div class="note-item-title">${escHtml(n.title) || 'Untitled'}</div>
+          </div>
+        `).join('')}
+        <button class="folder-add-btn" onclick="ST.activeProjectId='${p.id}'; newNote(); event.stopPropagation();">+ New Document</button>
+      </div>
+    `;
+  });
+  el.innerHTML = html;
+
+  // Sync active states in sidebar menu
+  document.getElementById('menu-home').classList.toggle('active', ST.viewType === 'dashboard');
 }
 
 function renderNoteItem(n){
@@ -883,32 +1046,38 @@ async function aiAction(action){
   }
 }
 
-// ===== DESKTOP CHAT =====
-let chatOpen=false;
+// ===== ASSISTANT CHAT LOGIC =====
 function toggleChat(){
-  chatOpen=!chatOpen;
-  document.getElementById('chat-panel').classList.toggle('hidden',!chatOpen);
-  updateChatCtx();
+  const rs=document.getElementById('right-sidebar');
+  if(!rs) return;
+  rs.classList.toggle('hidden');
+  if(!rs.classList.contains('hidden')){
+    updateChatHistory();
+    if(ST.rsTab==='toc') updateTOC();
+  }
 }
-function updateChatCtx(){
-  const note=ST.notes.find(n=>n.id===ST.activeId);
-  const txt=note?(note.title||'Untitled'):'Pilih note dulu';
-  document.getElementById('chat-ctx-txt').textContent=txt;
-  const m=document.getElementById('chat-ctx-txt-m');
-  if(m) m.textContent=txt;
-}
-function onChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
-function onChatKeyM(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatM();}}
 
-async function sendChatCore(msg,msgsEl,inputEl,sendBtn){
-  if(!msg) return;
+function updateChatCtx(){
+  // No-op for now, as we have a better title in the sidebar
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-input');
+  if(!inp || !inp.value.trim()) return;
   if(!ST.activeId){showToast('Buka note dulu','error');return;}
+  
+  const msg=inp.value.trim();
   const noteId=ST.activeId;
+  const msgsEl=document.getElementById('chat-messages');
+  const btn=document.querySelector('.chat-send');
+  
   if(!ST.chatHistory[noteId]) ST.chatHistory[noteId]=[];
   ST.chatHistory[noteId].push({role:'user',content:msg});
+  
   appendChatMsg(msgsEl,'user',msg);
-  inputEl.value=''; inputEl.style.height='auto';
-  sendBtn.disabled=true;
+  inp.value=''; inp.style.height='auto';
+  if(btn) btn.disabled=true;
+  
   const typing=appendTyping(msgsEl);
   const note=ST.notes.find(n=>n.id===noteId);
   const ctx=`Konteks note aktif:\nJudul: "${note?.title||'Untitled'}"\nIsi:\n${(note?.content||'').replace(/<[^>]*>/g,'').substring(0,2000)}\n---\n`;
@@ -916,6 +1085,7 @@ async function sendChatCore(msg,msgsEl,inputEl,sendBtn){
   const apiMsgs=hist.length===1
     ?[{role:'user',content:ctx+msg}]
     :[{role:'user',content:ctx+hist[0].content},...hist.slice(1)];
+    
   try{
     const res=await callAI(apiMsgs);
     typing.remove();
@@ -925,23 +1095,16 @@ async function sendChatCore(msg,msgsEl,inputEl,sendBtn){
     typing.remove();
     appendChatMsg(msgsEl,'ai','⚠️ '+err.message);
   }finally{
-    sendBtn.disabled=false;
+    if(btn) btn.disabled=false;
   }
 }
 
-function sendChat(){
-  const inp=document.getElementById('chat-input');
-  const btn=document.getElementById('chat-send-btn');
+function updateChatHistory(){
   const msgs=document.getElementById('chat-messages');
-  const emp=document.getElementById('chat-empty');
-  if(emp) emp.remove();
-  sendChatCore(inp.value.trim(),msgs,inp,btn);
-}
-function sendChatM(){
-  const inp=document.getElementById('chat-input-m');
-  const btn=document.getElementById('chat-send-btn-m');
-  const msgs=document.getElementById('chat-messages-m');
-  sendChatCore(inp.value.trim(),msgs,inp,btn);
+  if(!msgs) return;
+  const hist=ST.chatHistory[ST.activeId] || [];
+  msgs.innerHTML = hist.length === 0 ? '<div id="chat-empty">Hi 👋. Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>' : '';
+  hist.forEach(m=>appendChatMsg(msgs, m.role, m.content));
 }
 
 function appendChatMsg(container,role,content){
@@ -954,6 +1117,7 @@ function appendChatMsg(container,role,content){
   container.scrollTop=container.scrollHeight;
   return div;
 }
+
 function appendTyping(container){
   const div=document.createElement('div');
   div.className='chat-msg ai';
@@ -962,6 +1126,9 @@ function appendTyping(container){
   container.scrollTop=container.scrollHeight;
   return div;
 }
+
+function autoResizeChat(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+function clearChat(){if(ST.activeId){ST.chatHistory[ST.activeId]=[];updateChatHistory();}}
 
 // ===== SETTINGS =====
 function openSettings(){
@@ -1031,6 +1198,85 @@ function showToast(msg,type=''){
   const blob=new Blob([JSON.stringify(m)],{type:'application/json'});
   document.getElementById('manifest-link').href=URL.createObjectURL(blob);
 })();
+
+function setRSTab(tab, el){
+  ST.rsTab=tab;
+  document.querySelectorAll('.rs-tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.rs-view').forEach(v=>v.style.display='none');
+  document.getElementById(`rs-${tab}`).style.display='flex';
+  if(tab==='toc') updateTOC();
+}
+
+function quickAi(action){
+  const prompts = {
+    review: "Review doc ini dan berikan saran perbaikan.",
+    analyze: "Analisa struktur dan logika dari doc ini.",
+    streamline: "Buat kalimat di doc ini lebih efektif dan profesional."
+  };
+  document.getElementById('chat-input').value = prompts[action];
+  sendChat();
+}
+
+function updateStatusBar(){
+  const n=ST.notes.find(x=>x.id===ST.activeId);
+  const p=ST.projects.find(x=>x.id===(n?n.projectId:ST.activeProjectId));
+  document.getElementById('sb-proj-info').textContent = `Project: ${p?p.name:'General'}`;
+  const txt=(document.getElementById('editor').innerText||'').replace(/\u200B/g,'');
+  const w=txt.trim().split(/\s+/).filter(x=>x).length;
+  const c=txt.length;
+  document.getElementById('sb-count').textContent = `${w} words · ${c} characters`;
+}
+
+function updateTOC(){
+  const ed=document.getElementById('editor');
+  const heads=ed.querySelectorAll('h1, h2, h3');
+  const el=document.getElementById('toc-content');
+  if(!heads.length){el.innerHTML='<p style="padding:16px;color:var(--text3);font-size:12px;">No headings found.</p>';return;}
+  
+  el.innerHTML = Array.from(heads).map((h,i)=>{
+    h.id = h.id || `h-${i}`;
+    return `<div class="toc-item" style="padding:6px 16px;font-size:12px;cursor:pointer;color:var(--text2);margin-left:${(parseInt(h.tagName[1])-1)*12}px;" onclick="document.getElementById('${h.id}').scrollIntoView({behavior:'smooth'})">${h.textContent}</div>`;
+  }).join('');
+}
+
+// ===== SHARING & EXPORT =====
+function shareNote(){
+  if(!ST.activeId) return;
+  const n=ST.notes.find(x=>x.id===ST.activeId);
+  const data = JSON.stringify({title:n.title, content:n.content});
+  const encoded = btoa(unescape(encodeURIComponent(data)));
+  const url = `${window.location.origin}${window.location.pathname}#share=${encoded}`;
+  navigator.clipboard.writeText(url).then(()=>{
+    showToast('Link sharing telah disalin ke clipboard!','success');
+  });
+}
+
+function exportNote(){
+  if(!ST.activeId) return;
+  const n=ST.notes.find(x=>x.id===ST.activeId);
+  const html = `<!DOCTYPE html><html><head><title>${n.title}</title><style>body{font-family:sans-serif;padding:40px;line-height:1.6;max-width:800px;margin:0 auto;}</style></head><body><h1>${n.title}</h1>${n.content}</body></html>`;
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`${n.title||'note'}.html`; a.click();
+}
+
+// Handle shared link on load
+window.addEventListener('load', ()=>{
+  const hash = window.location.hash;
+  if(hash.startsWith('#share=')){
+    try {
+      const encoded = hash.split('=')[1];
+      const decoded = decodeURIComponent(escape(atob(encoded)));
+      const data = JSON.parse(decoded);
+      // Open in a read-only or temporary way
+      newNote(data.content, data.title + ' (Shared)');
+      window.location.hash = '';
+      showToast('Note bersama berhasil dibuka!');
+    } catch(e) { console.error('Share link error', e); }
+  }
+});
 
 // ===== BOOT =====
 fillModels('p-model','google');

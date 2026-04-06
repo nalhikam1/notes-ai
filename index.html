@@ -108,11 +108,11 @@
       </div>
     </div>
     <div class="sidebar-search">
-      <input class="search-input" id="search-input" placeholder="Cari notes..." oninput="renderSidebar()">
+      <input class="search-input" id="search-input" placeholder="Quick open..." oninput="renderSidebar()">
     </div>
-    <div class="sidebar-tabs">
-      <button class="sidebar-tab active" onclick="switchTab('notes',this)">Notes</button>
-      <button class="sidebar-tab" onclick="switchTab('templates',this)">Template</button>
+    <div class="sidebar-menu">
+      <button class="sidebar-item active" onclick="showDashboard()" id="menu-home">🏠 Home</button>
+      <button class="sidebar-item" onclick="openNewFolder()">📁 Projects</button>
     </div>
     <div class="sidebar-content" id="sidebar-content"></div>
     <div class="persona-badge" id="persona-badge">
@@ -186,84 +186,74 @@
         </div>
       </div>
 
-      <!-- Editor body -->
       <div id="editor-wrap">
-        <div id="editor" contenteditable="true"
-          onkeydown="onEditorKey(event)"
-          oninput="onEditorInput()"></div>
+        <div id="editor" contenteditable="true" onkeydown="onEditorKey(event)" oninput="onEditorInput()"></div>
       </div>
     </div>
   </div>
 
-  <!-- DESKTOP CHAT PANEL -->
-  <div id="chat-panel" class="hidden">
-    <div class="chat-header">
-      <div class="chat-title-row"><span class="chat-dot"></span>AI Chat</div>
-      <button class="icon-btn" onclick="toggleChat()">✕</button>
+  <!-- RIGHT SIDEBAR (Assistant) -->
+  <div id="right-sidebar" class="hidden">
+    <div class="rs-tabs">
+      <button class="rs-tab active" onclick="setRSTab('chat',this)" title="Assistant">💬</button>
+      <button class="rs-tab" onclick="setRSTab('toc',this)" title="Table of Contents">≡</button>
+      <button class="rs-tab" onclick="setRSTab('info',this)" title="Note info">ℹ</button>
+      <button class="rs-tab-close" onclick="toggleChat()">✕</button>
     </div>
-    <div class="chat-ctx" id="chat-ctx">📝 <span id="chat-ctx-txt">Pilih note</span></div>
-    <div id="chat-messages">
-      <div id="chat-empty" style="text-align:center;padding:32px 16px;color:var(--text3);font-size:12px;line-height:1.7;">Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>
-    </div>
-    <div class="chat-input-area">
-      <div class="chat-input-row">
-        <textarea class="chat-input" id="chat-input" placeholder="Tanya tentang note ini..." rows="1"
-          onkeydown="onChatKey(event)"
-          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
-        <button class="chat-send" id="chat-send-btn" onclick="sendChat()">↑</button>
+
+    <!-- Tab: Chat -->
+    <div id="rs-chat" class="rs-view">
+      <div class="chat-header">
+        <div class="chat-title-row"><span class="chat-dot"></span>Assistant <span class="badge">beta</span></div>
+        <button class="icon-btn" onclick="clearChat()">+ New</button>
+      </div>
+      <div id="chat-messages">
+        <div id="chat-empty">Hi 👋. Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chips-row">
+          <button class="chip" onclick="quickAi('review')">Review</button>
+          <button class="chip" onclick="quickAi('analyze')">Analyze</button>
+          <button class="chip" onclick="quickAi('streamline')">Streamline</button>
+        </div>
+        <div class="chat-input-row">
+          <textarea class="chat-input" id="chat-input" placeholder="Ask anything..." rows="1" oninput="autoResizeChat(this)"></textarea>
+          <button class="chat-send" onclick="sendChat()">↑</button>
+        </div>
+        <div class="model-picker-wrap">
+          <select id="rs-model-picker" class="model-select" onchange="updateSelectedModel(this.value)"></select>
+        </div>
       </div>
     </div>
+
+    <!-- Tab: TOC -->
+    <div id="rs-toc" class="rs-view" style="display:none">
+      <div class="rs-header">Table of Contents</div>
+      <div id="toc-content"></div>
+    </div>
+  </div>
+
+  <!-- STATUS FOOTER -->
+  <div id="status-bar">
+    <div class="sb-left">
+      <span id="sb-proj-info">Project: General</span>
+      <span class="sb-sep">|</span>
+      <span id="sb-count">0 words · 0 characters</span>
+    </div>
+    <div class="sb-right">
+      <span id="sb-save-status">Cloud Sync Ready</span>
+    </div>
+  </div>
   </div>
 
   <!-- MOBILE BOTTOM BAR -->
   <div id="bottom-bar">
-    <button class="bb-btn" onclick="toggleSidebar()"><span class="bb-icon">☰</span>Notes</button>
-    <button class="bb-btn" onclick="openMobileAI()"><span class="bb-icon">✦</span>AI Fill</button>
+    <button class="bb-btn" onclick="showDashboard()"><span class="bb-icon">🏠</span>Home</button>
+    <button class="bb-btn" onclick="toggleSidebar()"><span class="bb-icon">☰</span>Projects</button>
     <button class="bb-new" onclick="newNote()">+</button>
-    <button class="bb-btn" onclick="openMobileChat()"><span class="bb-icon">💬</span>Chat</button>
+    <button class="bb-btn" onclick="toggleChat()"><span class="bb-icon">✦</span>Assistant</button>
     <button class="bb-btn" onclick="openSettings()"><span class="bb-icon">⚙</span>Settings</button>
   </div>
-</div>
-
-<!-- MOBILE CHAT SHEET -->
-<div id="chat-sheet">
-  <div id="chat-sheet-bg" onclick="closeMobileChat()"></div>
-  <div id="chat-sheet-panel">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header">
-      <div class="chat-title-row"><span class="chat-dot"></span>AI Chat</div>
-      <button class="icon-btn" onclick="closeMobileChat()">✕</button>
-    </div>
-    <div class="chat-ctx" id="chat-ctx-m">📝 <span id="chat-ctx-txt-m">Pilih note</span></div>
-    <div id="chat-messages-m" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:120px;max-height:40vh;"></div>
-    <div class="chat-input-area">
-      <div class="chat-input-row">
-        <textarea class="chat-input" id="chat-input-m" placeholder="Tanya tentang note ini..." rows="1"
-          onkeydown="onChatKeyM(event)"
-          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
-        <button class="chat-send" id="chat-send-btn-m" onclick="sendChatM()">↑</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MOBILE AI SHEET -->
-<div id="ai-sheet">
-  <div id="ai-sheet-bg" onclick="closeMobileAI()"></div>
-  <div id="ai-sheet-panel">
-    <div class="ai-sheet-handle"></div>
-    <div class="ai-sheet-title">✦ AI Fill</div>
-    <div class="ai-sheet-grid">
-      <button class="ai-sheet-btn" onclick="aiAction('write');closeMobileAI()"><span class="ic">✍</span>Tulis dari judul</button>
-      <button class="ai-sheet-btn" onclick="aiAction('continue');closeMobileAI()"><span class="ic">→</span>Lanjutkan</button>
-      <button class="ai-sheet-btn" onclick="aiAction('improve');closeMobileAI()"><span class="ic">✨</span>Perbaiki</button>
-      <button class="ai-sheet-btn" onclick="aiAction('summarize');closeMobileAI()"><span class="ic">📝</span>Ringkas</button>
-      <button class="ai-sheet-btn" onclick="aiAction('expand');closeMobileAI()"><span class="ic">↔</span>Perluas</button>
-      <button class="ai-sheet-btn" onclick="aiAction('bullets');closeMobileAI()"><span class="ic">≡</span>Jadikan bullets</button>
-      <button class="ai-sheet-btn" onclick="aiAction('table');closeMobileAI()"><span class="ic">⊞</span>Jadikan tabel</button>
-    </div>
-  </div>
-</div>
 
 <!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal" style="display:none" onclick="if(event.target===this)closeSettings()">
@@ -340,6 +330,21 @@
       <button class="modal-close" onclick="document.getElementById('move-modal').style.display='none'">✕</button>
     </div>
     <div class="modal-body" id="move-modal-body"></div>
+  </div>
+</div>
+
+<!-- PROJECT MODAL (Formerly Folder Modal) -->
+<div class="modal-overlay" id="folder-modal" style="display:none" onclick="if(event.target===this)closeFolderModal()">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-header">
+      <div class="modal-title">New Project</div>
+      <button class="modal-close" onclick="closeFolderModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Project Name</label><input class="form-input" id="f-name" placeholder="e.g. My Novel"></div>
+      <div class="form-group"><label class="form-label">Emoji Icon</label><input class="form-input" id="f-emoji" placeholder="📁"></div>
+      <button class="btn-primary" onclick="saveFolder()">Create Project</button>
+    </div>
   </div>
 </div>
 
