@@ -124,18 +124,77 @@
     </div>
   </div>
 
-  <!-- MAIN EDITOR -->
-  <div id="main">
-    <!-- Empty state -->
-    <div id="empty-state">
-      <div class="empty-icon">✦</div>
-      <div class="empty-title">Pilih atau buat note baru</div>
-      <p class="empty-sub">Tap tombol + untuk mulai menulis dengan bantuan AI.</p>
+  <!-- WORKSPACE -->
+  <div id="workspace">
+    <!-- TOP BREADCRUMBS -->
+    <div id="top-nav">
+      <div id="breadcrumbs">
+        <span class="bc-item" onclick="showDashboard()">Home</span>
+        <span class="bc-sep">/</span>
+        <span class="bc-item" id="bc-project">General</span>
+        <span class="bc-sep" id="bc-note-sep">/</span>
+        <span class="bc-item active" id="bc-note">Untitled</span>
+      </div>
+      <div class="top-nav-actions">
+        <button class="icon-btn" onclick="shareNote()" title="Share">🔗</button>
+        <button class="icon-btn" onclick="exportNote()" title="Export">📤</button>
+      </div>
     </div>
 
-    <!-- Editor view -->
-    <div id="editor-view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+    <!-- VIEW: GLOBAL DASHBOARD -->
+    <div id="dashboard-view" class="view">
+      <div class="view-header">
+        <h1>Overview</h1>
+        <button class="btn-primary" onclick="ST.activeProjectId=null; newNote()" style="width:auto;padding:8px 16px;">+ New project</button>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Projects</div>
+          <div class="stat-value" id="stats-projects">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Documents</div>
+          <div class="stat-value" id="stats-docs">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Word Count</div>
+          <div class="stat-value" id="stats-words">0</div>
+        </div>
+      </div>
 
+      <div class="section-title">My Projects</div>
+      <div id="projects-grid" class="projects-grid"></div>
+    </div>
+
+    <!-- VIEW: PROJECT DASHBOARD -->
+    <div id="project-view" class="view" style="display:none">
+      <div class="view-header">
+        <h1 id="pv-title">Project Title</h1>
+        <div class="view-toggles">
+          <button class="toggle-btn active" onclick="setProjectView('list',this)">List</button>
+          <button class="toggle-btn" onclick="setProjectView('kanban',this)">Kanban</button>
+        </div>
+      </div>
+
+      <div class="stats-grid compact">
+        <div class="stat-card">
+          <div class="stat-label">Files</div>
+          <div class="stat-value" id="pv-files">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Words</div>
+          <div class="stat-value" id="pv-words">0</div>
+        </div>
+      </div>
+
+      <div id="project-content">
+        <!-- List View Table or Kanban columns go here -->
+      </div>
+    </div>
+
+    <!-- VIEW: EDITOR (The old #main) -->
+    <div id="editor-view" class="view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
       <!-- TOOLBAR (scrollable horizontal) -->
       <div id="toolbar">
         <button class="tb" onclick="fmt('bold')" title="Bold"><b>B</b></button>
@@ -191,6 +250,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- RIGHT SIDEBAR (Assistant) -->
   <div id="right-sidebar" class="hidden">
