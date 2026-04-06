@@ -16,9 +16,12 @@ const MODELS = {
     {v:'mixtral-8x7b-32768',l:'Mixtral 8x7B'}
   ],
   nvidia:[
-    {v:'meta/llama-3.3-70b-instruct',l:'Llama 3.3 70B Instruct'},
-    {v:'mistralai/mistral-large-2-instruct',l:'Mistral Large 2'},
-    {v:'nvidia/llama-3.1-nemotron-70b-instruct',l:'Nemotron 70B'}
+    {v:'nvidia/llama-3.3-nemotron-super-49b-v1',l:'Nemotron Super 49B (Recommended)'},
+    {v:'nvidia/llama-3.1-nemotron-ultra-253b-v1',l:'Nemotron Ultra 253B'},
+    {v:'mistralai/mistral-large-2-instruct',l:'Mistral Large 2 (~123B)'},
+    {v:'meta/llama-3.1-405b-instruct',l:'Llama 3.1 405B'},
+    {v:'meta/llama-3.3-70b-instruct',l:'Llama 3.3 70B'},
+    {v:'qwen/qwen2.5-72b-instruct',l:'Qwen 2.5 72B'}
   ]
 };
 
@@ -826,45 +829,20 @@ Gaya komunikasi: ${styles[p.style]||'natural'}. Gunakan ${langs[p.lang]||'Bahasa
 Selalu format output dengan markdown yang rapi. Tulis konten yang langsung berguna dan berkualitas tinggi.`;
 }
 
-// ===== AI API CALL =====
+// ===== AI API CALL (via Vercel proxy - fix CORS) =====
 async function callAI(messages){
   const{provider,apiKey,model}=ST.ai;
   if(!apiKey) throw new Error('API Key belum diset. Buka Settings ⚙');
-  const sys=buildSysPrompt();
-  let url,body,headers={'Content-Type':'application/json'};
+  const system=buildSysPrompt();
 
-  if(provider==='anthropic'){
-    url='https://api.anthropic.com/v1/messages';
-    headers['x-api-key']=apiKey;
-    headers['anthropic-version']='2023-06-01';
-    body={model,max_tokens:2048,system:sys,messages};
-  } else if(provider==='google'){
-    url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const contents=[
-      {role:'user',parts:[{text:sys+'\n\nPahami instruksi ini.'}]},
-      {role:'model',parts:[{text:'Siap membantu.'}]},
-      ...messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}))
-    ];
-    body={contents,generationConfig:{maxOutputTokens:2048}};
-  } else if(provider==='groq'){
-    url='https://api.groq.com/openai/v1/chat/completions';
-    headers['Authorization']=`Bearer ${apiKey}`;
-    body={model,max_tokens:2048,messages:[{role:'system',content:sys},...messages]};
-  } else if(provider==='nvidia'){
-    url='https://integrate.api.nvidia.com/v1/chat/completions';
-    headers['Authorization']=`Bearer ${apiKey}`;
-    body={model,max_tokens:2048,messages:[{role:'system',content:sys},...messages]};
-  }
-
-  const resp=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
-  if(!resp.ok){
-    const err=await resp.json().catch(()=>({}));
-    throw new Error(err?.error?.message||err?.message||`HTTP ${resp.status}`);
-  }
+  const resp=await fetch('/api/ai',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({provider,apiKey,model,messages,system})
+  });
   const data=await resp.json();
-  if(provider==='anthropic') return data.content[0].text;
-  if(provider==='google') return data.candidates[0].content.parts[0].text;
-  return data.choices[0].message.content;
+  if(!resp.ok) throw new Error(data?.error||`HTTP ${resp.status}`);
+  return data.text;
 }
 
 // ===== AI ACTIONS =====
