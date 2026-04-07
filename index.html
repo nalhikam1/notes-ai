@@ -260,17 +260,14 @@
 
   <!-- RIGHT SIDEBAR (Assistant) -->
   <div id="right-sidebar" class="hidden">
-    <div class="rs-tabs">
-      <button class="rs-tab active" onclick="setRSTab('chat',this)" title="Assistant">💬</button>
-      <button class="rs-tab" onclick="setRSTab('toc',this)" title="Table of Contents">≡</button>
-      <button class="rs-tab-close" onclick="toggleChat()">✕</button>
-    </div>
-
-    <!-- Tab: Chat -->
+    <!-- Assistant View -->
     <div id="rs-chat" class="rs-view">
-      <div class="chat-header">
+      <div class="chat-header" style="justify-content:space-between;">
         <div class="chat-title-row"><span class="chat-dot"></span>Assistant <span class="badge">beta</span></div>
-        <button class="icon-btn" onclick="clearChat()">+ New</button>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button class="icon-btn" onclick="clearChat()">+ New</button>
+          <button class="rs-tab-close" onclick="toggleChat()" style="margin-left:4px;padding:4px 8px;">✕</button>
+        </div>
       </div>
       <div class="model-picker-wrap">
         <select id="rs-model-picker" class="model-select" onchange="updateSelectedModel(this.value)"></select>
@@ -289,12 +286,6 @@
           <button class="chat-send" onclick="sendChat()">↑</button>
         </div>
       </div>
-    </div>
-
-    <!-- Tab: TOC -->
-    <div id="rs-toc" class="rs-view" style="display:none">
-      <div class="rs-header">Table of Contents</div>
-      <div id="toc-content"></div>
     </div>
   </div>
 
