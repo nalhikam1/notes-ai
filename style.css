@@ -450,11 +450,7 @@ body {
   gap: 2px;
 }
 
-@media (max-width: 640px) {
-  .hide-m {
-    display: none
-  }
-}
+
 
 .icon-btn {
   background: none;
@@ -2445,5 +2441,11 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .hide-m {
+    display: none
   }
 }
