@@ -21,6 +21,13 @@ function initTiptap() {
     const { TaskList } = window.tiptapTaskList || {};
     const { TaskItem } = window.tiptapTaskItem || {};
     const { Placeholder } = window.tiptapPlaceholder || {};
+    const { Underline } = window.tiptapUnderline || {};
+    const { TextAlign } = window.tiptapTextAlign || {};
+    const { TextStyle } = window.tiptapTextStyle || {};
+    const { Color } = window.tiptapColor || {};
+    const { Highlight } = window.tiptapHighlight || {};
+    const { Link } = window.tiptapLink || {};
+    const { Image } = window.tiptapImage || {};
 
     const extensions = [
       StarterKit.configure({
@@ -36,6 +43,40 @@ function initTiptap() {
     ];
 
     // Add optional extensions if available
+    if (Underline) extensions.push(Underline);
+    if (TextStyle) extensions.push(TextStyle);
+    if (Color) extensions.push(Color);
+    if (Highlight) extensions.push(Highlight.configure({ multicolor: true }));
+    
+    if (TextAlign) {
+      extensions.push(
+        TextAlign.configure({
+          types: ['heading', 'paragraph'],
+        })
+      );
+    }
+    
+    if (Link) {
+      extensions.push(
+        Link.configure({
+          openOnClick: false,
+          HTMLAttributes: {
+            class: 'editor-link',
+          },
+        })
+      );
+    }
+    
+    if (Image) {
+      extensions.push(
+        Image.configure({
+          HTMLAttributes: {
+            class: 'editor-image',
+          },
+        })
+      );
+    }
+
     if (Table && TableRow && TableCell && TableHeader) {
       extensions.push(
         Table.configure({
@@ -228,6 +269,14 @@ function tiptapHeading(level) {
   }
 }
 
+function tiptapParagraph() {
+  if (useTiptap && editor) {
+    editor.chain().focus().setParagraph().run();
+  } else {
+    document.execCommand('formatBlock', false, '<p>');
+  }
+}
+
 // Lists
 function tiptapBulletList() {
   if (useTiptap && editor) {
@@ -404,5 +453,136 @@ function appendAIContent(html) {
     if (editorEl) {
       editorEl.innerHTML += html;
     }
+  }
+}
+
+
+// ===== TEXT ALIGNMENT =====
+function tiptapAlign(alignment) {
+  if (useTiptap && editor) {
+    editor.chain().focus().setTextAlign(alignment).run();
+  } else {
+    // Fallback for contenteditable
+    if (alignment === 'left') document.execCommand('justifyLeft', false, null);
+    else if (alignment === 'center') document.execCommand('justifyCenter', false, null);
+    else if (alignment === 'right') document.execCommand('justifyRight', false, null);
+    else if (alignment === 'justify') document.execCommand('justifyFull', false, null);
+  }
+}
+
+// ===== TEXT COLOR & HIGHLIGHT =====
+let currentColorMode = 'text'; // 'text' or 'highlight'
+
+function openColorPicker(mode) {
+  currentColorMode = mode;
+  const colors = [
+    '#000000', '#434343', '#666666', '#999999', '#b7b7b7', '#cccccc', '#d9d9d9', '#efefef', '#f3f3f3', '#ffffff',
+    '#980000', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#4a86e8', '#0000ff', '#9900ff', '#ff00ff',
+    '#e6b8af', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#c9daf8', '#cfe2f3', '#d9d2e9', '#ead1dc',
+    '#dd7e6b', '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#a4c2f4', '#9fc5e8', '#b4a7d6', '#d5a6bd',
+    '#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6d9eeb', '#6fa8dc', '#8e7cc3', '#c27ba0',
+    '#a61c00', '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3c78d8', '#3d85c6', '#674ea7', '#a64d79',
+    '#85200c', '#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#1155cc', '#0b5394', '#351c75', '#741b47',
+    '#5b0f00', '#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#1c4587', '#073763', '#20124d', '#4c1130'
+  ];
+  
+  const picker = document.createElement('div');
+  picker.className = 'color-picker-popup';
+  picker.innerHTML = `
+    <div class="color-picker-header">
+      <span>${mode === 'text' ? 'Text Color' : 'Highlight Color'}</span>
+      <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">✕</button>
+    </div>
+    <div class="color-picker-grid">
+      ${colors.map(c => `<button class="color-swatch" style="background:${c}" onclick="applyColor('${c}', '${mode}'); this.parentElement.parentElement.remove();" title="${c}"></button>`).join('')}
+    </div>
+    <div class="color-picker-footer">
+      <button onclick="applyColor('', '${mode}'); this.parentElement.parentElement.remove();" style="padding:6px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text2);cursor:pointer;font-size:11px;width:100%;">Remove ${mode === 'text' ? 'Color' : 'Highlight'}</button>
+    </div>
+  `;
+  
+  document.body.appendChild(picker);
+  
+  // Position near the toolbar
+  const toolbar = document.getElementById('toolbar');
+  const rect = toolbar.getBoundingClientRect();
+  picker.style.top = (rect.bottom + 8) + 'px';
+  picker.style.left = Math.min(rect.left + 200, window.innerWidth - 320) + 'px';
+  
+  // Close on outside click
+  setTimeout(() => {
+    const closeHandler = (e) => {
+      if (!picker.contains(e.target)) {
+        picker.remove();
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+    document.addEventListener('click', closeHandler);
+  }, 10);
+}
+
+function applyColor(color, mode) {
+  if (useTiptap && editor) {
+    if (mode === 'text') {
+      if (color) {
+        editor.chain().focus().setColor(color).run();
+      } else {
+        editor.chain().focus().unsetColor().run();
+      }
+    } else {
+      if (color) {
+        editor.chain().focus().setHighlight({ color }).run();
+      } else {
+        editor.chain().focus().unsetHighlight().run();
+      }
+    }
+  } else {
+    // Fallback
+    if (mode === 'text') {
+      document.execCommand('foreColor', false, color || '#000000');
+    } else {
+      document.execCommand('backColor', false, color || 'transparent');
+    }
+  }
+}
+
+// ===== LINK =====
+function openLinkDialog() {
+  const url = prompt('Enter URL:', 'https://');
+  if (url && url !== 'https://') {
+    if (useTiptap && editor) {
+      editor.chain().focus().setLink({ href: url }).run();
+    } else {
+      document.execCommand('createLink', false, url);
+    }
+  }
+}
+
+function tiptapUnlink() {
+  if (useTiptap && editor) {
+    editor.chain().focus().unsetLink().run();
+  } else {
+    document.execCommand('unlink', false, null);
+  }
+}
+
+// ===== IMAGE =====
+function openImageDialog() {
+  const url = prompt('Enter image URL:', 'https://');
+  if (url && url !== 'https://') {
+    if (useTiptap && editor) {
+      editor.chain().focus().setImage({ src: url }).run();
+    } else {
+      document.execCommand('insertImage', false, url);
+    }
+  }
+}
+
+// ===== CLEAR FORMATTING =====
+function tiptapClearFormat() {
+  if (useTiptap && editor) {
+    editor.chain().focus().clearNodes().unsetAllMarks().run();
+  } else {
+    document.execCommand('removeFormat', false, null);
   }
 }

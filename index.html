@@ -19,6 +19,13 @@
   <script src="https://unpkg.com/@tiptap/core@2.1.13/dist/tiptap-core.umd.min.js"></script>
   <script src="https://unpkg.com/@tiptap/pm@2.1.13/dist/tiptap-pm.umd.min.js"></script>
   <script src="https://unpkg.com/@tiptap/starter-kit@2.1.13/dist/tiptap-starter-kit.umd.min.js"></script>
+  <script src="https://unpkg.com/@tiptap/extension-underline@2.1.13/dist/tiptap-extension-underline.umd.min.js"></script>
+  <script src="https://unpkg.com/@tiptap/extension-text-style@2.1.13/dist/tiptap-extension-text-style.umd.min.js"></script>
+  <script src="https://unpkg.com/@tiptap/extension-color@2.1.13/dist/tiptap-extension-color.umd.min.js"></script>
+  <script src="https://unpkg.com/@tiptap/extension-highlight@2.1.13/dist/tiptap-extension-highlight.umd.min.js"></script>
+  <script src="https://unpkg.com/@tiptap/extension-text-align@2.1.13/dist/tiptap-extension-text-align.umd.min.js"></script>
+  <script src="https://unpkg.com/@tiptap/extension-link@2.1.13/dist/tiptap-extension-link.umd.min.js"></script>
+  <script src="https://unpkg.com/@tiptap/extension-image@2.1.13/dist/tiptap-extension-image.umd.min.js"></script>
   <script src="https://unpkg.com/@tiptap/extension-table@2.1.13/dist/tiptap-extension-table.umd.min.js"></script>
   <script src="https://unpkg.com/@tiptap/extension-table-row@2.1.13/dist/tiptap-extension-table-row.umd.min.js"></script>
   <script src="https://unpkg.com/@tiptap/extension-table-cell@2.1.13/dist/tiptap-extension-table-cell.umd.min.js"></script>
@@ -231,25 +238,59 @@
       <div id="editor-view" class="view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
         <!-- TOOLBAR (scrollable horizontal) -->
         <div id="toolbar">
-          <button class="tb" onclick="tiptapBold()" title="Bold"><b>B</b></button>
-          <button class="tb" onclick="tiptapItalic()" title="Italic"><i>I</i></button>
+          <!-- Undo/Redo -->
+          <button class="tb" onclick="tiptapUndo()" title="Undo (Ctrl+Z)">↶</button>
+          <button class="tb" onclick="tiptapRedo()" title="Redo (Ctrl+Y)">↷</button>
+          <div class="tb-sep"></div>
+          
+          <!-- Headings -->
+          <button class="tb" onclick="tiptapHeading(1)" title="Heading 1">H1</button>
+          <button class="tb" onclick="tiptapHeading(2)" title="Heading 2">H2</button>
+          <button class="tb" onclick="tiptapHeading(3)" title="Heading 3">H3</button>
+          <button class="tb" onclick="tiptapParagraph()" title="Paragraph">P</button>
+          <div class="tb-sep"></div>
+          
+          <!-- Text formatting -->
+          <button class="tb" onclick="tiptapBold()" title="Bold (Ctrl+B)"><b>B</b></button>
+          <button class="tb" onclick="tiptapItalic()" title="Italic (Ctrl+I)"><i>I</i></button>
           <button class="tb" onclick="tiptapStrike()" title="Strikethrough"><s>S</s></button>
+          <button class="tb" onclick="tiptapUnderline()" title="Underline (Ctrl+U)"><u>U</u></button>
+          <button class="tb" onclick="tiptapCode()" title="Inline code">&lt;/&gt;</button>
           <div class="tb-sep"></div>
-          <button class="tb" onclick="tiptapHeading(1)">H1</button>
-          <button class="tb" onclick="tiptapHeading(2)">H2</button>
-          <button class="tb" onclick="tiptapHeading(3)">H3</button>
+          
+          <!-- Text color & highlight -->
+          <button class="tb" onclick="openColorPicker('text')" title="Text color">A<span style="font-size:8px;vertical-align:sub;">▾</span></button>
+          <button class="tb" onclick="openColorPicker('highlight')" title="Highlight">🎨</button>
           <div class="tb-sep"></div>
-          <button class="tb" onclick="tiptapBulletList()" title="Bullet list">≡</button>
+          
+          <!-- Lists -->
+          <button class="tb" onclick="tiptapBulletList()" title="Bullet list">•</button>
           <button class="tb" onclick="tiptapOrderedList()" title="Numbered list">1.</button>
           <button class="tb" onclick="tiptapTaskList()" title="Task list">☑</button>
           <div class="tb-sep"></div>
+          
+          <!-- Alignment -->
+          <button class="tb" onclick="tiptapAlign('left')" title="Align left">⫴</button>
+          <button class="tb" onclick="tiptapAlign('center')" title="Align center">≡</button>
+          <button class="tb" onclick="tiptapAlign('right')" title="Align right">⫵</button>
+          <button class="tb" onclick="tiptapAlign('justify')" title="Justify">▭</button>
+          <div class="tb-sep"></div>
+          
+          <!-- Insert elements -->
           <button class="tb" onclick="tiptapBlockquote()" title="Blockquote">❝</button>
           <button class="tb" onclick="tiptapCodeBlock()" title="Code block">&lt;/&gt;</button>
-          <button class="tb" onclick="tiptapInsertTable()" title="Tabel">⊞</button>
-          <button class="tb" onclick="tiptapHR()" title="Divider">—</button>
+          <button class="tb" onclick="tiptapInsertTable()" title="Insert table">⊞</button>
+          <button class="tb" onclick="tiptapHR()" title="Horizontal rule">—</button>
+          <button class="tb" onclick="openLinkDialog()" title="Insert link">🔗</button>
+          <button class="tb" onclick="openImageDialog()" title="Insert image">🖼</button>
           <div class="tb-sep"></div>
-          <button class="tb" onclick="saveAsTemplate()" title="Simpan template">📋</button>
+          
+          <!-- More options -->
+          <button class="tb" onclick="tiptapClearFormat()" title="Clear formatting">✕</button>
+          <button class="tb" onclick="saveAsTemplate()" title="Save as template">📋</button>
+          
           <!-- Desktop: chat toggle & AI fill -->
+          <div class="tb-spacer"></div>
           <button class="tb desktop-only" onclick="toggleChat()" title="AI Chat" id="chat-toggle-btn">💬</button>
           <div class="ai-drop desktop-only">
             <button class="ai-btn" onclick="toggleAIMenu(event)">✦ AI Fill ▾</button>
