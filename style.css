@@ -1190,6 +1190,9 @@ body {
   font-family: 'DM Sans', sans-serif;
   max-width: 720px;
   caret-color: var(--accent);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 #editor:empty::before {
@@ -1226,6 +1229,8 @@ body {
 #editor p {
   margin-bottom: 10px;
   min-height: 1.5em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 #editor strong {
