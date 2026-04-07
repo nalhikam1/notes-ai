@@ -548,12 +548,24 @@ function openNewFolder(projectId = null, parentId = null, e = null){
   tempPId = projectId || ST.activeProjectId || (ST.projects[0] ? ST.projects[0].id : null);
   tempFId = parentId;
   
-  // Set modal title dynamically
   const isCreatingFolder = !!tempPId && !!e; // Explicitly passed an event from sidebar plus button
-  document.querySelector('#folder-modal .modal-title').textContent = isCreatingFolder ? 'New Folder' : 'New Project';
+  const isProject = !isCreatingFolder;
+  
+  document.querySelector('#folder-modal .modal-title').textContent = isProject ? 'New Project' : 'New Folder';
+  
+  const lbl = document.getElementById('f-name-lbl');
+  if(lbl) lbl.textContent = isProject ? 'Project Name' : 'Folder Name';
+  
+  const btn = document.getElementById('f-submit-btn');
+  if(btn) btn.textContent = isProject ? 'Create Project' : 'Create Folder';
+  
+  const emojiInput = document.getElementById('f-emoji');
+  if(emojiInput) {
+    emojiInput.placeholder = isProject ? '📦' : '📁';
+    emojiInput.value = '';
+  }
   
   document.getElementById('f-name').value='';
-  document.getElementById('f-emoji').value='';
   document.getElementById('folder-modal').style.display='flex';
   setTimeout(()=>document.getElementById('f-name').focus(),100);
 }
@@ -563,7 +575,9 @@ function closeFolderModal(){document.getElementById('folder-modal').style.displa
 function saveFolder(){
   const name=document.getElementById('f-name').value.trim();
   if(!name){showToast('Name is empty','error');return;}
-  const emoji=document.getElementById('f-emoji').value.trim()||'📁';
+  const isProject = document.querySelector('#folder-modal .modal-title').textContent === 'New Project';
+  const defaultEmoji = isProject ? '📦' : '📁';
+  const emoji = document.getElementById('f-emoji').value.trim() || defaultEmoji;
   
   // If tempPId is somehow forcing a folder via recursion
   if(tempPId && document.querySelector('#folder-modal .modal-title').textContent !== 'New Project') {
