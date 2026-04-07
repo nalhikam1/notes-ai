@@ -964,11 +964,6 @@ function onEditorKey(e){
   }
 }
 
-function onEditorInput(){
-  scheduleAutoSave();
-  updateWordCount();
-}
-
 // ===== LIST INDENT / OUTDENT =====
 function listIndent(){
   document.getElementById('editor').focus();
