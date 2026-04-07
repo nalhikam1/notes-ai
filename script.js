@@ -1459,6 +1459,95 @@ function resetAllData(){
   }
 }
 
+// ===== EXPORT & IMPORT =====
+function exportData(){
+  const data = localStorage.getItem('quill2') || localStorage.getItem('quill_state');
+  if(!data){ showToast('Tidak ada data untuk diexport','error'); return; }
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `quill-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data berhasil diexport','success');
+}
+
+function importData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const imported = JSON.parse(e.target.result);
+      if(!imported.notes && !imported.folders && !imported.projects){
+        showToast('File JSON tidak valid','error'); return;
+      }
+      
+      let mergedP = 0, mergedF = 0, mergedN = 0;
+
+      if(imported.projects){
+        imported.projects.forEach(ip => {
+          const expectedTitle = ip.name.trim().toLowerCase();
+          const existing = ST.projects.find(p => p.name.trim().toLowerCase() === expectedTitle);
+          if(existing){
+            ip.newId = existing.id;
+            mergedP++;
+          } else {
+            ip.newId = ip.id;
+            ST.projects.push(ip);
+          }
+        });
+      }
+
+      if(imported.folders){
+        imported.folders.forEach(ifol => {
+          const origProj = imported.projects ? imported.projects.find(p => p.id === ifol.projectId) : null;
+          ifol.projectId = origProj ? origProj.newId : ifol.projectId;
+
+          const expectedName = ifol.name.trim().toLowerCase();
+          const existing = ST.folders.find(f => f.name.trim().toLowerCase() === expectedName && f.projectId === ifol.projectId && f.parentId === ifol.parentId);
+          if(existing){
+            ifol.newId = existing.id;
+            mergedF++;
+          } else {
+            ifol.newId = ifol.id;
+            ST.folders.push(ifol);
+          }
+        });
+      }
+
+      if(imported.notes){
+        imported.notes.forEach(inote => {
+          const origProj = imported.projects ? imported.projects.find(p => p.id === inote.projectId) : null;
+          inote.projectId = origProj ? origProj.newId : inote.projectId;
+
+          const origFol = imported.folders ? imported.folders.find(f => f.id === inote.folderId) : null;
+          inote.folderId = origFol ? origFol.newId : inote.folderId;
+
+          const expectedTitle = (inote.title||'Untitled').trim().toLowerCase();
+          const existing = ST.notes.find(n => (n.title||'Untitled').trim().toLowerCase() === expectedTitle && n.projectId === inote.projectId && n.folderId === inote.folderId);
+          if(existing && expectedTitle !== 'untitled'){
+            mergedN++; // skip duplicate with same name
+          } else {
+            ST.notes.push(inote);
+          }
+        });
+      }
+
+      saveState();
+      alert(`Import Berhasil! Menggabungkan ${mergedP} Project, ${mergedF} Folder, ${mergedN} Note yang duplikat.`);
+      location.reload();
+      
+    } catch(err){
+      showToast('Gagal memproses file','error');
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
 // ===== BOOT =====
 fillModels('p-model','google');
 if(loadState()){

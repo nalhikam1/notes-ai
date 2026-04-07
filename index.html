@@ -366,22 +366,23 @@
           </div>
         </div>
         <div class="modal-section">
-          <div class="modal-section-title">AI Provider</div>
-          <div class="provider-grid">
-            <button class="provider-btn" id="sp-google" onclick="settingProvider('google')">🤖 Google Gemini</button>
-            <button class="provider-btn" id="sp-anthropic" onclick="settingProvider('anthropic')">🔮 Claude</button>
-            <button class="provider-btn" id="sp-groq" onclick="settingProvider('groq')">⚡ Groq</button>
-            <button class="provider-btn" id="sp-nvidia" onclick="settingProvider('nvidia')">🟢 NVIDIA NIM</button>
-          </div>
-          <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="s-apikey"
-              type="password"></div>
-          <div class="form-group"><label class="form-label">Model</label><select class="form-select"
-              id="s-model"></select></div>
+          <div class="modal-section-title">AI Provider (NVIDIA NIM)</div>
+          <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="s-apikey" type="password" placeholder="Masukkan NVIDIA API Key..."></div>
+          <div class="form-group"><label class="form-label">Model</label><select class="form-select" id="s-model"></select></div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:10px;">
-          <button class="btn-primary" style="flex:1" onclick="saveSettings()">Simpan</button>
-          <button class="btn-secondary" style="color:var(--red);border-color:var(--red);padding:0 12px;"
-            onclick="resetAllData()" title="Reset All Data">🗑</button>
+        
+        <div class="modal-section" style="margin-bottom:12px;">
+          <div class="modal-section-title">Data & Sinkronisasi</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <button class="btn-secondary" style="flex:1;font-size:12px;padding:8px;" onclick="exportData()">↑ Export JSON</button>
+            <button class="btn-secondary" style="flex:1;font-size:12px;padding:8px;" onclick="document.getElementById('import-file').click()">↓ Import JSON</button>
+            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+          </div>
+          <button class="btn-secondary" style="width:100%;color:var(--red);border-color:rgba(192,57,43,0.3);font-size:12px;padding:8px;background:rgba(192,57,43,0.05);" onclick="resetAllData()">Reset All Data</button>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button class="btn-primary" style="width:100%" onclick="saveSettings()">Simpan Pengaturan</button>
         </div>
       </div>
     </div>
