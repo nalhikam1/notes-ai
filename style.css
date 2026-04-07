@@ -436,9 +436,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .chat-msg{max-width:92%;animation:slideUp .2s ease;}
 .chat-msg.user{align-self:flex-end;}
 .chat-msg.ai{align-self:flex-start;max-width:95%;}
-.chat-bubble{padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.6;}
+.chat-bubble{padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.6;word-wrap:break-word;overflow-wrap:break-word;}
 .user .chat-bubble{background:var(--accent-dim);border:1px solid rgba(212,168,83,.2);color:var(--text);border-radius:12px 12px 4px 12px;}
-.ai .chat-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:12px 12px 12px 4px;box-shadow: 0 2px 8px rgba(0,0,0,0.2);}
+.ai .chat-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:12px 12px 12px 4px;box-shadow: 0 2px 8px rgba(0,0,0,0.2);max-width:100%;overflow:hidden;}
 .chat-bubble p{margin-bottom:5px;} .chat-bubble p:last-child{margin-bottom:0;}
 .chat-bubble code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg);padding:1px 4px;border-radius:3px;color:var(--accent);}
 .chat-bubble pre{background:var(--bg);padding:8px;border-radius:6px;margin:5px 0;overflow-x:auto;}
@@ -447,6 +447,10 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .chat-bubble strong{font-weight:600;}
 .chat-bubble h1,.chat-bubble h2,.chat-bubble h3{font-family:'Lora',serif;margin:6px 0 3px;}
 .chat-bubble h1{font-size:15px;} .chat-bubble h2{font-size:14px;} .chat-bubble h3{font-size:13px;}
+.chat-bubble table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px;display:block;overflow-x:auto;}
+.chat-bubble table th{background:var(--bg2);padding:6px 8px;text-align:left;font-weight:600;font-size:11px;color:var(--accent);border:1px solid var(--border2);white-space:nowrap;}
+.chat-bubble table td{padding:6px 8px;border:1px solid var(--border);color:var(--text2);white-space:nowrap;}
+.chat-bubble table tr:hover td{background:var(--bg2);}
 .chat-time{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:3px;padding:0 2px;}
 .user .chat-time{text-align:right;}
 .chat-typing{display:flex;align-items:center;gap:4px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:12px 12px 12px 4px;width:fit-content;}
