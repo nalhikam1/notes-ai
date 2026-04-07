@@ -341,7 +341,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .empty-title{font-family:'Lora',serif;font-size:20px;color:var(--text2);margin-bottom:8px;}
 .empty-sub{font-size:13px;line-height:1.6;max-width:260px;}
 /* ===== DASHBOARD & STATS ===== */
-.view-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.view-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
 .view-header h1 { font-family: 'Lora', serif; font-size: 24px; font-weight: 600; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 32px; }

@@ -138,8 +138,6 @@
         <span class="bc-item active" id="bc-note">Untitled</span>
       </div>
       <div class="top-nav-actions">
-        <button class="icon-btn" onclick="shareNote()" title="Share">🔗</button>
-        <button class="icon-btn" onclick="exportNote()" title="Export">📤</button>
       </div>
     </div>
 
@@ -173,10 +171,14 @@
     <div id="project-view" class="view" style="display:none">
       <div class="view-header">
         <h1 id="pv-title">Project Title</h1>
-        <div class="view-toggles">
-          <button class="toggle-btn active" onclick="setProjectView('list',this)">List</button>
-          <button class="toggle-btn" onclick="setProjectView('kanban',this)">Kanban</button>
+        <div class="view-actions" style="display:flex;gap:8px;align-items:center;">
+          <button class="btn-secondary" onclick="openNewFolder(null, null, event)" style="padding:6px 12px;font-size:12px;">+ Folder</button>
+          <button class="btn-primary" onclick="newNote()" style="padding:6px 12px;font-size:12px;">+ Note</button>
         </div>
+      </div>
+      <div class="view-toggles" style="margin-bottom:16px;">
+        <button class="toggle-btn active" onclick="setProjectView('list',this)">List</button>
+        <button class="toggle-btn" onclick="setProjectView('kanban',this)">Kanban</button>
       </div>
 
       <div class="stats-grid compact">
@@ -357,7 +359,10 @@
         <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="s-apikey" type="password"></div>
         <div class="form-group"><label class="form-label">Model</label><select class="form-select" id="s-model"></select></div>
       </div>
-      <button class="btn-primary" onclick="saveSettings()">Simpan</button>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-primary" style="flex:1" onclick="saveSettings()">Simpan</button>
+        <button class="btn-secondary" style="color:var(--red);border-color:var(--red);padding:0 12px;" onclick="resetAllData()" title="Reset All Data">🗑</button>
+      </div>
     </div>
   </div>
 </div>

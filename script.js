@@ -94,7 +94,18 @@ function initApp(){
   updatePersonaBadge();
   renderSidebar();
   showDashboard();
+  if (ST.ai && ST.ai.provider) {
+    fillModels('rs-model-picker', ST.ai.provider);
+    const rsm = document.getElementById('rs-model-picker');
+    if(rsm) rsm.value = ST.ai.model;
+  }
 }
+
+function updateSelectedModel(val){
+  ST.ai.model = val;
+  saveState();
+}
+
 function migrateOldData(){
   // V3 Architecture Hard Reset for Ghost Files
   if(!localStorage.getItem('quill_v3')){
@@ -292,30 +303,57 @@ function renderProjectDashboard(){
   if(ST.projectView==='kanban'){
     renderKanban(pNotes);
   } else {
-    renderProjectList(pNotes);
+    renderProjectList(p.id);
   }
 }
 
-function renderProjectList(notes){
+function renderProjectList(projectId){
   const el=document.getElementById('project-content');
-  if(!notes.length){el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text3)">No documents yet. <button class="btn-primary" onclick="newNote()" style="width:auto;margin-top:10px;">+ Create one</button></div>`;return;}
+  const folders = ST.folders.filter(f => f.projectId === projectId && !f.parentId);
+  const notes = ST.notes.filter(n => n.projectId === projectId);
   
-  let html=`<table class="project-table" style="width:100%;border-collapse:collapse;margin-top:20px;">
+  if(!folders.length && !notes.length){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text3)">Belum ada dokumen atau folder.</div>`;
+    return;
+  }
+  
+  let html=`<div style="overflow-x:auto;width:100%;"><table class="project-table" style="width:100%;min-width:400px;border-collapse:collapse;margin-top:20px;">
     <thead><tr style="text-align:left;color:var(--text3);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);">
-      <th style="padding:10px;">Title</th><th style="padding:10px;">Status</th><th style="padding:10px;">Words</th><th style="padding:10px;text-align:right;">Updated</th>
+      <th style="padding:10px;">Name</th><th style="padding:10px;">Status</th><th style="padding:10px;">Words</th><th style="padding:10px;text-align:right;">Updated</th>
     </tr></thead><tbody>`;
   
-  html+=notes.map(n=>{
+  const renderNoteRow = (n, indent) => {
     const ts=fmtTS(n.updatedAt);
     const words=((n.content||'').replace(/<[^>]*>/g,'').trim().split(/\s+/).filter(x=>x).length);
     return `<tr onclick="openNote('${n.id}')" style="cursor:pointer;border-bottom:1px solid var(--border2);transition:background .2s;">
-      <td style="padding:12px 10px;">${escHtml(n.title)||'Untitled'}</td>
+      <td style="padding:12px 10px;padding-left:${10 + indent}px;">📝 ${escHtml(n.title)||'Untitled'}</td>
       <td style="padding:12px 10px;"><span class="status-badge" style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:10px;">${n.status||'No status'}</span></td>
       <td style="padding:12px 10px;font-family:monospace;font-size:11px;">${words}</td>
       <td style="padding:12px 10px;text-align:right;color:var(--text3);font-size:11px;">${ts.rel}</td>
     </tr>`;
-  }).join('');
-  html+=`</tbody></table>`;
+  };
+
+  folders.forEach(f => {
+    const fNotes = notes.filter(n => n.folderId === f.id);
+    const isOpen = ST.openNodes[f.id];
+    html += `<tr class="folder-row" onclick="toggleNode('${f.id}'); renderProjectDashboard();" style="cursor:pointer;background:var(--bg2);border-bottom:1px solid var(--border2);">
+      <td colspan="4" style="padding:12px 10px;font-weight:600;">
+        <span style="display:inline-block;width:20px;text-align:center;">${isOpen ? '▼' : '▶'}</span>
+        ${f.emoji||'📁'} ${escHtml(f.name)} <span style="color:var(--text3);font-weight:normal;font-size:12px;margin-left:8px;">(${fNotes.length} notes)</span>
+      </td>
+    </tr>`;
+    if(isOpen) {
+      if(fNotes.length === 0) {
+        html += `<tr><td colspan="4" style="padding:12px 10px;padding-left:40px;color:var(--text3);font-size:12px;border-bottom:1px solid var(--border2);">Folder kosong</td></tr>`;
+      } else {
+        fNotes.forEach(n => { html += renderNoteRow(n, 20); });
+      }
+    }
+  });
+
+  notes.filter(n => !n.folderId).forEach(n => { html += renderNoteRow(n, 0); });
+
+  html+=`</tbody></table></div>`;
   el.innerHTML=html;
 }
 
@@ -334,7 +372,10 @@ function renderKanban(notes){
       <div class="kanban-cards">
         ${colNotes.map(n=>`
           <div class="note-card" onclick="openNote('${n.id}')">
-            <div class="note-card-title">${escHtml(n.title)||'Untitled'}</div>
+            <div class="note-card-title">
+              ${n.folderId ? (() => {const f=ST.folders.find(x=>x.id===n.folderId);return f?`<span style="font-size:10px;border-radius:4px;padding:2px 4px;background:var(--bg3);display:inline-block;margin-bottom:4px;">${f.emoji||'📁'} ${escHtml(f.name)}</span><br>`:''})() : ''}
+              ${escHtml(n.title)||'Untitled'}
+            </div>
             <div class="note-card-preview">${(n.content||'').replace(/<[^>]*>/g,'').substring(0,60)}...</div>
             <div class="note-card-footer" style="margin-top:8px;display:flex;justify-content:flex-end;">
               <select class="status-select" onclick="event.stopPropagation()" onchange="updateNoteStatus('${n.id}', this.value); event.stopPropagation();" style="font-size:10px;background:var(--bg3);color:var(--text3);border:none;border-radius:4px;padding:2px 4px;">
@@ -1180,7 +1221,9 @@ function appendChatMsg(container,role,content){
   }
   div.innerHTML=`<div class="chat-bubble">${rendered}</div><div class="chat-time">${ts}</div>`;
   container.appendChild(div);
-  container.scrollTop=container.scrollHeight;
+  if(role!=='ai'){
+    container.scrollTop=container.scrollHeight;
+  }
   return div;
 }
 
@@ -1228,6 +1271,13 @@ function saveSettings(){
   };
   ST.ai.apiKey=document.getElementById('s-apikey').value;
   ST.ai.model=document.getElementById('s-model').value;
+  
+  const rsm = document.getElementById('rs-model-picker');
+  if(rsm) {
+    fillModels('rs-model-picker', ST.ai.provider);
+    rsm.value = ST.ai.model;
+  }
+
   saveState(); updatePersonaBadge(); closeSettings();
   showToast('Settings tersimpan ✓','success');
 }
@@ -1306,43 +1356,13 @@ function updateTOC(){
   }).join('');
 }
 
-// ===== SHARING & EXPORT =====
-function shareNote(){
-  if(!ST.activeId) return;
-  const n=ST.notes.find(x=>x.id===ST.activeId);
-  const data = JSON.stringify({title:n.title, content:n.content});
-  const encoded = btoa(unescape(encodeURIComponent(data)));
-  const url = `${window.location.origin}${window.location.pathname}#share=${encoded}`;
-  navigator.clipboard.writeText(url).then(()=>{
-    showToast('Link sharing telah disalin ke clipboard!','success');
-  });
-}
-
-function exportNote(){
-  if(!ST.activeId) return;
-  const n=ST.notes.find(x=>x.id===ST.activeId);
-  const html = `<!DOCTYPE html><html><head><title>${n.title}</title><style>body{font-family:sans-serif;padding:40px;line-height:1.6;max-width:800px;margin:0 auto;}</style></head><body><h1>${n.title}</h1>${n.content}</body></html>`;
-  const blob = new Blob([html], {type:'text/html'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url; a.download=`${n.title||'note'}.html`; a.click();
-}
-
-// Handle shared link on load
-window.addEventListener('load', ()=>{
-  const hash = window.location.hash;
-  if(hash.startsWith('#share=')){
-    try {
-      const encoded = hash.split('=')[1];
-      const decoded = decodeURIComponent(escape(atob(encoded)));
-      const data = JSON.parse(decoded);
-      // Open in a read-only or temporary way
-      newNote(data.content, data.title + ' (Shared)');
-      window.location.hash = '';
-      showToast('Note bersama berhasil dibuka!');
-    } catch(e) { console.error('Share link error', e); }
+// ===== RESET DATA =====
+function resetAllData(){
+  if(confirm("Yakin ingin menghapus SEMUA data (Notes, Project, Settings)? Langkah ini tidak dapat dibatalkan!")) {
+    localStorage.clear();
+    location.reload();
   }
-});
+}
 
 // ===== BOOT =====
 fillModels('p-model','google');
