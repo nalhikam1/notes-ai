@@ -450,7 +450,7 @@ body {
   gap: 2px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 640px) {
   .hide-m {
     display: none
   }
