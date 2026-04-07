@@ -590,6 +590,9 @@ function saveFolder(){
     showToast(`Project "${name}" created ✓`,'success');
   }
   saveState(); closeFolderModal(); renderSidebar();
+  if (ST.viewType === 'dashboard') {
+    renderGlobalDashboard();
+  }
 }
 
 function newNote(projectId = null){

@@ -102,7 +102,6 @@
     <div class="sidebar-header">
       <div class="logo">Quill ✦</div>
       <div class="sidebar-actions">
-        <button class="icon-btn" onclick="openNewFolder()" title="Folder baru" style="font-size:16px">📁</button>
         <button class="icon-btn" onclick="newNote()" title="Note baru" style="font-size:20px">+</button>
         <button class="icon-btn" onclick="openSettings()" title="Settings">⚙</button>
       </div>
@@ -110,9 +109,12 @@
     <div class="sidebar-search">
       <input class="search-input" id="search-input" placeholder="Quick open..." oninput="renderSidebar()">
     </div>
-    <div class="sidebar-menu">
-      <button class="sidebar-item active" onclick="showDashboard()" id="menu-home">🏠 Home</button>
-      <button class="sidebar-item" onclick="openNewFolder()">📁 Projects</button>
+    <div class="sidebar-menu" style="flex:unset;border-bottom:none;padding-bottom:0;">
+      <button class="sidebar-item active" onclick="showDashboard()" id="menu-home">🏠 Home Dashboard</button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 6px;text-transform:uppercase;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.06em;">
+      <span>Projects</span>
+      <button onclick="openNewFolder(null, null, null)" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'" title="New Project">+</button>
     </div>
     <div class="sidebar-content" id="sidebar-content"></div>
     <div class="sidebar-footer">
