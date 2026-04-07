@@ -7,46 +7,26 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { provider, apiKey, model, messages, system } = req.body;
-  if (!provider || !apiKey || !model || !messages) {
+  // Kini hanya fokus pada param penting untuk NVIDIA
+  const { apiKey, model, messages, system } = req.body;
+  if (!apiKey || !model || !messages) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  let url, body, headers = { 'Content-Type': 'application/json' };
-
   try {
-    if (provider === 'anthropic') {
-      url = 'https://api.anthropic.com/v1/messages';
-      headers['x-api-key'] = apiKey;
-      headers['anthropic-version'] = '2023-06-01';
-      body = { model, max_tokens: 2048, system, messages };
-
-    } else if (provider === 'google') {
-      url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const contents = [
-        { role: 'user', parts: [{ text: system + '\n\nPahami instruksi ini.' }] },
-        { role: 'model', parts: [{ text: 'Siap membantu.' }] },
-        ...messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }))
-      ];
-      body = { contents, generationConfig: { maxOutputTokens: 2048 } };
-
-    } else if (provider === 'groq') {
-      url = 'https://api.groq.com/openai/v1/chat/completions';
-      headers['Authorization'] = `Bearer ${apiKey}`;
-      body = { model, max_tokens: 2048, messages: [{ role: 'system', content: system }, ...messages] };
-
-    } else if (provider === 'nvidia') {
-      url = 'https://integrate.api.nvidia.com/v1/chat/completions';
-      headers['Authorization'] = `Bearer ${apiKey}`;
-      body = { model, max_tokens: 2048, messages: [{ role: 'system', content: system }, ...messages] };
-
-    } else {
-      return res.status(400).json({ error: 'Unknown provider: ' + provider });
-    }
+    const url = 'https://integrate.api.nvidia.com/v1/chat/completions';
+    const body = { 
+      model, 
+      max_tokens: 2048, 
+      messages: [{ role: 'system', content: system }, ...messages] 
+    };
 
     const response = await fetch(url, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
       body: JSON.stringify(body)
     });
 
@@ -57,12 +37,8 @@ module.exports = async function handler(req, res) {
       return res.status(response.status).json({ error: msg });
     }
 
-    // Ekstrak teks dari response sesuai provider
-    let text;
-    if (provider === 'anthropic') text = data.content[0].text;
-    else if (provider === 'google') text = data.candidates[0].content.parts[0].text;
-    else text = data.choices[0].message.content;
-
+    // Ekstrak teks bentuk OpenAI-style milik NVIDIA
+    const text = data.choices[0].message.content;
     return res.status(200).json({ text });
 
   } catch (err) {
