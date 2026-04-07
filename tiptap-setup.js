@@ -586,3 +586,47 @@ function tiptapClearFormat() {
     document.execCommand('removeFormat', false, null);
   }
 }
+
+
+// ===== TOOLBAR DROPDOWN =====
+function toggleToolbarDropdown(e, menuId) {
+  e.stopPropagation();
+  
+  // Close all other dropdowns first
+  document.querySelectorAll('.tb-menu').forEach(m => {
+    if (m.id !== menuId) m.classList.remove('show');
+  });
+  
+  const menu = document.getElementById(menuId);
+  const btn = e.currentTarget;
+  
+  if (!menu || !btn) return;
+  
+  const isShown = menu.classList.contains('show');
+  
+  if (isShown) {
+    menu.classList.remove('show');
+  } else {
+    // Position the menu right below the button
+    const rect = btn.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 6) + 'px';
+    menu.style.left = rect.left + 'px';
+    
+    menu.classList.add('show');
+    
+    // Close on outside click
+    setTimeout(() => {
+      const closeHandler = (evt) => {
+        if (!menu.contains(evt.target) && !btn.contains(evt.target)) {
+          menu.classList.remove('show');
+          document.removeEventListener('click', closeHandler);
+        }
+      };
+      document.addEventListener('click', closeHandler);
+    }, 10);
+  }
+}
+
+function closeToolbarDropdown() {
+  document.querySelectorAll('.tb-menu').forEach(m => m.classList.remove('show'));
+}
