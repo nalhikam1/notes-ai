@@ -14,6 +14,18 @@
     href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- Tiptap Editor -->
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.1.13/dist/tiptap-core.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.1.13/dist/tiptap-starter-kit.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-table@2.1.13/dist/tiptap-extension-table.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-table-row@2.1.13/dist/tiptap-extension-table-row.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-table-cell@2.1.13/dist/tiptap-extension-table-cell.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-table-header@2.1.13/dist/tiptap-extension-table-header.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-task-list@2.1.13/dist/tiptap-extension-task-list.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-task-item@2.1.13/dist/tiptap-extension-task-item.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-placeholder@2.1.13/dist/tiptap-extension-placeholder.umd.min.js"></script>
+  
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -218,25 +230,22 @@
       <div id="editor-view" class="view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
         <!-- TOOLBAR (scrollable horizontal) -->
         <div id="toolbar">
-          <button class="tb" onclick="fmt('bold')" title="Bold"><b>B</b></button>
-          <button class="tb" onclick="fmt('italic')" title="Italic"><i>I</i></button>
-          <button class="tb" onclick="fmt('underline')" title="Underline"><u>U</u></button>
-          <button class="tb" onclick="fmt('strikeThrough')" title="Strikethrough"><s>S</s></button>
+          <button class="tb" onclick="tiptapBold()" title="Bold"><b>B</b></button>
+          <button class="tb" onclick="tiptapItalic()" title="Italic"><i>I</i></button>
+          <button class="tb" onclick="tiptapStrike()" title="Strikethrough"><s>S</s></button>
           <div class="tb-sep"></div>
-          <button class="tb" onclick="fmtBlock('h1')">H1</button>
-          <button class="tb" onclick="fmtBlock('h2')">H2</button>
-          <button class="tb" onclick="fmtBlock('h3')">H3</button>
+          <button class="tb" onclick="tiptapHeading(1)">H1</button>
+          <button class="tb" onclick="tiptapHeading(2)">H2</button>
+          <button class="tb" onclick="tiptapHeading(3)">H3</button>
           <div class="tb-sep"></div>
-          <button class="tb" onclick="fmt('insertUnorderedList')" title="Bullet list">≡</button>
-          <button class="tb" onclick="fmt('insertOrderedList')" title="Numbered list">1.</button>
-          <button class="tb" onclick="insertChecklist()" title="Checklist">☑</button>
-          <button class="tb" onclick="listIndent()" title="Indent (nested list)">→</button>
-          <button class="tb" onclick="listOutdent()" title="Outdent">←</button>
+          <button class="tb" onclick="tiptapBulletList()" title="Bullet list">≡</button>
+          <button class="tb" onclick="tiptapOrderedList()" title="Numbered list">1.</button>
+          <button class="tb" onclick="tiptapTaskList()" title="Task list">☑</button>
           <div class="tb-sep"></div>
-          <button class="tb" onclick="fmtBlock('blockquote')" title="Blockquote">❝</button>
-          <button class="tb" onclick="insertCode()" title="Code">&lt;/&gt;</button>
-          <button class="tb" onclick="insertTable()" title="Tabel">⊞</button>
-          <button class="tb" onclick="insertHR()" title="Divider">—</button>
+          <button class="tb" onclick="tiptapBlockquote()" title="Blockquote">❝</button>
+          <button class="tb" onclick="tiptapCodeBlock()" title="Code block">&lt;/&gt;</button>
+          <button class="tb" onclick="tiptapInsertTable()" title="Tabel">⊞</button>
+          <button class="tb" onclick="tiptapHR()" title="Divider">—</button>
           <div class="tb-sep"></div>
           <button class="tb" onclick="saveAsTemplate()" title="Simpan template">📋</button>
           <!-- Desktop: chat toggle & AI fill -->
@@ -274,7 +283,7 @@
         </div>
 
         <div id="editor-wrap">
-          <div id="editor" contenteditable="true" onkeydown="onEditorKey(event)" oninput="onEditorInput()"></div>
+          <div id="editor"></div>
         </div>
       </div>
     </div>
@@ -446,6 +455,7 @@
   <!-- Toast -->
   <div id="toast"></div>
 
+  <script src="tiptap-setup.js"></script>
   <script src="script.js"></script>
 </body>
 

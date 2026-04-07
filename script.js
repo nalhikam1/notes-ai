@@ -90,6 +90,9 @@ function finishOnboarding(){
 
 // ===== INIT =====
 function initApp(){
+  // Initialize Tiptap editor
+  initTiptap();
+  
   migrateOldData();
   updatePersonaBadge();
   renderSidebar();
@@ -192,9 +195,10 @@ function openNote(id){
   
   showView('editor');
   document.getElementById('note-title').value=n.title;
-  document.getElementById('editor').innerHTML=n.content;
   
-  reattachChecklistListeners();
+  // Use Tiptap to set content
+  setEditorHTML(n.content || '');
+  
   updateMeta(n);
   updateWordCount();
   updateChatCtx();
@@ -209,8 +213,7 @@ function deleteNote(id,e){
   ST.notes=ST.notes.filter(n=>n.id!==id);
   if(ST.activeId===id){
     ST.activeId=null;
-    document.getElementById('editor-view').style.display='none';
-    document.getElementById('empty-state').style.display='flex';
+    showDashboard();
   }
   saveState(); renderSidebar();
   if(ST.viewType === 'dashboard') renderGlobalDashboard();
@@ -305,7 +308,7 @@ function updateMeta(n){
   document.getElementById('meta-date').textContent=`${ts.day}, ${ts.date}`;
 }
 function updateWordCount(){
-  const txt=(document.getElementById('editor').innerText||'').replace(/\u200B/g,'');
+  const txt = getEditorText();
   const w=txt.trim().split(/\s+/).filter(x=>x).length;
   document.getElementById('meta-words').textContent=`${w} kata`;
 }
@@ -320,14 +323,10 @@ function autoSave(){
   if(!ST.activeId) return;
   const n=ST.notes.find(x=>x.id===ST.activeId); if(!n) return;
   n.title=document.getElementById('note-title').value;
-  // Clone editor to clean before saving
-  const edClone=document.getElementById('editor').cloneNode(true);
-  // Strip contenteditable attrs and zero-width spaces from check spans
-  edClone.querySelectorAll('.ql-check-text').forEach(s=>{
-    s.removeAttribute('contenteditable');
-    s.textContent=s.textContent.replace(/\u200B/g,'');
-  });
-  n.content=edClone.innerHTML;
+  
+  // Get content from Tiptap
+  n.content = getEditorHTML();
+  
   n.updatedAt=new Date().toISOString();
   updateMeta(n); saveState(); renderSidebar();
   const ms=document.getElementById('meta-saved');
@@ -1204,7 +1203,8 @@ async function aiAction(action){
   closeAIMenu();
   if(!ST.activeId){showToast('Buka note dulu','error');return;}
   const title=document.getElementById('note-title').value;
-  const content=document.getElementById('editor').innerText;
+  const content = getEditorText(); // Use Tiptap getText
+  
   const prompts={
     write:`Tulis konten yang komprehensif untuk note berjudul: "${title}". Format dengan markdown yang rapi.`,
     continue:`Lanjutkan tulisan ini secara natural:\n\n${content}`,
@@ -1220,13 +1220,14 @@ async function aiAction(action){
   try{
     const result=await callAI([{role:'user',content:prompts[action]}]);
     const html=marked.parse(result);
-    const editor=document.getElementById('editor');
+    
+    // Use Tiptap functions to insert content
     if(['write','summarize','bullets','table'].includes(action)){
-      editor.innerHTML=html;
+      replaceWithAIContent(html);
     } else {
-      editor.innerHTML+=html;
+      appendAIContent(html);
     }
-    reattachChecklistListeners();
+    
     autoSave();
     showToast('AI selesai ✓','success');
   }catch(err){
@@ -1375,7 +1376,7 @@ function closeSettings(){document.getElementById('settings-modal').style.display
 
 // ===== STORAGE =====
 function saveState(){
-  localStorage.setItem('quill2',JSON.stringify({notes:ST.notes,templates:ST.templates,folders:ST.folders,persona:ST.persona,ai:ST.ai}));
+  localStorage.setItem('quill2',JSON.stringify({notes:ST.notes,templates:ST.templates,folders:ST.folders,projects:ST.projects,persona:ST.persona,ai:ST.ai}));
 }
 function loadState(){
   try{
@@ -1383,6 +1384,7 @@ function loadState(){
     if(d.persona){
       ST.notes=d.notes||[]; ST.templates=d.templates||[];
       ST.folders=d.folders||[];
+      ST.projects=d.projects||[];
       ST.persona=d.persona; ST.ai=d.ai||ST.ai;
       return true;
     }
@@ -1428,7 +1430,7 @@ function updateStatusBar(){
   const n=ST.notes.find(x=>x.id===ST.activeId);
   const p=ST.projects.find(x=>x.id===(n?n.projectId:ST.activeProjectId));
   document.getElementById('sb-proj-info').textContent = `Project: ${p?p.name:'General'}`;
-  const txt=(document.getElementById('editor').innerText||'').replace(/\u200B/g,'');
+  const txt = getEditorText();
   const w=txt.trim().split(/\s+/).filter(x=>x).length;
   const c=txt.length;
   document.getElementById('sb-count').textContent = `${w} words · ${c} characters`;

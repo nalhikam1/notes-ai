@@ -1065,11 +1065,16 @@ body {
   white-space: nowrap;
   position: relative;
   z-index: 101;
+  pointer-events: auto;
 }
 
 .ai-btn:hover {
   background: var(--accent);
   color: #0f0f0f;
+}
+
+.ai-btn:active {
+  transform: scale(0.98);
 }
 
 .ai-menu {
@@ -1079,7 +1084,7 @@ body {
   border-radius: var(--r2);
   padding: 6px;
   min-width: 200px;
-  z-index: 9999;
+  z-index: 10000;
   visibility: hidden;
   opacity: 0;
   transform: translateY(-10px);
@@ -1172,7 +1177,7 @@ body {
   color: var(--green);
 }
 
-/* EDITOR */
+/* EDITOR - Tiptap */
 #editor-wrap {
   flex: 1;
   overflow-y: auto;
@@ -1190,18 +1195,23 @@ body {
   font-family: 'DM Sans', sans-serif;
   max-width: 720px;
   caret-color: var(--accent);
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
 }
 
-#editor:empty::before {
+/* Tiptap base styles */
+.tiptap {
+  outline: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
   content: 'Mulai menulis...';
   color: var(--text3);
   pointer-events: none;
+  float: left;
+  height: 0;
 }
 
-#editor h1 {
+/* Tiptap content styles */
+.tiptap h1 {
   font-family: 'Lora', serif;
   font-size: 24px;
   font-weight: 600;
@@ -1210,7 +1220,7 @@ body {
   line-height: 1.3;
 }
 
-#editor h2 {
+.tiptap h2 {
   font-family: 'Lora', serif;
   font-size: 20px;
   font-weight: 600;
@@ -1218,7 +1228,7 @@ body {
   color: var(--text);
 }
 
-#editor h3 {
+.tiptap h3 {
   font-family: 'Lora', serif;
   font-size: 17px;
   font-weight: 500;
@@ -1226,33 +1236,34 @@ body {
   color: var(--text);
 }
 
-#editor p {
+.tiptap p {
   margin-bottom: 10px;
   min-height: 1.5em;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
-#editor strong {
+.tiptap strong {
   font-weight: 600;
 }
 
-#editor em {
+.tiptap em {
   font-style: italic;
   font-family: 'Lora', serif;
 }
 
-#editor ul,
-#editor ol {
+.tiptap ul,
+.tiptap ol {
   margin: 8px 0 8px 22px;
+  padding-left: 0;
 }
 
-#editor li {
+.tiptap li {
   margin-bottom: 4px;
   line-height: 1.7;
 }
 
-#editor blockquote {
+.tiptap blockquote {
   border-left: 3px solid var(--accent);
   padding: 8px 14px;
   margin: 14px 0;
@@ -1263,7 +1274,7 @@ body {
   font-family: 'Lora', serif;
 }
 
-#editor code {
+.tiptap code {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   background: var(--bg3);
@@ -1273,7 +1284,7 @@ body {
   color: var(--accent);
 }
 
-#editor pre {
+.tiptap pre {
   background: var(--bg2);
   border: 1px solid var(--border2);
   border-radius: var(--r2);
@@ -1282,7 +1293,7 @@ body {
   overflow-x: auto;
 }
 
-#editor pre code {
+.tiptap pre code {
   background: none;
   border: none;
   padding: 0;
@@ -1291,22 +1302,22 @@ body {
   line-height: 1.6;
 }
 
-#editor hr {
+.tiptap hr {
   border: none;
   border-top: 1px solid var(--border2);
   margin: 20px 0;
 }
 
-/* TABLE with controls */
-#editor table {
+/* Tiptap Table */
+.tiptap table {
   width: 100%;
   border-collapse: collapse;
   margin: 14px 0;
   font-size: 14px;
-  position: relative;
+  table-layout: fixed;
 }
 
-#editor table th {
+.tiptap table th {
   background: var(--bg2);
   padding: 9px 12px;
   text-align: left;
@@ -1318,7 +1329,7 @@ body {
   border: 1px solid var(--border2);
 }
 
-#editor table td {
+.tiptap table td {
   padding: 8px 12px;
   border: 1px solid var(--border);
   color: var(--text2);
@@ -1326,133 +1337,74 @@ body {
   min-width: 80px;
 }
 
-#editor table tr:hover td {
+.tiptap table tr:hover td {
   background: var(--bg2);
 }
 
-#editor table td:focus,
-#editor table th:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
+.tiptap table .selectedCell {
   background: var(--accent-dim);
 }
 
-/* Table toolbar popup */
-.table-toolbar {
-  position: absolute;
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  padding: 4px;
-  display: flex;
-  gap: 2px;
-  z-index: 150;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, .4);
-  animation: fadeIn .15s ease;
+/* Tiptap Task List */
+.tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
 }
 
-.table-toolbar button {
-  background: none;
-  border: none;
-  color: var(--text2);
-  cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-family: 'DM Sans', sans-serif;
-  white-space: nowrap;
-  transition: all .15s;
-  min-height: 30px;
-}
-
-.table-toolbar button:hover {
-  background: var(--bg3);
-  color: var(--text);
-}
-
-.table-toolbar button.danger:hover {
-  background: rgba(192, 57, 43, .15);
-  color: var(--red);
-}
-
-.table-toolbar .t-sep {
-  width: 1px;
-  background: var(--border2);
-  margin: 2px 2px;
-}
-
-/* Checklist */
-.ql-check {
+.tiptap ul[data-type="taskList"] li {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   margin: 3px 0;
-  line-height: 1.7;
   padding: 2px 0;
-  cursor: text;
 }
 
-.ql-check-box {
+.tiptap ul[data-type="taskList"] li > label {
+  flex: 0 0 auto;
   margin-top: 4px;
+  user-select: none;
+}
+
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"] {
   width: 17px;
   height: 17px;
   border: 2px solid var(--border2);
   border-radius: 4px;
   cursor: pointer;
-  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all .15s;
-  background: transparent;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
-.ql-check-box:hover {
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:hover {
   border-color: var(--accent);
 }
 
-.ql-check.done .ql-check-box {
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
   background: var(--accent);
   border-color: var(--accent);
 }
 
-.ql-check.done .ql-check-box::after {
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
   content: '✓';
   font-size: 11px;
   font-weight: 700;
   color: #0f0f0f;
-  line-height: 1;
 }
 
-.ql-check-text {
-  outline: none;
+.tiptap ul[data-type="taskList"] li > div {
   flex: 1;
   min-width: 0;
-  font-size: 16px;
-  line-height: 1.7;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
 }
 
-.ql-check.done .ql-check-text {
+.tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
   text-decoration: line-through;
   color: var(--text3);
-}
-
-/* Nested list support */
-#editor ul ul,
-#editor ol ol,
-#editor ul ol,
-#editor ol ul {
-  margin-left: 22px;
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-
-#editor li {
-  padding-left: 2px;
 }
 
 
