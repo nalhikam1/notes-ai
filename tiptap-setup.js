@@ -630,3 +630,83 @@ function toggleToolbarDropdown(e, menuId) {
 function closeToolbarDropdown() {
   document.querySelectorAll('.tb-menu').forEach(m => m.classList.remove('show'));
 }
+
+
+// ===== CLEAN AI HTML =====
+function cleanAIHTML(html) {
+  // Create a temporary div to parse HTML
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  
+  // Remove empty paragraphs
+  temp.querySelectorAll('p').forEach(p => {
+    if (!p.textContent.trim() && !p.querySelector('img, br')) {
+      p.remove();
+    }
+  });
+  
+  // Clean up list items - remove nested p tags inside li
+  temp.querySelectorAll('li > p').forEach(p => {
+    const li = p.parentElement;
+    if (li && li.children.length === 1) {
+      // If li only has one p child, unwrap it
+      li.innerHTML = p.innerHTML;
+    }
+  });
+  
+  // Ensure proper spacing between elements
+  temp.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
+    // Remove empty headings
+    if (!heading.textContent.trim()) {
+      heading.remove();
+    }
+  });
+  
+  // Clean up blockquotes
+  temp.querySelectorAll('blockquote').forEach(bq => {
+    // Remove nested blockquotes
+    const nestedBq = bq.querySelector('blockquote');
+    if (nestedBq) {
+      bq.innerHTML = nestedBq.innerHTML;
+    }
+  });
+  
+  // Clean up code blocks
+  temp.querySelectorAll('pre code').forEach(code => {
+    // Remove language class if present (marked.js adds it)
+    code.className = '';
+  });
+  
+  // Remove any script tags for security
+  temp.querySelectorAll('script').forEach(s => s.remove());
+  
+  // Remove any style tags
+  temp.querySelectorAll('style').forEach(s => s.remove());
+  
+  // Clean up excessive line breaks
+  let cleaned = temp.innerHTML;
+  cleaned = cleaned.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '<br>'); // Multiple br to single
+  cleaned = cleaned.replace(/(<\/p>)\s*(<p>)/gi, '$1$2'); // Remove space between paragraphs
+  
+  return cleaned;
+}
+
+// Override the AI content insertion functions to use cleaned HTML
+const originalReplaceWithAIContent = replaceWithAIContent;
+const originalAppendAIContent = appendAIContent;
+const originalInsertAIContent = insertAIContent;
+
+replaceWithAIContent = function(html) {
+  const cleaned = cleanAIHTML(html);
+  originalReplaceWithAIContent(cleaned);
+};
+
+appendAIContent = function(html) {
+  const cleaned = cleanAIHTML(html);
+  originalAppendAIContent(cleaned);
+};
+
+insertAIContent = function(html) {
+  const cleaned = cleanAIHTML(html);
+  originalInsertAIContent(cleaned);
+};
