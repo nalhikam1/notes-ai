@@ -1,305 +1,328 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f0f0f">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Quill</title>
-<link rel="manifest" href="#" id="manifest-link">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0f0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Quill</title>
+  <link rel="manifest" href="#" id="manifest-link">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<!-- ONBOARDING -->
-<div id="onboarding">
-  <div class="onboard-card">
-    <div class="onboard-logo">Quill ✦</div>
-    <p class="onboard-sub">Notes management dengan AI yang mengenal kamu.</p>
-    <div class="step-dots">
-      <div class="step-dot active" id="d0"></div>
-      <div class="step-dot" id="d1"></div>
-      <div class="step-dot" id="d2"></div>
-    </div>
+  <!-- ONBOARDING -->
+  <div id="onboarding">
+    <div class="onboard-card">
+      <div class="onboard-logo">Quill ✦</div>
+      <p class="onboard-sub">Notes management dengan AI yang mengenal kamu.</p>
+      <div class="step-dots">
+        <div class="step-dot active" id="d0"></div>
+        <div class="step-dot" id="d1"></div>
+        <div class="step-dot" id="d2"></div>
+      </div>
 
-    <div class="onboard-step active" id="s0">
-      <div class="step-label">Langkah 1 · Persona</div>
-      <div class="form-group">
-        <label class="form-label">Nama kamu</label>
-        <input class="form-input" id="p-name" placeholder="e.g. Naufal..." type="text" autocomplete="given-name">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Role / Pekerjaan</label>
-        <input class="form-input" id="p-role" placeholder="e.g. Business Analyst, Mahasiswa...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Tentang kamu (opsional)</label>
-        <textarea class="form-textarea" id="p-about" placeholder="Keahlian, fokus kerja, atau hal lain yang relevan..."></textarea>
-      </div>
-      <button class="btn-primary" onclick="nextStep()">Lanjut →</button>
-    </div>
-
-    <div class="onboard-step" id="s1">
-      <div class="step-label">Langkah 2 · Preferensi AI</div>
-      <div class="form-group">
-        <label class="form-label">Gaya komunikasi AI</label>
-        <select class="form-select" id="p-style">
-          <option value="casual">Santai & Friendly</option>
-          <option value="professional">Profesional & Formal</option>
-          <option value="concise">Singkat & To the Point</option>
-          <option value="detailed">Detail & Komprehensif</option>
-          <option value="creative">Kreatif & Eksploratif</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Bahasa</label>
-        <select class="form-select" id="p-lang">
-          <option value="id">Bahasa Indonesia</option>
-          <option value="en">English</option>
-          <option value="mixed">Mixed (Campur)</option>
-        </select>
-      </div>
-      <button class="btn-primary" onclick="nextStep()">Lanjut →</button>
-      <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
-    </div>
-
-    <div class="onboard-step" id="s2">
-      <div class="step-label">Langkah 3 · Setup AI</div>
-      <div class="form-group">
-        <label class="form-label">Provider AI</label>
-        <div class="provider-grid">
-          <button class="provider-btn active" onclick="pickProvider('google',this)">🤖 Google Gemini<br><small style="opacity:.6">Gratis di AI Studio</small></button>
-          <button class="provider-btn" onclick="pickProvider('anthropic',this)">🔮 Claude<br><small style="opacity:.6">Anthropic</small></button>
-          <button class="provider-btn" onclick="pickProvider('groq',this)">⚡ Groq<br><small style="opacity:.6">Llama gratis</small></button>
-          <button class="provider-btn" onclick="pickProvider('nvidia',this)">🟢 NVIDIA NIM<br><small style="opacity:.6">Free credits</small></button>
+      <div class="onboard-step active" id="s0">
+        <div class="step-label">Langkah 1 · Persona</div>
+        <div class="form-group">
+          <label class="form-label">Nama kamu</label>
+          <input class="form-input" id="p-name" placeholder="e.g. Naufal..." type="text" autocomplete="given-name">
         </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">API Key</label>
-        <input class="form-input" id="p-apikey" type="password" placeholder="Masukkan API key..." autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Model</label>
-        <select class="form-select" id="p-model"></select>
-      </div>
-      <button class="btn-primary" onclick="finishOnboarding()">Mulai Quill ✦</button>
-      <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
-    </div>
-  </div>
-</div>
-
-<!-- MAIN APP -->
-<div id="app" style="display:none">
-  <!-- Sidebar overlay (mobile) -->
-  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
-
-  <!-- SIDEBAR -->
-  <div id="sidebar">
-    <div class="sidebar-header">
-      <div class="logo">Quill ✦</div>
-      <div class="sidebar-actions">
-        <button class="icon-btn" onclick="newNote()" title="Note baru" style="font-size:20px">+</button>
-        <button class="icon-btn" onclick="openSettings()" title="Settings">⚙</button>
-      </div>
-    </div>
-    <div class="sidebar-search">
-      <input class="search-input" id="search-input" placeholder="Quick open..." oninput="renderSidebar()">
-    </div>
-    <div class="sidebar-menu" style="flex:unset;border-bottom:none;padding-bottom:0;">
-      <button class="sidebar-item active" onclick="showDashboard()" id="menu-home">🏠 Home Dashboard</button>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 6px;text-transform:uppercase;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.06em;">
-      <span>Projects</span>
-      <button onclick="openNewFolder(null, null, null)" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'" title="New Project">+</button>
-    </div>
-    <div class="sidebar-content" id="sidebar-content"></div>
-    <div class="sidebar-footer">
-      <div class="persona-badge" id="persona-badge">
-        <div class="persona-avatar" id="p-avatar">?</div>
-        <div>
-          <div class="persona-name" id="p-name-badge">-</div>
-          <div class="persona-role" id="p-role-badge">-</div>
+        <div class="form-group">
+          <label class="form-label">Role / Pekerjaan</label>
+          <input class="form-input" id="p-role" placeholder="e.g. Business Analyst, Mahasiswa...">
         </div>
+        <div class="form-group">
+          <label class="form-label">Tentang kamu (opsional)</label>
+          <textarea class="form-textarea" id="p-about"
+            placeholder="Keahlian, fokus kerja, atau hal lain yang relevan..."></textarea>
+        </div>
+        <button class="btn-primary" onclick="nextStep()">Lanjut →</button>
+      </div>
+
+      <div class="onboard-step" id="s1">
+        <div class="step-label">Langkah 2 · Preferensi AI</div>
+        <div class="form-group">
+          <label class="form-label">Gaya komunikasi AI</label>
+          <select class="form-select" id="p-style">
+            <option value="casual">Santai & Friendly</option>
+            <option value="professional">Profesional & Formal</option>
+            <option value="concise">Singkat & To the Point</option>
+            <option value="detailed">Detail & Komprehensif</option>
+            <option value="creative">Kreatif & Eksploratif</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bahasa</label>
+          <select class="form-select" id="p-lang">
+            <option value="id">Bahasa Indonesia</option>
+            <option value="en">English</option>
+            <option value="mixed">Mixed (Campur)</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="nextStep()">Lanjut →</button>
+        <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
+      </div>
+
+      <div class="onboard-step" id="s2">
+        <div class="step-label">Langkah 3 · Setup AI</div>
+        <div class="form-group">
+          <label class="form-label">Provider AI</label>
+          <div class="provider-grid">
+            <button class="provider-btn active" onclick="pickProvider('google',this)">🤖 Google Gemini<br><small
+                style="opacity:.6">Gratis di AI Studio</small></button>
+            <button class="provider-btn" onclick="pickProvider('anthropic',this)">🔮 Claude<br><small
+                style="opacity:.6">Anthropic</small></button>
+            <button class="provider-btn" onclick="pickProvider('groq',this)">⚡ Groq<br><small style="opacity:.6">Llama
+                gratis</small></button>
+            <button class="provider-btn" onclick="pickProvider('nvidia',this)">🟢 NVIDIA NIM<br><small
+                style="opacity:.6">Free credits</small></button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <input class="form-input" id="p-apikey" type="password" placeholder="Masukkan API key..." autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Model</label>
+          <select class="form-select" id="p-model"></select>
+        </div>
+        <button class="btn-primary" onclick="finishOnboarding()">Mulai Quill ✦</button>
+        <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
       </div>
     </div>
   </div>
 
-  <!-- WORKSPACE -->
-  <div id="workspace">
-    <!-- TOP BREADCRUMBS -->
-    <div id="top-nav">
-      <div id="breadcrumbs">
-        <span class="bc-item" onclick="showDashboard()">Home</span>
-        <span class="bc-sep">/</span>
-        <span class="bc-item" id="bc-project">General</span>
-        <span class="bc-sep" id="bc-note-sep">/</span>
-        <span class="bc-item active" id="bc-note">Untitled</span>
-      </div>
-      <div class="top-nav-actions">
-      </div>
-    </div>
+  <!-- MAIN APP -->
+  <div id="app" style="display:none">
+    <!-- Sidebar overlay (mobile) -->
+    <div id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-    <!-- VIEW: GLOBAL DASHBOARD -->
-    <div id="dashboard-view" class="view">
-      <div class="view-header">
-        <h1>Overview</h1>
-        <button class="btn-primary" onclick="openNewFolder()" style="width:auto;padding:8px 16px;">+ New project</button>
-      </div>
-      
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Projects</div>
-          <div class="stat-value" id="stats-projects">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Documents</div>
-          <div class="stat-value" id="stats-docs">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Word Count</div>
-          <div class="stat-value" id="stats-words">0</div>
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">Quill ✦</div>
+        <div class="sidebar-actions">
+          <button class="icon-btn" onclick="newNote()" title="Note baru" style="font-size:20px">+</button>
+          <button class="icon-btn hide-m" onclick="openSettings()" title="Settings">⚙</button>
         </div>
       </div>
-
-      <div class="section-title">My Projects</div>
-      <div id="projects-grid" class="projects-grid"></div>
-    </div>
-
-    <!-- VIEW: PROJECT DASHBOARD -->
-    <div id="project-view" class="view" style="display:none">
-      <div class="view-header">
-        <h1 id="pv-title">Project Title</h1>
-        <div class="view-actions" style="display:flex;gap:8px;align-items:center;">
-          <button class="btn-secondary" onclick="openNewFolder(null, null, event)" style="padding:6px 12px;font-size:12px;">+ Folder</button>
-          <button class="btn-primary" onclick="newNote()" style="padding:6px 12px;font-size:12px;">+ Note</button>
-        </div>
+      <div class="sidebar-search">
+        <input class="search-input" id="search-input" placeholder="Quick open..." oninput="renderSidebar()">
       </div>
-      <div class="view-toggles" style="margin-bottom:16px;">
-        <button class="toggle-btn active" onclick="setProjectView('list',this)">List</button>
-        <button class="toggle-btn" onclick="setProjectView('kanban',this)">Kanban</button>
+      <div class="sidebar-menu" style="flex:unset;border-bottom:none;padding-bottom:0;">
+        <button class="sidebar-item active" onclick="showDashboard()" id="menu-home">🏠 Home Dashboard</button>
       </div>
-
-      <div class="stats-grid compact">
-        <div class="stat-card">
-          <div class="stat-label">Files</div>
-          <div class="stat-value" id="pv-files">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Words</div>
-          <div class="stat-value" id="pv-words">0</div>
-        </div>
+      <div
+        style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 6px;text-transform:uppercase;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.06em;">
+        <span>Projects</span>
+        <button onclick="openNewFolder(null, null, null)"
+          style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:color .2s;"
+          onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'"
+          title="New Project">+</button>
       </div>
-
-      <div id="project-content">
-        <!-- List View Table or Kanban columns go here -->
-      </div>
-    </div>
-
-    <!-- VIEW: EDITOR (The old #main) -->
-    <div id="editor-view" class="view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
-      <!-- TOOLBAR (scrollable horizontal) -->
-      <div id="toolbar">
-        <button class="tb" onclick="fmt('bold')" title="Bold"><b>B</b></button>
-        <button class="tb" onclick="fmt('italic')" title="Italic"><i>I</i></button>
-        <button class="tb" onclick="fmt('underline')" title="Underline"><u>U</u></button>
-        <button class="tb" onclick="fmt('strikeThrough')" title="Strikethrough"><s>S</s></button>
-        <div class="tb-sep"></div>
-        <button class="tb" onclick="fmtBlock('h1')">H1</button>
-        <button class="tb" onclick="fmtBlock('h2')">H2</button>
-        <button class="tb" onclick="fmtBlock('h3')">H3</button>
-        <div class="tb-sep"></div>
-        <button class="tb" onclick="fmt('insertUnorderedList')" title="Bullet list">≡</button>
-        <button class="tb" onclick="fmt('insertOrderedList')" title="Numbered list">1.</button>
-        <button class="tb" onclick="insertChecklist()" title="Checklist">☑</button>
-        <button class="tb" onclick="listIndent()" title="Indent (nested list)">→</button>
-        <button class="tb" onclick="listOutdent()" title="Outdent">←</button>
-        <div class="tb-sep"></div>
-        <button class="tb" onclick="fmtBlock('blockquote')" title="Blockquote">❝</button>
-        <button class="tb" onclick="insertCode()" title="Code">&lt;/&gt;</button>
-        <button class="tb" onclick="insertTable()" title="Tabel">⊞</button>
-        <button class="tb" onclick="insertHR()" title="Divider">—</button>
-        <div class="tb-sep"></div>
-        <button class="tb" onclick="saveAsTemplate()" title="Simpan template">📋</button>
-        <!-- Desktop: chat toggle & AI fill -->
-        <button class="tb desktop-only" onclick="toggleChat()" title="AI Chat" id="chat-toggle-btn">💬</button>
-        <div class="ai-drop desktop-only">
-          <button class="ai-btn" onclick="toggleAIMenu(event)">✦ AI Fill ▾</button>
-          <div class="ai-menu" id="ai-menu">
-            <button class="ai-item" onclick="aiAction('write');closeAIMenu()"><span class="ic">✍</span>Tulis dari judul</button>
-            <button class="ai-item" onclick="aiAction('continue');closeAIMenu()"><span class="ic">→</span>Lanjutkan</button>
-            <button class="ai-item" onclick="aiAction('improve');closeAIMenu()"><span class="ic">✨</span>Perbaiki</button>
-            <button class="ai-item" onclick="aiAction('summarize');closeAIMenu()"><span class="ic">📝</span>Ringkas</button>
-            <button class="ai-item" onclick="aiAction('expand');closeAIMenu()"><span class="ic">↔</span>Perluas</button>
-            <button class="ai-item" onclick="aiAction('bullets');closeAIMenu()"><span class="ic">≡</span>Jadikan bullets</button>
-            <button class="ai-item" onclick="aiAction('table');closeAIMenu()"><span class="ic">⊞</span>Jadikan tabel</button>
+      <div class="sidebar-content" id="sidebar-content"></div>
+      <div class="sidebar-footer">
+        <div class="persona-badge" id="persona-badge">
+          <div class="persona-avatar" id="p-avatar">?</div>
+          <div>
+            <div class="persona-name" id="p-name-badge">-</div>
+            <div class="persona-role" id="p-role-badge">-</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Note header -->
-      <div id="note-header">
-        <input id="note-title" placeholder="Judul note..." oninput="scheduleAutoSave()">
-        <div class="meta-bar">
-          <div class="meta-item">🕐 <span id="meta-time">-</span></div>
-          <div class="meta-item">📅 <span id="meta-date">-</span></div>
-          <div class="meta-item">✦ <span id="meta-words">0 kata</span></div>
-          <span id="meta-saved"></span>
+    <!-- WORKSPACE -->
+    <div id="workspace">
+      <!-- TOP BREADCRUMBS -->
+      <div id="top-nav">
+        <div id="breadcrumbs">
+          <span class="bc-item" onclick="showDashboard()">Home</span>
+          <span class="bc-sep">/</span>
+          <span class="bc-item" id="bc-project">General</span>
+          <span class="bc-sep" id="bc-note-sep">/</span>
+          <span class="bc-item active" id="bc-note">Untitled</span>
+        </div>
+        <div class="top-nav-actions">
         </div>
       </div>
 
-      <div id="editor-wrap">
-        <div id="editor" contenteditable="true" onkeydown="onEditorKey(event)" oninput="onEditorInput()"></div>
+      <!-- VIEW: GLOBAL DASHBOARD -->
+      <div id="dashboard-view" class="view">
+        <div class="view-header">
+          <h1>Overview</h1>
+          <button class="btn-primary" onclick="openNewFolder()" style="width:auto;padding:8px 16px;">+ New
+            project</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Projects</div>
+            <div class="stat-value" id="stats-projects">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Documents</div>
+            <div class="stat-value" id="stats-docs">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Word Count</div>
+            <div class="stat-value" id="stats-words">0</div>
+          </div>
+        </div>
+
+        <div class="section-title">My Projects</div>
+        <div id="projects-grid" class="projects-grid"></div>
       </div>
-    </div>
-  </div>
 
+      <!-- VIEW: PROJECT DASHBOARD -->
+      <div id="project-view" class="view" style="display:none">
+        <div class="view-header">
+          <h1 id="pv-title">Project Title</h1>
+          <div class="view-actions" style="display:flex;gap:8px;align-items:center;">
+            <button class="btn-secondary" onclick="openNewFolder(null, null, event)"
+              style="padding:6px 12px;font-size:12px;">+ Folder</button>
+            <button class="btn-primary" onclick="newNote()" style="padding:6px 12px;font-size:12px;">+ Note</button>
+          </div>
+        </div>
+        <div class="view-toggles" style="margin-bottom:16px;">
+          <button class="toggle-btn active" onclick="setProjectView('list',this)">List</button>
+          <button class="toggle-btn" onclick="setProjectView('kanban',this)">Kanban</button>
+        </div>
 
-  <!-- RIGHT SIDEBAR (Assistant) -->
-  <div id="right-sidebar" class="hidden">
-    <!-- Assistant View -->
-    <div id="rs-chat" class="rs-view">
-      <div class="chat-header" style="justify-content:space-between;">
-        <div class="chat-title-row"><span class="chat-dot"></span>Assistant <span class="badge">beta</span></div>
-        <div style="display:flex;align-items:center;gap:4px;">
-          <button class="icon-btn" onclick="clearChat()">+ New</button>
-          <button class="rs-tab-close" onclick="toggleChat()" style="margin-left:4px;padding:4px 8px;">✕</button>
+        <div class="stats-grid compact">
+          <div class="stat-card">
+            <div class="stat-label">Files</div>
+            <div class="stat-value" id="pv-files">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Words</div>
+            <div class="stat-value" id="pv-words">0</div>
+          </div>
+        </div>
+
+        <div id="project-content">
+          <!-- List View Table or Kanban columns go here -->
         </div>
       </div>
-      <div class="model-picker-wrap">
-        <select id="rs-model-picker" class="model-select" onchange="updateSelectedModel(this.value)"></select>
-      </div>
-      <div id="chat-messages">
-        <div id="chat-empty">Hi 👋. Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>
-      </div>
-      <div class="chat-input-area">
-        <div class="chips-row">
-          <button class="chip" onclick="quickAi('review')">Review</button>
-          <button class="chip" onclick="quickAi('analyze')">Analyze</button>
-          <button class="chip" onclick="quickAi('streamline')">Streamline</button>
-        </div>
-        <div class="chat-input-row">
-          <textarea class="chat-input" id="chat-input" placeholder="Ask anything..." rows="1" oninput="autoResizeChat(this)"></textarea>
-          <button class="chat-send" onclick="sendChat()">↑</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- STATUS FOOTER -->
-  <div id="status-bar">
-    <div class="sb-left">
-      <span id="sb-proj-info">Project: General</span>
-      <span class="sb-sep">|</span>
-      <span id="sb-count">0 words · 0 characters</span>
+      <!-- VIEW: EDITOR (The old #main) -->
+      <div id="editor-view" class="view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+        <!-- TOOLBAR (scrollable horizontal) -->
+        <div id="toolbar">
+          <button class="tb" onclick="fmt('bold')" title="Bold"><b>B</b></button>
+          <button class="tb" onclick="fmt('italic')" title="Italic"><i>I</i></button>
+          <button class="tb" onclick="fmt('underline')" title="Underline"><u>U</u></button>
+          <button class="tb" onclick="fmt('strikeThrough')" title="Strikethrough"><s>S</s></button>
+          <div class="tb-sep"></div>
+          <button class="tb" onclick="fmtBlock('h1')">H1</button>
+          <button class="tb" onclick="fmtBlock('h2')">H2</button>
+          <button class="tb" onclick="fmtBlock('h3')">H3</button>
+          <div class="tb-sep"></div>
+          <button class="tb" onclick="fmt('insertUnorderedList')" title="Bullet list">≡</button>
+          <button class="tb" onclick="fmt('insertOrderedList')" title="Numbered list">1.</button>
+          <button class="tb" onclick="insertChecklist()" title="Checklist">☑</button>
+          <button class="tb" onclick="listIndent()" title="Indent (nested list)">→</button>
+          <button class="tb" onclick="listOutdent()" title="Outdent">←</button>
+          <div class="tb-sep"></div>
+          <button class="tb" onclick="fmtBlock('blockquote')" title="Blockquote">❝</button>
+          <button class="tb" onclick="insertCode()" title="Code">&lt;/&gt;</button>
+          <button class="tb" onclick="insertTable()" title="Tabel">⊞</button>
+          <button class="tb" onclick="insertHR()" title="Divider">—</button>
+          <div class="tb-sep"></div>
+          <button class="tb" onclick="saveAsTemplate()" title="Simpan template">📋</button>
+          <!-- Desktop: chat toggle & AI fill -->
+          <button class="tb desktop-only" onclick="toggleChat()" title="AI Chat" id="chat-toggle-btn">💬</button>
+          <div class="ai-drop desktop-only">
+            <button class="ai-btn" onclick="toggleAIMenu(event)">✦ AI Fill ▾</button>
+            <div class="ai-menu" id="ai-menu">
+              <button class="ai-item" onclick="aiAction('write');closeAIMenu()"><span class="ic">✍</span>Tulis dari
+                judul</button>
+              <button class="ai-item" onclick="aiAction('continue');closeAIMenu()"><span
+                  class="ic">→</span>Lanjutkan</button>
+              <button class="ai-item" onclick="aiAction('improve');closeAIMenu()"><span
+                  class="ic">✨</span>Perbaiki</button>
+              <button class="ai-item" onclick="aiAction('summarize');closeAIMenu()"><span
+                  class="ic">📝</span>Ringkas</button>
+              <button class="ai-item" onclick="aiAction('expand');closeAIMenu()"><span
+                  class="ic">↔</span>Perluas</button>
+              <button class="ai-item" onclick="aiAction('bullets');closeAIMenu()"><span class="ic">≡</span>Jadikan
+                bullets</button>
+              <button class="ai-item" onclick="aiAction('table');closeAIMenu()"><span class="ic">⊞</span>Jadikan
+                tabel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Note header -->
+        <div id="note-header">
+          <input id="note-title" placeholder="Judul note..." oninput="scheduleAutoSave()">
+          <div class="meta-bar">
+            <div class="meta-item">🕐 <span id="meta-time">-</span></div>
+            <div class="meta-item">📅 <span id="meta-date">-</span></div>
+            <div class="meta-item">✦ <span id="meta-words">0 kata</span></div>
+            <span id="meta-saved"></span>
+          </div>
+        </div>
+
+        <div id="editor-wrap">
+          <div id="editor" contenteditable="true" onkeydown="onEditorKey(event)" oninput="onEditorInput()"></div>
+        </div>
+      </div>
     </div>
-    <div class="sb-right">
-      <span id="sb-save-status">Cloud Sync Ready</span>
+
+
+    <!-- RIGHT SIDEBAR (Assistant) -->
+    <div id="right-sidebar" class="hidden">
+      <!-- Assistant View -->
+      <div id="rs-chat" class="rs-view">
+        <div class="chat-header" style="justify-content:space-between;">
+          <div class="chat-title-row"><span class="chat-dot"></span>Assistant <span class="badge">beta</span></div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button class="icon-btn" onclick="clearChat()">+ New</button>
+            <button class="rs-tab-close" onclick="toggleChat()" style="margin-left:4px;padding:4px 8px;">✕</button>
+          </div>
+        </div>
+        <div class="model-picker-wrap">
+          <select id="rs-model-picker" class="model-select" onchange="updateSelectedModel(this.value)"></select>
+        </div>
+        <div id="chat-messages">
+          <div id="chat-empty">Hi 👋. Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chips-row">
+            <button class="chip" onclick="quickAi('review')">Review</button>
+            <button class="chip" onclick="quickAi('analyze')">Analyze</button>
+            <button class="chip" onclick="quickAi('streamline')">Streamline</button>
+          </div>
+          <div class="chat-input-row">
+            <textarea class="chat-input" id="chat-input" placeholder="Ask anything..." rows="1"
+              oninput="autoResizeChat(this)"></textarea>
+            <button class="chat-send" onclick="sendChat()">↑</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+
+    <!-- STATUS FOOTER -->
+    <div id="status-bar">
+      <div class="sb-left">
+        <span id="sb-proj-info">Project: General</span>
+        <span class="sb-sep">|</span>
+        <span id="sb-count">0 words · 0 characters</span>
+      </div>
+      <div class="sb-right">
+        <span id="sb-save-status">Cloud Sync Ready</span>
+      </div>
+    </div>
   </div>
 
   <!-- MOBILE BOTTOM BAR -->
@@ -311,103 +334,118 @@
     <button class="bb-btn" onclick="openSettings()"><span class="bb-icon">⚙</span>Settings</button>
   </div>
 
-<!-- SETTINGS MODAL -->
-<div class="modal-overlay" id="settings-modal" style="display:none" onclick="if(event.target===this)closeSettings()">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Settings</div>
-      <button class="modal-close" onclick="closeSettings()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-section">
-        <div class="modal-section-title">Persona</div>
-        <div class="form-group"><label class="form-label">Nama</label><input class="form-input" id="s-name"></div>
-        <div class="form-group"><label class="form-label">Role</label><input class="form-input" id="s-role"></div>
-        <div class="form-group"><label class="form-label">Tentang</label><textarea class="form-textarea" id="s-about"></textarea></div>
-        <div class="form-group"><label class="form-label">Gaya AI</label>
-          <select class="form-select" id="s-style">
-            <option value="casual">Santai & Friendly</option>
-            <option value="professional">Profesional & Formal</option>
-            <option value="concise">Singkat & To the Point</option>
-            <option value="detailed">Detail & Komprehensif</option>
-            <option value="creative">Kreatif & Eksploratif</option>
-          </select>
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settings-modal" style="display:none" onclick="if(event.target===this)closeSettings()">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Settings</div>
+        <button class="modal-close" onclick="closeSettings()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">Persona</div>
+          <div class="form-group"><label class="form-label">Nama</label><input class="form-input" id="s-name"></div>
+          <div class="form-group"><label class="form-label">Role</label><input class="form-input" id="s-role"></div>
+          <div class="form-group"><label class="form-label">Tentang</label><textarea class="form-textarea"
+              id="s-about"></textarea></div>
+          <div class="form-group"><label class="form-label">Gaya AI</label>
+            <select class="form-select" id="s-style">
+              <option value="casual">Santai & Friendly</option>
+              <option value="professional">Profesional & Formal</option>
+              <option value="concise">Singkat & To the Point</option>
+              <option value="detailed">Detail & Komprehensif</option>
+              <option value="creative">Kreatif & Eksploratif</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Bahasa</label>
+            <select class="form-select" id="s-lang">
+              <option value="id">Bahasa Indonesia</option>
+              <option value="en">English</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
         </div>
-        <div class="form-group"><label class="form-label">Bahasa</label>
-          <select class="form-select" id="s-lang">
-            <option value="id">Bahasa Indonesia</option>
-            <option value="en">English</option>
-            <option value="mixed">Mixed</option>
-          </select>
+        <div class="modal-section">
+          <div class="modal-section-title">AI Provider</div>
+          <div class="provider-grid">
+            <button class="provider-btn" id="sp-google" onclick="settingProvider('google')">🤖 Google Gemini</button>
+            <button class="provider-btn" id="sp-anthropic" onclick="settingProvider('anthropic')">🔮 Claude</button>
+            <button class="provider-btn" id="sp-groq" onclick="settingProvider('groq')">⚡ Groq</button>
+            <button class="provider-btn" id="sp-nvidia" onclick="settingProvider('nvidia')">🟢 NVIDIA NIM</button>
+          </div>
+          <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="s-apikey"
+              type="password"></div>
+          <div class="form-group"><label class="form-label">Model</label><select class="form-select"
+              id="s-model"></select></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn-primary" style="flex:1" onclick="saveSettings()">Simpan</button>
+          <button class="btn-secondary" style="color:var(--red);border-color:var(--red);padding:0 12px;"
+            onclick="resetAllData()" title="Reset All Data">🗑</button>
         </div>
       </div>
-      <div class="modal-section">
-        <div class="modal-section-title">AI Provider</div>
-        <div class="provider-grid">
-          <button class="provider-btn" id="sp-google" onclick="settingProvider('google')">🤖 Google Gemini</button>
-          <button class="provider-btn" id="sp-anthropic" onclick="settingProvider('anthropic')">🔮 Claude</button>
-          <button class="provider-btn" id="sp-groq" onclick="settingProvider('groq')">⚡ Groq</button>
-          <button class="provider-btn" id="sp-nvidia" onclick="settingProvider('nvidia')">🟢 NVIDIA NIM</button>
-        </div>
-        <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="s-apikey" type="password"></div>
-        <div class="form-group"><label class="form-label">Model</label><select class="form-select" id="s-model"></select></div>
+    </div>
+  </div>
+
+
+  <!-- MOVE TO FOLDER MODAL -->
+  <div class="modal-overlay" id="move-modal" style="display:none"
+    onclick="if(event.target===this)document.getElementById('move-modal').style.display='none'">
+    <div class="modal" style="max-width:320px">
+      <div class="modal-header">
+        <div class="modal-title">Pindah ke Folder</div>
+        <button class="modal-close" onclick="document.getElementById('move-modal').style.display='none'">✕</button>
       </div>
-      <div style="display:flex;gap:10px;margin-top:10px;">
-        <button class="btn-primary" style="flex:1" onclick="saveSettings()">Simpan</button>
-        <button class="btn-secondary" style="color:var(--red);border-color:var(--red);padding:0 12px;" onclick="resetAllData()" title="Reset All Data">🗑</button>
+      <div class="modal-body" id="move-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- PROJECT MODAL (Formerly Folder Modal) -->
+  <div class="modal-overlay" id="folder-modal" style="display:none" onclick="if(event.target===this)closeFolderModal()">
+    <div class="modal" style="max-width:340px">
+      <div class="modal-header">
+        <div class="modal-title">New Project</div>
+        <button class="modal-close" onclick="closeFolderModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label" id="f-name-lbl">Project Name</label><input class="form-input"
+            id="f-name" placeholder="e.g. My Novel"></div>
+        <div class="form-group"><label class="form-label">Emoji Icon</label><input class="form-input" id="f-emoji"
+            placeholder="📦"></div>
+        <button class="btn-primary" id="f-submit-btn" onclick="saveFolder()">Create Project</button>
       </div>
     </div>
   </div>
-</div>
 
-
-<!-- MOVE TO FOLDER MODAL -->
-<div class="modal-overlay" id="move-modal" style="display:none" onclick="if(event.target===this)document.getElementById('move-modal').style.display='none'">
-  <div class="modal" style="max-width:320px">
-    <div class="modal-header">
-      <div class="modal-title">Pindah ke Folder</div>
-      <button class="modal-close" onclick="document.getElementById('move-modal').style.display='none'">✕</button>
-    </div>
-    <div class="modal-body" id="move-modal-body"></div>
-  </div>
-</div>
-
-<!-- PROJECT MODAL (Formerly Folder Modal) -->
-<div class="modal-overlay" id="folder-modal" style="display:none" onclick="if(event.target===this)closeFolderModal()">
-  <div class="modal" style="max-width:340px">
-    <div class="modal-header">
-      <div class="modal-title">New Project</div>
-      <button class="modal-close" onclick="closeFolderModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label" id="f-name-lbl">Project Name</label><input class="form-input" id="f-name" placeholder="e.g. My Novel"></div>
-      <div class="form-group"><label class="form-label">Emoji Icon</label><input class="form-input" id="f-emoji" placeholder="📦"></div>
-      <button class="btn-primary" id="f-submit-btn" onclick="saveFolder()">Create Project</button>
+  <!-- TEMPLATE MODAL -->
+  <div class="modal-overlay" id="tmpl-modal" style="display:none" onclick="if(event.target===this)closeTmplModal()">
+    <div class="modal" style="max-width:380px">
+      <div class="modal-header">
+        <div class="modal-title">Simpan Template</div>
+        <button class="modal-close" onclick="closeTmplModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Nama Template</label><input class="form-input" id="tmpl-name"
+            placeholder="e.g. Meeting Notes..."></div>
+        <div class="form-group"><label class="form-label">Deskripsi (opsional)</label><input class="form-input"
+            id="tmpl-desc" placeholder="Deskripsi singkat..."></div>
+        <button class="btn-primary" onclick="confirmSaveTemplate()">Simpan</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- TEMPLATE MODAL -->
-<div class="modal-overlay" id="tmpl-modal" style="display:none" onclick="if(event.target===this)closeTmplModal()">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-header">
-      <div class="modal-title">Simpan Template</div>
-      <button class="modal-close" onclick="closeTmplModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Nama Template</label><input class="form-input" id="tmpl-name" placeholder="e.g. Meeting Notes..."></div>
-      <div class="form-group"><label class="form-label">Deskripsi (opsional)</label><input class="form-input" id="tmpl-desc" placeholder="Deskripsi singkat..."></div>
-      <button class="btn-primary" onclick="confirmSaveTemplate()">Simpan</button>
+  <!-- AI Overlay -->
+  <div id="ai-overlay">
+    <div class="ai-loader">
+      <div class="ai-spinner"></div>
+      <div class="ai-loader-txt" id="ai-ltxt">AI sedang menulis...</div>
     </div>
   </div>
-</div>
 
-<!-- AI Overlay -->
-<div id="ai-overlay"><div class="ai-loader"><div class="ai-spinner"></div><div class="ai-loader-txt" id="ai-ltxt">AI sedang menulis...</div></div></div>
+  <!-- Toast -->
+  <div id="toast"></div>
 
-<!-- Toast -->
-<div id="toast"></div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
+
 </html>
