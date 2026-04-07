@@ -213,7 +213,78 @@ function deleteNote(id,e){
     document.getElementById('empty-state').style.display='flex';
   }
   saveState(); renderSidebar();
+  if(ST.viewType === 'dashboard') renderGlobalDashboard();
+  if(ST.viewType === 'project') renderProjectDashboard();
   showToast('Note dihapus');
+}
+
+function showFolderMenu(id,e){
+  e.stopPropagation();
+  if(_noteMenuEl){_noteMenuEl.remove();_noteMenuEl=null;}
+  const menu=document.createElement('div');
+  menu.className='context-menu';
+  menu.style.cssText=`position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.5);min-width:160px;`;
+  let menuHTML=`<button onclick="deleteFolder('${id}',event)" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;border-radius:5px;text-align:left;">🗑 Hapus Folder</button>`;
+  menu.innerHTML=menuHTML;
+  document.body.appendChild(menu);
+  _noteMenuEl=menu;
+  const rect=e.target.getBoundingClientRect();
+  const mw=170, mh=menu.offsetHeight||40;
+  let left=rect.right-mw, top=rect.bottom+4;
+  if(top+mh>window.innerHeight) top=rect.top-mh-4;
+  if(left<4) left=4;
+  menu.style.left=left+'px'; menu.style.top=top+'px';
+  setTimeout(()=>document.addEventListener('click',()=>{if(_noteMenuEl){_noteMenuEl.remove();_noteMenuEl=null;}},{once:true}),10);
+}
+
+function deleteFolder(id,e){
+  if(e){e.stopPropagation();}
+  if(_noteMenuEl){_noteMenuEl.remove();_noteMenuEl=null;}
+  if(!confirm('Hapus folder ini (semua notes di dalamnya juga akan terhapus)?')) return;
+  ST.folders=ST.folders.filter(f=>f.id!==id);
+  ST.notes=ST.notes.filter(n=>n.folderId!==id); // delete all notes inside it
+  saveState(); renderSidebar();
+  if(ST.viewType === 'dashboard') renderGlobalDashboard();
+  if(ST.viewType === 'project') renderProjectDashboard();
+  showToast('Folder dihapus');
+}
+
+function showProjectMenu(id,e){
+  e.stopPropagation();
+  if(_noteMenuEl){_noteMenuEl.remove();_noteMenuEl=null;}
+  const menu=document.createElement('div');
+  menu.className='context-menu';
+  menu.style.cssText=`position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.5);min-width:160px;`;
+  let menuHTML=`<button onclick="deleteProject('${id}',event)" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;border-radius:5px;text-align:left;">🗑 Hapus Project</button>`;
+  menu.innerHTML=menuHTML;
+  document.body.appendChild(menu);
+  _noteMenuEl=menu;
+  const rect=e.target.getBoundingClientRect();
+  const mw=170, mh=menu.offsetHeight||40;
+  let left=rect.right-mw, top=rect.bottom+4;
+  if(top+mh>window.innerHeight) top=rect.top-mh-4;
+  if(left<4) left=4;
+  menu.style.left=left+'px'; menu.style.top=top+'px';
+  setTimeout(()=>document.addEventListener('click',()=>{if(_noteMenuEl){_noteMenuEl.remove();_noteMenuEl=null;}},{once:true}),10);
+}
+
+function deleteProject(id,e){
+  if(e){e.stopPropagation();}
+  if(_noteMenuEl){_noteMenuEl.remove();_noteMenuEl=null;}
+  if(ST.projects.length<=1){showToast('Tidak bisa hapus project terakhir','error');return;}
+  if(!confirm('Hapus project ini secara permanen beserta SELURUH isinya?')) return;
+  
+  ST.projects=ST.projects.filter(p=>p.id!==id);
+  ST.folders=ST.folders.filter(f=>f.projectId!==id);
+  ST.notes=ST.notes.filter(n=>n.projectId!==id);
+  
+  if(ST.activeProjectId===id){
+    showDashboard();
+  } else {
+    saveState(); renderSidebar();
+    if(ST.viewType === 'dashboard') renderGlobalDashboard();
+  }
+  showToast('Project dihapus');
 }
 
 function fmtTS(iso){
@@ -422,13 +493,16 @@ function renderTree(projectId, parentId, q) {
   folders.forEach(f => {
     const isOpen = ST.openNodes[f.id];
     html += `
-      <div class="tree-row" onclick="toggleNode('${f.id}')">
-        <div style="display:flex;align-items:center;">
+      <div class="tree-row" onclick="toggleNode('${f.id}', event)">
+        <div style="display:flex;align-items:center;flex:1;min-width:0;">
           <span class="tree-arrow ${isOpen ? 'open' : ''}">▶</span>
           <span class="tree-icon">${f.emoji || '📁'}</span>&nbsp;
-          <span>${escHtml(f.name)}</span>
+          <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(f.name)}</span>
         </div>
-        <button class="note-menu-btn" onclick="openNewFolder('${projectId}','${f.id}', event)" title="Sub-folder">+</button>
+        <div style="display:flex;gap:2px;">
+          <button class="note-menu-btn" onclick="newNote('${projectId}','${f.id}'); event.stopPropagation();" title="New Note">+</button>
+          <button class="note-menu-btn" onclick="showFolderMenu('${f.id}', event)" title="Opsi Folder">⋯</button>
+        </div>
       </div>
       <div class="tree-children ${isOpen ? 'open' : ''}">
         ${isOpen ? renderTree(projectId, f.id, q) : ''}
@@ -439,8 +513,9 @@ function renderTree(projectId, parentId, q) {
   notes.forEach(n => {
     if(q && !(n.title||'').toLowerCase().includes(q) && !(n.content||'').toLowerCase().includes(q)) return;
     html += `
-      <div class="tree-item sidebar-item ${n.id === ST.activeId ? 'active' : ''}" onclick="openNote('${n.id}')">
-        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📝 ${escHtml(n.title)||'Untitled'}</span>
+      <div class="tree-item sidebar-item ${n.id === ST.activeId ? 'active' : ''}" onclick="openNote('${n.id}')" style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;">📝 ${escHtml(n.title)||'Untitled'}</span>
+        <button class="note-menu-btn" onclick="showNoteMenu('${n.id}', event)">⋯</button>
       </div>
     `;
   });
@@ -462,12 +537,15 @@ function renderSidebar(){
     const isOpen = ST.openNodes[p.id] || ST.activeProjectId === p.id;
     html += `
       <div class="tree-row ${ST.activeProjectId === p.id && !ST.activeId ? 'active' : ''}" onclick="openProject('${p.id}')">
-        <div style="display:flex;align-items:center;" onclick="toggleNode('${p.id}', event)">
+        <div style="display:flex;align-items:center;flex:1;min-width:0;" onclick="toggleNode('${p.id}', event)">
           <span class="tree-arrow ${isOpen ? 'open' : ''}">▶</span>
           <span class="tree-icon">${p.emoji || '📦'}</span>&nbsp;
-          <span style="font-weight:600;">${escHtml(p.name)}</span>
+          <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(p.name)}</span>
         </div>
-        <button class="note-menu-btn" onclick="newNote('${p.id}'); event.stopPropagation();" title="New Note">📝</button>
+        <div style="display:flex;gap:2px;">
+          <button class="note-menu-btn" onclick="openNewFolder('${p.id}', null, event)" title="New Folder">+</button>
+          <button class="note-menu-btn" onclick="showProjectMenu('${p.id}', event)" title="Opsi Project">⋯</button>
+        </div>
       </div>
       <div class="tree-children ${isOpen ? 'open' : ''}">
         ${isOpen ? renderTree(p.id, null, q) : ''}
@@ -595,11 +673,11 @@ function saveFolder(){
   }
 }
 
-function newNote(projectId = null){
+function newNote(projectId = null, folderId = null){
   const projId = projectId || ST.activeProjectId || (ST.projects[0] ? ST.projects[0].id : 'p-general');
   const n={
     id:uid(), title:'', content:'', 
-    projectId:projId, folderId:null, // Root note in project by default
+    projectId:projId, folderId:folderId, // Assign to correct folder if provided
     status:'To Do',
     createdAt:new Date().toISOString(), 
     updatedAt:new Date().toISOString()
