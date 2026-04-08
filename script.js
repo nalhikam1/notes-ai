@@ -146,15 +146,17 @@ function openProject(id){
 }
 
 function updateBreadcrumbs(){
-  const bcProj=document.getElementById('bc-project');
-  const bcNote=document.getElementById('bc-note');
-  const bcSep=document.getElementById('bc-note-sep');
-  
-  // Clear existing breadcrumbs (except Home)
   const breadcrumbsEl = document.getElementById('breadcrumbs');
-  const homeItem = breadcrumbsEl.querySelector('.bc-item:first-child');
-  const homeSep = breadcrumbsEl.querySelector('.bc-sep:first-child');
+  
+  // Clear all breadcrumbs
   breadcrumbsEl.innerHTML = '';
+  
+  // Always add Home (clickable)
+  const homeItem = document.createElement('span');
+  homeItem.className = 'bc-item';
+  homeItem.textContent = 'Home';
+  homeItem.style.cursor = 'pointer';
+  homeItem.onclick = () => showDashboard();
   breadcrumbsEl.appendChild(homeItem);
   
   if(ST.activeProjectId){
@@ -171,7 +173,7 @@ function updateBreadcrumbs(){
       projItem.className = 'bc-item';
       projItem.textContent = p.name;
       projItem.style.cursor = 'pointer';
-      projItem.onclick = () => showProjectDashboard(p.id);
+      projItem.onclick = () => openProject(p.id);
       breadcrumbsEl.appendChild(projItem);
     }
   }
@@ -196,7 +198,7 @@ function updateBreadcrumbs(){
           folderItem.style.cursor = 'pointer';
           folderItem.onclick = () => {
             ST.openNodes[folder.id] = true;
-            showProjectDashboard(n.projectId);
+            openProject(n.projectId);
           };
           breadcrumbsEl.appendChild(folderItem);
         }
