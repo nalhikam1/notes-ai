@@ -587,6 +587,80 @@ function tiptapClearFormat() {
   }
 }
 
+// ===== CLEAN EDITOR CONTENT =====
+function cleanEditorFormatting() {
+  if (!ST.activeId) {
+    showToast('Buka note dulu', 'error');
+    return;
+  }
+  
+  if (!confirm('Bersihkan formatting berlebihan dari konten editor? (Struktur konten tetap dipertahankan)')) {
+    return;
+  }
+  
+  // Get current HTML
+  const currentHTML = getEditorHTML();
+  
+  // Create temp div to clean
+  const temp = document.createElement('div');
+  temp.innerHTML = currentHTML;
+  
+  // Remove excessive whitespace from all text nodes
+  const walker = document.createTreeWalker(
+    temp,
+    NodeFilter.SHOW_TEXT,
+    null,
+    false
+  );
+  
+  let node;
+  while (node = walker.nextNode()) {
+    // Clean excessive whitespace
+    node.textContent = node.textContent.replace(/\s+/g, ' ');
+  }
+  
+  // Clean all elements
+  temp.querySelectorAll('*').forEach(el => {
+    // Remove excessive whitespace in innerHTML
+    if (el.children.length === 0) {
+      el.innerHTML = el.innerHTML.trim();
+    }
+  });
+  
+  // Remove empty paragraphs
+  temp.querySelectorAll('p').forEach(p => {
+    if (!p.textContent.trim() && !p.querySelector('img, br, code')) {
+      p.remove();
+    }
+  });
+  
+  // Clean list items
+  temp.querySelectorAll('li').forEach(li => {
+    li.innerHTML = li.innerHTML.replace(/\s+/g, ' ').trim();
+  });
+  
+  // Clean headings
+  temp.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+    h.innerHTML = h.innerHTML.replace(/\s+/g, ' ').trim();
+  });
+  
+  // Get cleaned HTML
+  let cleaned = temp.innerHTML;
+  
+  // Additional cleaning
+  cleaned = cleaned.replace(/>\s+</g, '><');  // Remove whitespace between tags
+  cleaned = cleaned.replace(/(<br\s*\/?>\s*){2,}/gi, '<br>');  // Remove multiple br
+  cleaned = cleaned.replace(/(<\/p>)\s*(<p>)/gi, '$1$2');  // Clean paragraph spacing
+  
+  // Set cleaned content back
+  setEditorHTML(cleaned);
+  
+  // Save
+  scheduleAutoSave();
+  
+  showToast('Formatting dibersihkan ✓', 'success');
+}
+
 
 // ===== TOOLBAR DROPDOWN =====
 function toggleToolbarDropdown(e, menuId) {
@@ -638,10 +712,15 @@ function cleanAIHTML(html) {
   const temp = document.createElement('div');
   temp.innerHTML = html;
   
-  // Remove empty paragraphs
+  // Remove empty paragraphs and excessive whitespace
   temp.querySelectorAll('p').forEach(p => {
-    if (!p.textContent.trim() && !p.querySelector('img, br')) {
+    // Trim whitespace inside paragraph
+    const text = p.textContent.trim();
+    if (!text && !p.querySelector('img, br, code')) {
       p.remove();
+    } else if (text) {
+      // Clean up excessive whitespace within text
+      p.innerHTML = p.innerHTML.replace(/\s+/g, ' ').trim();
     }
   });
   
@@ -649,9 +728,14 @@ function cleanAIHTML(html) {
   temp.querySelectorAll('li > p').forEach(p => {
     const li = p.parentElement;
     if (li && li.children.length === 1) {
-      // If li only has one p child, unwrap it
-      li.innerHTML = p.innerHTML;
+      // If li only has one p child, unwrap it and clean whitespace
+      li.innerHTML = p.innerHTML.replace(/\s+/g, ' ').trim();
     }
+  });
+  
+  // Clean up all list items for excessive whitespace
+  temp.querySelectorAll('li').forEach(li => {
+    li.innerHTML = li.innerHTML.replace(/\s+/g, ' ').trim();
   });
   
   // Ensure proper spacing between elements
@@ -659,6 +743,9 @@ function cleanAIHTML(html) {
     // Remove empty headings
     if (!heading.textContent.trim()) {
       heading.remove();
+    } else {
+      // Clean whitespace in headings
+      heading.innerHTML = heading.innerHTML.replace(/\s+/g, ' ').trim();
     }
   });
   
@@ -669,6 +756,8 @@ function cleanAIHTML(html) {
     if (nestedBq) {
       bq.innerHTML = nestedBq.innerHTML;
     }
+    // Clean whitespace
+    bq.innerHTML = bq.innerHTML.replace(/\s+/g, ' ').trim();
   });
   
   // Clean up code blocks
@@ -677,16 +766,43 @@ function cleanAIHTML(html) {
     code.className = '';
   });
   
+  // Clean up tables
+  temp.querySelectorAll('td, th').forEach(cell => {
+    cell.innerHTML = cell.innerHTML.replace(/\s+/g, ' ').trim();
+  });
+  
   // Remove any script tags for security
   temp.querySelectorAll('script').forEach(s => s.remove());
   
   // Remove any style tags
   temp.querySelectorAll('style').forEach(s => s.remove());
   
-  // Clean up excessive line breaks
+  // Clean up excessive line breaks and whitespace
   let cleaned = temp.innerHTML;
-  cleaned = cleaned.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '<br>'); // Multiple br to single
-  cleaned = cleaned.replace(/(<\/p>)\s*(<p>)/gi, '$1$2'); // Remove space between paragraphs
+  
+  // Remove multiple consecutive br tags
+  cleaned = cleaned.replace(/(<br\s*\/?>\s*){2,}/gi, '<br>');
+  
+  // Remove whitespace between closing and opening tags
+  cleaned = cleaned.replace(/>\s+</g, '><');
+  
+  // Remove excessive spaces within text content
+  cleaned = cleaned.replace(/\s{2,}/g, ' ');
+  
+  // Clean up paragraph spacing
+  cleaned = cleaned.replace(/(<\/p>)\s*(<p>)/gi, '$1$2');
+  
+  // Remove leading/trailing whitespace in paragraphs
+  cleaned = cleaned.replace(/<p>\s+/gi, '<p>');
+  cleaned = cleaned.replace(/\s+<\/p>/gi, '</p>');
+  
+  // Clean up list spacing
+  cleaned = cleaned.replace(/<li>\s+/gi, '<li>');
+  cleaned = cleaned.replace(/\s+<\/li>/gi, '</li>');
+  
+  // Clean up heading spacing
+  cleaned = cleaned.replace(/<(h[1-6])>\s+/gi, '<$1>');
+  cleaned = cleaned.replace(/\s+<\/(h[1-6])>/gi, '</$1>');
   
   return cleaned;
 }

@@ -1166,7 +1166,15 @@ function buildSysPrompt(){
   const langs={id:'Bahasa Indonesia',en:'English',mixed:'mix Bahasa Indonesia dan English'};
   return `Kamu adalah asisten notes cerdas untuk ${p.name}, seorang ${p.role||'pengguna'}.${p.about?`\nTentang mereka: ${p.about}`:''}
 Gaya komunikasi: ${styles[p.style]||'natural'}. Gunakan ${langs[p.lang]||'Bahasa Indonesia'}.
-Selalu format output dengan markdown yang rapi. Tulis konten yang langsung berguna dan berkualitas tinggi.`;
+
+PENTING - Aturan Formatting:
+1. Tulis konten yang PADAT dan LANGSUNG ke inti
+2. JANGAN gunakan spasi berlebihan atau line break ganda
+3. Gunakan markdown yang BERSIH dan MINIMAL
+4. Untuk list: langsung tulis item tanpa spasi ekstra
+5. Untuk paragraf: pisahkan dengan 1 line break saja
+6. HINDARI formatting yang berlebihan
+7. Tulis konten yang berkualitas tinggi dan langsung berguna`;
 }
 
 // ===== AI API CALL (via Vercel API) =====
@@ -1192,20 +1200,28 @@ async function aiAction(action){
   const content = getEditorText(); // Use Tiptap getText
   
   const prompts={
-    write:`Tulis konten yang komprehensif untuk note berjudul: "${title}". Format dengan markdown yang rapi.`,
-    continue:`Lanjutkan tulisan ini secara natural:\n\n${content}`,
-    improve:`Perbaiki tulisan ini dari segi kejelasan dan struktur (pertahankan ide utama):\n\n${content}`,
-    summarize:`Buat ringkasan terstruktur dalam bullet points:\n\n${content}`,
-    expand:`Elaborasi dengan lebih banyak detail dan contoh:\n\n${content}`,
-    bullets:`Konversi menjadi bullet points ringkas:\n\n${content}`,
-    table:`Konversi menjadi tabel markdown yang informatif:\n\n${content}`
+    write:`Tulis konten yang komprehensif untuk note berjudul: "${title}". Format dengan markdown yang rapi dan PADAT tanpa spasi berlebihan.`,
+    continue:`Lanjutkan tulisan ini secara natural dan PADAT:\n\n${content}`,
+    improve:`Perbaiki tulisan ini dari segi kejelasan dan struktur (pertahankan ide utama). Buat lebih PADAT dan EFISIEN:\n\n${content}`,
+    summarize:`Buat ringkasan PADAT dalam bullet points SINGKAT:\n\n${content}`,
+    expand:`Elaborasi dengan lebih banyak detail dan contoh, tapi tetap PADAT:\n\n${content}`,
+    bullets:`Konversi menjadi bullet points RINGKAS dan PADAT:\n\n${content}`,
+    table:`Konversi menjadi tabel markdown yang INFORMATIF dan PADAT:\n\n${content}`
   };
   const labels={write:'AI menulis...',continue:'AI melanjutkan...',improve:'AI memperbaiki...',summarize:'AI meringkas...',expand:'AI mengembangkan...',bullets:'Mengonversi...',table:'Membuat tabel...'};
   document.getElementById('ai-ltxt').textContent=labels[action];
   document.getElementById('ai-overlay').classList.add('show');
   try{
     const result=await callAI([{role:'user',content:prompts[action]}]);
-    const html=marked.parse(result);
+    
+    // Clean the markdown result before parsing
+    const cleanedResult = result
+      .replace(/\n{3,}/g, '\n\n')  // Remove excessive line breaks
+      .replace(/\s+$/gm, '')        // Remove trailing spaces
+      .replace(/^\s+/gm, '')        // Remove leading spaces
+      .trim();
+    
+    const html=marked.parse(cleanedResult);
     
     // Use Tiptap functions to insert content
     if(['write','summarize','bullets','table'].includes(action)){
@@ -1291,8 +1307,32 @@ function appendChatMsg(container,role,content){
   const ts=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
   let rendered='';
   if(role==='ai'){
-    // Ensure all markdown goes into the single bubble nicely
-    rendered=marked.parse(content);
+    // Clean the content before parsing
+    const cleanedContent = content
+      .replace(/\n{3,}/g, '\n\n')  // Remove excessive line breaks
+      .replace(/\s+$/gm, '')        // Remove trailing spaces
+      .trim();
+    
+    // Parse markdown
+    rendered = marked.parse(cleanedContent);
+    
+    // Additional HTML cleaning
+    const temp = document.createElement('div');
+    temp.innerHTML = rendered;
+    
+    // Remove empty paragraphs
+    temp.querySelectorAll('p').forEach(p => {
+      if (!p.textContent.trim()) {
+        p.remove();
+      }
+    });
+    
+    // Clean list items
+    temp.querySelectorAll('li').forEach(li => {
+      li.innerHTML = li.innerHTML.replace(/\s+/g, ' ').trim();
+    });
+    
+    rendered = temp.innerHTML;
   } else {
     rendered=escHtml(content).replace(/\n/g,'<br>');
   }
