@@ -19,6 +19,13 @@ let isGuest = false;
 
 function initFirebase() {
   try {
+    // Check if Firebase is loaded
+    if (typeof firebase === 'undefined') {
+      console.warn('Firebase SDK not loaded');
+      updateSyncStatus('local');
+      return;
+    }
+    
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     auth = firebase.auth();
@@ -32,6 +39,7 @@ function initFirebase() {
     console.error('Firebase initialization error:', error);
     // Fallback to localStorage only
     showToast('Cloud sync unavailable, using local storage only', 'error');
+    updateSyncStatus('local');
   }
 }
 
