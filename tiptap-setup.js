@@ -47,6 +47,15 @@ function initTiptap() {
             class: 'code-block',
           },
         },
+        // Ensure markdown shortcuts are enabled (default is true)
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
       }),
     ];
 
@@ -248,6 +257,33 @@ function destroyEditor() {
 
 // ===== TOOLBAR COMMANDS =====
 
+// Helper function to preserve scroll position during formatting
+function preserveScrollAndFocus(callback) {
+  if (!useTiptap || !editor) {
+    callback();
+    return;
+  }
+  
+  const editorWrap = document.getElementById('editor-wrap');
+  const scrollTop = editorWrap ? editorWrap.scrollTop : 0;
+  const { from } = editor.state.selection;
+  
+  callback();
+  
+  setTimeout(() => {
+    if (editorWrap) {
+      editorWrap.scrollTop = scrollTop;
+    }
+    editor.commands.focus();
+    try {
+      editor.commands.setTextSelection(from);
+    } catch (e) {
+      // Selection might be invalid after transformation, just focus
+      editor.commands.focus();
+    }
+  }, 0);
+}
+
 // Text formatting
 function tiptapBold() {
   if (useTiptap && editor) {
@@ -284,7 +320,9 @@ function tiptapStrike() {
 // Headings
 function tiptapHeading(level) {
   if (useTiptap && editor) {
-    editor.chain().focus().toggleHeading({ level }).run();
+    preserveScrollAndFocus(() => {
+      editor.chain().focus().toggleHeading({ level }).run();
+    });
   } else {
     document.execCommand('formatBlock', false, `<h${level}>`);
   }
@@ -292,7 +330,9 @@ function tiptapHeading(level) {
 
 function tiptapParagraph() {
   if (useTiptap && editor) {
-    editor.chain().focus().setParagraph().run();
+    preserveScrollAndFocus(() => {
+      editor.chain().focus().setParagraph().run();
+    });
   } else {
     document.execCommand('formatBlock', false, '<p>');
   }
@@ -301,7 +341,9 @@ function tiptapParagraph() {
 // Lists
 function tiptapBulletList() {
   if (useTiptap && editor) {
-    editor.chain().focus().toggleBulletList().run();
+    preserveScrollAndFocus(() => {
+      editor.chain().focus().toggleBulletList().run();
+    });
   } else {
     document.execCommand('insertUnorderedList', false, null);
   }
@@ -309,7 +351,9 @@ function tiptapBulletList() {
 
 function tiptapOrderedList() {
   if (useTiptap && editor) {
-    editor.chain().focus().toggleOrderedList().run();
+    preserveScrollAndFocus(() => {
+      editor.chain().focus().toggleOrderedList().run();
+    });
   } else {
     document.execCommand('insertOrderedList', false, null);
   }
@@ -317,7 +361,9 @@ function tiptapOrderedList() {
 
 function tiptapTaskList() {
   if (useTiptap && editor) {
-    editor.chain().focus().toggleTaskList().run();
+    preserveScrollAndFocus(() => {
+      editor.chain().focus().toggleTaskList().run();
+    });
   } else {
     // Fallback: insert a simple checkbox list item
     const html = '<ul><li><input type="checkbox"> Task item</li></ul>';
@@ -328,7 +374,9 @@ function tiptapTaskList() {
 // Blockquote
 function tiptapBlockquote() {
   if (useTiptap && editor) {
-    editor.chain().focus().toggleBlockquote().run();
+    preserveScrollAndFocus(() => {
+      editor.chain().focus().toggleBlockquote().run();
+    });
   } else {
     document.execCommand('formatBlock', false, '<blockquote>');
   }
@@ -650,7 +698,7 @@ function cleanEditorFormatting() {
     return;
   }
   
-  if (!confirm('Bersihkan formatting berlebihan dari konten editor? (Struktur konten tetap dipertahankan)')) {
+  if (!confirm('Rapihkan konten editor?\n\nIni akan:\n✓ Menghapus whitespace berlebihan\n✓ Menghapus paragraf kosong\n✓ Merapikan spacing\n\n✗ TIDAK menghapus formatting (bold, heading, list, dll tetap dipertahankan)')) {
     return;
   }
   
@@ -671,7 +719,7 @@ function cleanEditorFormatting() {
   
   let node;
   while (node = walker.nextNode()) {
-    // Clean excessive whitespace
+    // Clean excessive whitespace (but preserve single spaces)
     node.textContent = node.textContent.replace(/\s+/g, ' ');
   }
   
@@ -683,9 +731,9 @@ function cleanEditorFormatting() {
     }
   });
   
-  // Remove empty paragraphs
+  // Remove empty paragraphs (but keep ones with br or other content)
   temp.querySelectorAll('p').forEach(p => {
-    if (!p.textContent.trim() && !p.querySelector('img, br, code')) {
+    if (!p.textContent.trim() && !p.querySelector('img, br, code, strong, em, a')) {
       p.remove();
     }
   });
@@ -705,7 +753,7 @@ function cleanEditorFormatting() {
   
   // Additional cleaning
   cleaned = cleaned.replace(/>\s+</g, '><');  // Remove whitespace between tags
-  cleaned = cleaned.replace(/(<br\s*\/?>\s*){2,}/gi, '<br>');  // Remove multiple br
+  cleaned = cleaned.replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>');  // Max 2 consecutive br
   cleaned = cleaned.replace(/(<\/p>)\s*(<p>)/gi, '$1$2');  // Clean paragraph spacing
   
   // Set cleaned content back
@@ -714,7 +762,7 @@ function cleanEditorFormatting() {
   // Save
   scheduleAutoSave();
   
-  showToast('Formatting dibersihkan ✓', 'success');
+  showToast('Konten berhasil dirapihkan ✓', 'success');
 }
 
 
