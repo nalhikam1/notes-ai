@@ -642,6 +642,35 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Keyboard detection for mobile toolbar positioning
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const toolbar = document.getElementById('mobile-toolbar');
+    if (toolbar && window.innerWidth <= 900) {
+      const keyboardHeight = window.innerHeight - window.visualViewport.height;
+      if (keyboardHeight > 0) {
+        toolbar.style.bottom = `${keyboardHeight}px`;
+      } else {
+        toolbar.style.bottom = '0px';
+      }
+    }
+  });
+}
+
+// Alternative method for older browsers
+window.addEventListener('resize', () => {
+  const toolbar = document.getElementById('mobile-toolbar');
+  if (toolbar && window.innerWidth <= 900) {
+    // Simple detection: if viewport height decreased significantly, keyboard is likely open
+    const viewportHeight = window.innerHeight;
+    const screenHeight = window.screen.height;
+    if (viewportHeight < screenHeight * 0.75) {
+      // Keyboard is likely open
+      toolbar.style.bottom = '0px'; // Will be above keyboard automatically
+    }
+  }
+});
+
 // ===== TEMPLATES =====
 function saveAsTemplate(){
   if(!ST.activeId){showToast('Buka note dulu','error');return;}

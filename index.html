@@ -131,30 +131,34 @@
         <input class="search-input" id="search-input" placeholder="Quick open..." oninput="renderSidebar()">
       </div>
       
-      <!-- Collapsible Sections -->
-      <div class="sidebar-section">
-        <div class="section-header" onclick="toggleSection('home')">
-          <span class="section-arrow" id="arrow-home">▼</span>
-          <span class="section-title">Home</span>
+      <!-- Scrollable Content Area -->
+      <div class="sidebar-scroll">
+        <!-- Home Section -->
+        <div class="sidebar-section">
+          <div class="section-header" onclick="toggleSection('home')">
+            <span class="section-arrow" id="arrow-home">▼</span>
+            <span class="section-title">Home</span>
+          </div>
+          <div class="section-content" id="section-home">
+            <button class="sidebar-item active" onclick="showDashboard()" id="menu-home">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Dashboard
+            </button>
+          </div>
         </div>
-        <div class="section-content" id="section-home">
-          <button class="sidebar-item active" onclick="showDashboard()" id="menu-home">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Dashboard
-          </button>
-        </div>
-      </div>
-      
-      <div class="sidebar-section">
-        <div class="section-header" onclick="toggleSection('projects')">
-          <span class="section-arrow" id="arrow-projects">▼</span>
-          <span class="section-title">Projects</span>
-          <button class="section-action" onclick="openNewFolder(null, null, event); event.stopPropagation();" title="New Project">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          </button>
-        </div>
-        <div class="section-content" id="section-projects">
-          <div id="sidebar-content"></div>
+        
+        <!-- Projects Section -->
+        <div class="sidebar-section">
+          <div class="section-header" onclick="toggleSection('projects')">
+            <span class="section-arrow" id="arrow-projects">▼</span>
+            <span class="section-title">Projects</span>
+            <button class="section-action" onclick="openNewFolder(null, null, event); event.stopPropagation();" title="New Project">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+          <div class="section-content" id="section-projects">
+            <div id="sidebar-content"></div>
+          </div>
         </div>
       </div>
       
