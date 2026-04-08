@@ -585,6 +585,63 @@ function closeSidebar(){
   document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
+// ===== SIDEBAR SECTIONS =====
+const sectionStates = {
+  home: true,
+  projects: true
+};
+
+function toggleSection(sectionId) {
+  sectionStates[sectionId] = !sectionStates[sectionId];
+  const content = document.getElementById(`section-${sectionId}`);
+  const arrow = document.getElementById(`arrow-${sectionId}`);
+  
+  if (sectionStates[sectionId]) {
+    content.classList.remove('collapsed');
+    arrow.classList.remove('collapsed');
+  } else {
+    content.classList.add('collapsed');
+    arrow.classList.add('collapsed');
+  }
+}
+
+// ===== MOBILE TOOLBAR =====
+let activeMobileMenu = null;
+
+function toggleMobileMenu(menuId) {
+  const menu = document.getElementById(`mobile-menu-${menuId}`);
+  
+  // Close other menus
+  document.querySelectorAll('.mobile-menu').forEach(m => {
+    if (m.id !== `mobile-menu-${menuId}`) {
+      m.classList.remove('show');
+    }
+  });
+  
+  // Toggle current menu
+  if (activeMobileMenu === menuId) {
+    menu.classList.remove('show');
+    activeMobileMenu = null;
+  } else {
+    menu.classList.add('show');
+    activeMobileMenu = menuId;
+  }
+}
+
+function closeMobileMenu() {
+  document.querySelectorAll('.mobile-menu').forEach(m => {
+    m.classList.remove('show');
+  });
+  activeMobileMenu = null;
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.mobile-toolbar') && !e.target.closest('.mobile-menu')) {
+    closeMobileMenu();
+  }
+});
+
 // ===== TEMPLATES =====
 function saveAsTemplate(){
   if(!ST.activeId){showToast('Buka note dulu','error');return;}
