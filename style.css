@@ -1597,7 +1597,7 @@ body {
   margin-bottom: 0 !important;
 }
 
-/* Tiptap Table */
+/* Tiptap Table - with horizontal scroll wrapper */
 .tiptap table,
 #editor[contenteditable="true"] table {
   width: 100%;
@@ -1606,6 +1606,24 @@ body {
   font-size: 14px;
   table-layout: auto;
   border: 1px solid var(--border);
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Table wrapper for custom tables */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 16px 0;
+  position: relative;
+  border-radius: var(--r2);
+}
+
+.table-wrap table {
+  margin: 0;
+  width: 100%;
+  min-width: 100%;
 }
 
 .tiptap table th,
@@ -1620,6 +1638,7 @@ body {
   text-transform: uppercase;
   border: 1px solid var(--border2);
   vertical-align: top;
+  white-space: nowrap;
 }
 
 .tiptap table td,
@@ -1629,6 +1648,7 @@ body {
   color: var(--text);
   line-height: 1.6;
   vertical-align: top;
+  white-space: nowrap;
 }
 
 .tiptap table tr:nth-child(even) td,
@@ -1643,6 +1663,19 @@ body {
 
 .tiptap table .selectedCell {
   background: var(--accent-dim);
+}
+
+/* Table wrapper for better mobile scrolling */
+.tiptap .table-wrapper,
+#editor[contenteditable="true"] .table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 16px 0;
+}
+
+.tiptap .table-wrapper table,
+#editor[contenteditable="true"] .table-wrapper table {
+  margin: 0;
 }
 
 /* Table in lists */
@@ -2434,6 +2467,45 @@ body {
   padding: 10px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
+}
+
+.chips-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.chips-row::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  padding: 6px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  color: var(--text2);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.chip:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip:active {
+  transform: scale(0.95);
 }
 
 .chat-input-row {
