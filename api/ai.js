@@ -1,5 +1,5 @@
 module.exports = async function handler(req, res) {
-  // CORS headers agar bisa dipanggil dari browser
+  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -7,10 +7,15 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Kini hanya fokus pada param penting untuk NVIDIA
-  const { apiKey, model, messages, system } = req.body;
-  if (!apiKey || !model || !messages) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  // Get API key from environment variable
+  const apiKey = process.env.NVIDIA_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'NVIDIA API key not configured on server' });
+  }
+
+  const { model, messages, system } = req.body;
+  if (!model || !messages) {
+    return res.status(400).json({ error: 'Missing required fields: model, messages' });
   }
 
   try {
@@ -37,7 +42,7 @@ module.exports = async function handler(req, res) {
       return res.status(response.status).json({ error: msg });
     }
 
-    // Ekstrak teks bentuk OpenAI-style milik NVIDIA
+    // Extract text from NVIDIA response (OpenAI-compatible format)
     const text = data.choices[0].message.content;
     return res.status(200).json({ text });
 

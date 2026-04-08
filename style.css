@@ -2757,3 +2757,43 @@ body {
   padding: 2px 0;
   border-radius: 2px;
 }
+
+
+/* ===== AUTH SECTION ===== */
+#auth-section {
+  font-size: 11px;
+}
+
+.auth-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+}
+
+.auth-info span {
+  flex: 1;
+  min-width: 100px;
+  color: var(--text2);
+}
+
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-buttons .btn-primary,
+.auth-buttons .btn-secondary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  padding: 10px 14px;
+}
+
+.auth-buttons .btn-primary svg {
+  flex-shrink: 0;
+}

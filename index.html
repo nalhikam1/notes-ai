@@ -15,6 +15,11 @@
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  
   <!-- Tiptap Editor - Using unpkg for better compatibility -->
   <script src="https://unpkg.com/@tiptap/core@2.1.13/dist/tiptap-core.umd.min.js"></script>
   <script src="https://unpkg.com/@tiptap/pm@2.1.13/dist/tiptap-pm.umd.min.js"></script>
@@ -93,26 +98,9 @@
       </div>
 
       <div class="onboard-step" id="s2">
-        <div class="step-label">Langkah 3 · Setup AI</div>
+        <div class="step-label">Langkah 3 · Pilih Model AI</div>
         <div class="form-group">
-          <label class="form-label">Provider AI</label>
-          <div class="provider-grid">
-            <button class="provider-btn active" onclick="pickProvider('google',this)">🤖 Google Gemini<br><small
-                style="opacity:.6">Gratis di AI Studio</small></button>
-            <button class="provider-btn" onclick="pickProvider('anthropic',this)">🔮 Claude<br><small
-                style="opacity:.6">Anthropic</small></button>
-            <button class="provider-btn" onclick="pickProvider('groq',this)">⚡ Groq<br><small style="opacity:.6">Llama
-                gratis</small></button>
-            <button class="provider-btn" onclick="pickProvider('nvidia',this)">🟢 NVIDIA NIM<br><small
-                style="opacity:.6">Free credits</small></button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">API Key</label>
-          <input class="form-input" id="p-apikey" type="password" placeholder="Masukkan API key..." autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Model</label>
+          <label class="form-label">Model NVIDIA</label>
           <select class="form-select" id="p-model"></select>
         </div>
         <button class="btn-primary" onclick="finishOnboarding()">Mulai Fnote ✦</button>
@@ -151,6 +139,9 @@
       </div>
       <div class="sidebar-content" id="sidebar-content"></div>
       <div class="sidebar-footer">
+        <!-- Auth Section -->
+        <div id="auth-section" style="padding:10px;border-bottom:1px solid var(--border);"></div>
+        
         <div class="persona-badge" id="persona-badge">
           <div class="persona-avatar" id="p-avatar">?</div>
           <div>
@@ -505,8 +496,7 @@
           </div>
         </div>
         <div class="modal-section">
-          <div class="modal-section-title">AI Provider (NVIDIA NIM)</div>
-          <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="s-apikey" type="password" placeholder="Masukkan NVIDIA API Key..."></div>
+          <div class="modal-section-title">AI Model (NVIDIA NIM)</div>
           <div class="form-group"><label class="form-label">Model</label><select class="form-select" id="s-model"></select></div>
         </div>
         
@@ -585,6 +575,7 @@
   <!-- Toast -->
   <div id="toast"></div>
 
+  <script src="firebase-config.js"></script>
   <script src="tiptap-setup.js"></script>
   <script src="script.js"></script>
 </body>

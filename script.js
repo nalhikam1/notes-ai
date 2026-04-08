@@ -1,20 +1,5 @@
 // ===== MODELS =====
 const MODELS = {
-  google:[
-    {v:'gemini-2.0-flash',l:'Gemini 2.0 Flash (Recommended)'},
-    {v:'gemini-1.5-flash',l:'Gemini 1.5 Flash'},
-    {v:'gemini-1.5-pro',l:'Gemini 1.5 Pro'}
-  ],
-  anthropic:[
-    {v:'claude-sonnet-4-5',l:'Claude Sonnet 4.5'},
-    {v:'claude-3-5-haiku-20241022',l:'Claude 3.5 Haiku'},
-    {v:'claude-opus-4-5',l:'Claude Opus 4.5'}
-  ],
-  groq:[
-    {v:'llama-3.3-70b-versatile',l:'Llama 3.3 70B (Recommended)'},
-    {v:'llama-3.1-8b-instant',l:'Llama 3.1 8B Fast'},
-    {v:'mixtral-8x7b-32768',l:'Mixtral 8x7B'}
-  ],
   nvidia:[
     {v:'openai/gpt-oss-120b',l:'GPT-OSS 120B ⚡ (Recommended)'},
     {v:'nvidia/llama-3.3-nemotron-super-49b-v1',l:'Nemotron Super 49B'},
@@ -30,13 +15,13 @@ const MODELS = {
 const ST = {
   projects:[], folders:[], notes:[], templates:[], 
   activeId:null, activeProjectId:null, openNodes:{},
-  persona:null, ai:{provider:'nvidia',apiKey:'',model:'openai/gpt-oss-120b'},
+  persona:null, ai:{provider:'nvidia',model:'openai/gpt-oss-120b'},
   viewType:'dashboard', // dashboard, project, editor
   projectView:'list', // list, kanban
   rsTab:'chat', // chat, toc, info
   chatHistory:{}, saveTimer:null
 };
-let onbStep=0, onbProvider='nvidia';
+let onbStep=0;
 
 // ===== ONBOARDING =====
 function nextStep(){
@@ -54,19 +39,11 @@ function prevStep(){
   document.getElementById(`s${onbStep}`).classList.add('active');
   document.getElementById(`d${onbStep}`).classList.add('active');
 }
-function pickProvider(p,el){
-  onbProvider=p;
-  document.querySelectorAll('#s2 .provider-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  fillModels('p-model',p);
-}
-function fillModels(id,p){
+function fillModels(id){
   const sel=document.getElementById(id);
-  sel.innerHTML=MODELS[p].map(m=>`<option value="${m.v}">${m.l}</option>`).join('');
+  sel.innerHTML=MODELS.nvidia.map(m=>`<option value="${m.v}">${m.l}</option>`).join('');
 }
 function finishOnboarding(){
-  const key=document.getElementById('p-apikey').value.trim();
-  if(!key){showToast('Masukkan API key','error');return;}
   ST.persona={
     name:document.getElementById('p-name').value.trim(),
     role:document.getElementById('p-role').value.trim(),
@@ -74,7 +51,7 @@ function finishOnboarding(){
     style:document.getElementById('p-style').value,
     lang:document.getElementById('p-lang').value
   };
-  ST.ai={provider:onbProvider,apiKey:key,model:document.getElementById('p-model').value};
+  ST.ai={provider:'nvidia',model:document.getElementById('p-model').value};
   // Default templates
   ST.templates=[
     {id:uid(),name:'Meeting Notes',desc:'Catatan rapat',content:'<h2>Meeting Notes</h2><p><strong>Tanggal:</strong> &nbsp;</p><p><strong>Peserta:</strong> &nbsp;</p><hr><h3>Agenda</h3><ul><li>Item 1</li></ul><h3>Diskusi</h3><p>Tulis hasil diskusi di sini...</p><h3>Action Items</h3><ul><li>Action item 1</li></ul>'},
@@ -90,6 +67,11 @@ function finishOnboarding(){
 
 // ===== INIT =====
 function initApp(){
+  // Initialize Firebase
+  if (typeof initFirebase === 'function') {
+    initFirebase();
+  }
+  
   // Initialize Tiptap editor
   initTiptap();
   
@@ -97,10 +79,15 @@ function initApp(){
   updatePersonaBadge();
   renderSidebar();
   showDashboard();
-  if (ST.ai && ST.ai.provider) {
-    fillModels('rs-model-picker', ST.ai.provider);
-    const rsm = document.getElementById('rs-model-picker');
-    if(rsm) rsm.value = ST.ai.model;
+  
+  // Fill model picker in chat
+  fillModels('rs-model-picker');
+  const rsm = document.getElementById('rs-model-picker');
+  if(rsm && ST.ai && ST.ai.model) rsm.value = ST.ai.model;
+  
+  // Update auth UI
+  if (typeof updateAuthUI === 'function') {
+    updateAuthUI();
   }
 }
 
@@ -1182,16 +1169,15 @@ Gaya komunikasi: ${styles[p.style]||'natural'}. Gunakan ${langs[p.lang]||'Bahasa
 Selalu format output dengan markdown yang rapi. Tulis konten yang langsung berguna dan berkualitas tinggi.`;
 }
 
-// ===== AI API CALL (via Vercel proxy - fix CORS) =====
+// ===== AI API CALL (via Vercel API) =====
 async function callAI(messages){
-  const{provider,apiKey,model}=ST.ai;
-  if(!apiKey) throw new Error('API Key belum diset. Buka Settings ⚙');
+  const{model}=ST.ai;
   const system=buildSysPrompt();
 
   const resp=await fetch('/api/ai',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({provider,apiKey,model,messages,system})
+    body:JSON.stringify({model,messages,system})
   });
   const data=await resp.json();
   if(!resp.ok) throw new Error(data?.error||`HTTP ${resp.status}`);
@@ -1339,18 +1325,9 @@ function openSettings(){
   document.getElementById('s-about').value=p.about||'';
   document.getElementById('s-style').value=p.style||'casual';
   document.getElementById('s-lang').value=p.lang||'id';
-  document.getElementById('s-apikey').value=ST.ai.apiKey||'';
-  document.querySelectorAll('[id^="sp-"]').forEach(b=>b.classList.remove('active'));
-  document.getElementById(`sp-${ST.ai.provider}`)?.classList.add('active');
-  fillModels('s-model',ST.ai.provider);
+  fillModels('s-model');
   document.getElementById('s-model').value=ST.ai.model;
   document.getElementById('settings-modal').style.display='flex';
-}
-function settingProvider(p){
-  ST.ai.provider=p;
-  document.querySelectorAll('[id^="sp-"]').forEach(b=>b.classList.remove('active'));
-  document.getElementById(`sp-${p}`)?.classList.add('active');
-  fillModels('s-model',p);
 }
 function saveSettings(){
   ST.persona={...ST.persona,
@@ -1360,12 +1337,11 @@ function saveSettings(){
     style:document.getElementById('s-style').value,
     lang:document.getElementById('s-lang').value
   };
-  ST.ai.apiKey=document.getElementById('s-apikey').value;
   ST.ai.model=document.getElementById('s-model').value;
   
   const rsm = document.getElementById('rs-model-picker');
   if(rsm) {
-    fillModels('rs-model-picker', ST.ai.provider);
+    fillModels('rs-model-picker');
     rsm.value = ST.ai.model;
   }
 
@@ -1377,6 +1353,11 @@ function closeSettings(){document.getElementById('settings-modal').style.display
 // ===== STORAGE =====
 function saveState(){
   localStorage.setItem('quill2',JSON.stringify({notes:ST.notes,templates:ST.templates,folders:ST.folders,projects:ST.projects,persona:ST.persona,ai:ST.ai}));
+  
+  // Trigger cloud sync if available
+  if (typeof scheduleCloudSync === 'function') {
+    scheduleCloudSync();
+  }
 }
 function loadState(){
   try{
@@ -1546,7 +1527,7 @@ function importData(event){
 }
 
 // ===== BOOT =====
-fillModels('p-model','google');
+fillModels('p-model');
 if(loadState()){
   document.getElementById('onboarding').style.display='none';
   document.getElementById('app').style.display='flex';
