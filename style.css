@@ -871,6 +871,7 @@ body {
   color: var(--text2);
   border-radius: var(--r);
   transition: background .2s;
+  position: relative;
 }
 
 .tree-row:hover {
@@ -884,23 +885,41 @@ body {
 }
 
 .tree-arrow {
-  width: 16px;
+  width: 20px;
+  height: 20px;
   font-size: 10px;
   opacity: .5;
-  transition: transform .2s;
-  display: inline-block;
-  text-align: center;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   user-select: none;
   flex-shrink: 0;
+  border-radius: 4px;
+  position: relative;
 }
 
-.tree-arrow.open {
-  transform: rotate(90deg);
+.tree-arrow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  transition: border-color .2s;
 }
 
 .tree-arrow:hover {
   opacity: 1;
+  background: var(--bg4);
+}
+
+.tree-arrow:hover::before {
+  border-color: var(--accent);
+}
+
+.tree-arrow.open {
+  transform: rotate(90deg);
 }
 
 .tree-children {
@@ -915,6 +934,14 @@ body {
 .tree-icon {
   opacity: .7;
   flex-shrink: 0;
+  transition: all .2s;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.tree-icon:hover {
+  opacity: 1;
+  background: var(--bg4);
 }
 
 /* Note Menu Button */
@@ -924,14 +951,21 @@ body {
   color: white;
   opacity: 0;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 4px 8px;
   border-radius: 4px;
   flex-shrink: 0;
-  transition: opacity .2s;
+  transition: all .2s;
+  font-size: 14px;
+  min-width: 28px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .note-menu-btn:hover {
   background: var(--bg4);
+  opacity: 1 !important;
 }
 
 .tree-row:hover .note-menu-btn {
@@ -2896,15 +2930,57 @@ body {
 
 /* ===== EDITOR LINK & IMAGE STYLES ===== */
 .tiptap .editor-link,
+.tiptap a,
 #editor[contenteditable="true"] a {
   color: var(--accent);
   text-decoration: underline;
   cursor: pointer;
+  transition: all .2s;
+  word-break: break-word;
+  position: relative;
 }
 
 .tiptap .editor-link:hover,
+.tiptap a:hover,
 #editor[contenteditable="true"] a:hover {
   color: var(--accent2);
+  text-decoration-thickness: 2px;
+  background: var(--accent-dim2);
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-radius: 4px;
+}
+
+/* Link with external indicator */
+.tiptap a[target="_blank"]::after,
+#editor[contenteditable="true"] a[target="_blank"]::after {
+  content: ' ↗';
+  font-size: 0.8em;
+  opacity: 0.6;
+}
+
+/* Tooltip for links */
+.tiptap a:hover::before,
+#editor[contenteditable="true"] a:hover::before {
+  content: attr(href);
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 100;
+  margin-bottom: 4px;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tiptap .editor-image,

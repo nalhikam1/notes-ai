@@ -466,9 +466,16 @@ function setProjectView(v,btn){
 }
 
 function toggleNode(id, e){
-  if(e) e.stopPropagation();
+  if(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  
+  const wasOpen = ST.openNodes[id];
   ST.openNodes[id] = !ST.openNodes[id];
-  console.log('Toggle node:', id, 'Open:', ST.openNodes[id]); // Debug
+  
+  console.log('Toggle node:', id, 'Was open:', wasOpen, 'Now open:', ST.openNodes[id]);
+  
   renderSidebar();
 }
 
@@ -524,10 +531,10 @@ function renderSidebar(){
     const isOpen = ST.openNodes[p.id] || ST.activeProjectId === p.id;
     html += `
       <div class="tree-row ${ST.activeProjectId === p.id && !ST.activeId ? 'active' : ''}">
-        <div style="display:flex;align-items:center;flex:1;min-width:0;cursor:pointer;" onclick="toggleNode('${p.id}', event)">
-          <span class="tree-arrow ${isOpen ? 'open' : ''}">▶</span>
-          <span class="tree-icon">${p.emoji || '📦'}</span>&nbsp;
-          <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onclick="openProject('${p.id}'); event.stopPropagation();">${escHtml(p.name)}</span>
+        <div style="display:flex;align-items:center;flex:1;min-width:0;gap:4px;">
+          <span class="tree-arrow ${isOpen ? 'open' : ''}" onclick="toggleNode('${p.id}', event)" title="Toggle expand/collapse">▶</span>
+          <span class="tree-icon" onclick="openProject('${p.id}')" style="cursor:pointer;" title="Open project">${p.emoji || '📦'}</span>
+          <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;flex:1;" onclick="openProject('${p.id}')" title="Open project">${escHtml(p.name)}</span>
         </div>
         <div style="display:flex;gap:2px;">
           <button class="note-menu-btn" onclick="openNewFolder('${p.id}', null, event)" title="New Folder">+</button>

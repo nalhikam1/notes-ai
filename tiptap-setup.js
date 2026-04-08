@@ -59,9 +59,11 @@ function initTiptap() {
     if (Link) {
       extensions.push(
         Link.configure({
-          openOnClick: false,
+          openOnClick: true,
           HTMLAttributes: {
             class: 'editor-link',
+            target: '_blank',
+            rel: 'noopener noreferrer',
           },
         })
       );
@@ -154,6 +156,17 @@ function initFallbackEditor() {
       if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
       if (typeof updateWordCount === 'function') updateWordCount();
       if (typeof updateStatusBar === 'function') updateStatusBar();
+    });
+    
+    // Add click listener for links
+    editorEl.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') {
+        e.preventDefault();
+        const href = e.target.getAttribute('href');
+        if (href) {
+          window.open(href, '_blank', 'noopener,noreferrer');
+        }
+      }
     });
     
     console.log('Using fallback contenteditable editor');
@@ -548,13 +561,46 @@ function applyColor(color, mode) {
 
 // ===== LINK =====
 function openLinkDialog() {
-  const url = prompt('Enter URL:', 'https://');
+  let url = prompt('Enter URL:', 'https://');
   if (url && url !== 'https://') {
-    if (useTiptap && editor) {
-      editor.chain().focus().setLink({ href: url }).run();
-    } else {
-      document.execCommand('createLink', false, url);
+    // Add https:// if not present
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
     }
+    
+    if (useTiptap && editor) {
+      editor.chain().focus().setLink({ href: url, target: '_blank' }).run();
+    } else {
+      // For fallback editor
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const selectedText = range.toString();
+        
+        if (selectedText) {
+          // Create link with selected text
+          const link = document.createElement('a');
+          link.href = url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = selectedText;
+          
+          range.deleteContents();
+          range.insertNode(link);
+        } else {
+          // No selection, insert URL as text and link
+          document.execCommand('createLink', false, url);
+          // Set target and rel attributes
+          const links = document.getElementById('editor').querySelectorAll('a[href="' + url + '"]');
+          links.forEach(link => {
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+          });
+        }
+      }
+    }
+    
+    if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
   }
 }
 
@@ -564,6 +610,8 @@ function tiptapUnlink() {
   } else {
     document.execCommand('unlink', false, null);
   }
+  
+  if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
 }
 
 // ===== IMAGE =====
