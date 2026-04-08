@@ -17,7 +17,6 @@ const ST = {
   activeId:null, activeProjectId:null, openNodes:{},
   persona:null, ai:{provider:'nvidia',model:'openai/gpt-oss-120b'},
   viewType:'dashboard', // dashboard, project, editor
-  projectView:'list', // list, kanban
   rsTab:'chat', // chat, toc, info
   chatHistory:{}, saveTimer:null
 };
@@ -151,24 +150,70 @@ function updateBreadcrumbs(){
   const bcNote=document.getElementById('bc-note');
   const bcSep=document.getElementById('bc-note-sep');
   
+  // Clear existing breadcrumbs (except Home)
+  const breadcrumbsEl = document.getElementById('breadcrumbs');
+  const homeItem = breadcrumbsEl.querySelector('.bc-item:first-child');
+  const homeSep = breadcrumbsEl.querySelector('.bc-sep:first-child');
+  breadcrumbsEl.innerHTML = '';
+  breadcrumbsEl.appendChild(homeItem);
+  
   if(ST.activeProjectId){
     const p=ST.projects.find(x=>x.id===ST.activeProjectId);
-    bcProj.textContent=p?p.name:'Project';
-    bcProj.style.display='inline';
-    document.querySelector('.bc-sep').style.display='inline';
-  } else {
-    bcProj.style.display='none';
-    document.querySelector('.bc-sep').style.display='none';
+    if(p) {
+      // Add separator
+      const sep1 = document.createElement('span');
+      sep1.className = 'bc-sep';
+      sep1.textContent = '/';
+      breadcrumbsEl.appendChild(sep1);
+      
+      // Add project (clickable)
+      const projItem = document.createElement('span');
+      projItem.className = 'bc-item';
+      projItem.textContent = p.name;
+      projItem.style.cursor = 'pointer';
+      projItem.onclick = () => showProjectDashboard(p.id);
+      breadcrumbsEl.appendChild(projItem);
+    }
   }
 
   if(ST.activeId){
     const n=ST.notes.find(x=>x.id===ST.activeId);
-    bcNote.textContent=n?n.title||'Untitled':'Untitled';
-    bcNote.style.display='inline';
-    bcSep.style.display='inline';
-  } else {
-    bcNote.style.display='none';
-    bcSep.style.display='none';
+    if(n) {
+      // Add folder if exists
+      if(n.folderId) {
+        const folder = ST.folders.find(f => f.id === n.folderId);
+        if(folder) {
+          // Add separator
+          const sep2 = document.createElement('span');
+          sep2.className = 'bc-sep';
+          sep2.textContent = '/';
+          breadcrumbsEl.appendChild(sep2);
+          
+          // Add folder (clickable - opens project view with folder expanded)
+          const folderItem = document.createElement('span');
+          folderItem.className = 'bc-item';
+          folderItem.textContent = `${folder.emoji || '📁'} ${folder.name}`;
+          folderItem.style.cursor = 'pointer';
+          folderItem.onclick = () => {
+            ST.openNodes[folder.id] = true;
+            showProjectDashboard(n.projectId);
+          };
+          breadcrumbsEl.appendChild(folderItem);
+        }
+      }
+      
+      // Add separator
+      const sep3 = document.createElement('span');
+      sep3.className = 'bc-sep';
+      sep3.textContent = '/';
+      breadcrumbsEl.appendChild(sep3);
+      
+      // Add note (active, not clickable)
+      const noteItem = document.createElement('span');
+      noteItem.className = 'bc-item active';
+      noteItem.textContent = n.title || 'Untitled';
+      breadcrumbsEl.appendChild(noteItem);
+    }
   }
 }
 
@@ -357,11 +402,7 @@ function renderProjectDashboard(){
   document.getElementById('pv-words').textContent=pWords;
 
   const content=document.getElementById('project-content');
-  if(ST.projectView==='kanban'){
-    renderKanban(pNotes);
-  } else {
-    renderProjectList(p.id);
-  }
+  renderProjectList(p.id);
 }
 
 function renderProjectList(projectId){
@@ -414,41 +455,6 @@ function renderProjectList(projectId){
   el.innerHTML=html;
 }
 
-function renderKanban(notes){
-  const el=document.getElementById('project-content');
-  const columns=['To Do','In Progress','Review','Done'];
-  let html=`<div class="kanban-board">`;
-  
-  columns.forEach(col=>{
-    const colNotes=notes.filter(n=>(n.status||'To Do')===col);
-    html+=`<div class="kanban-col">
-      <div class="col-header">
-        <span class="col-title">${col}</span>
-        <span class="col-count">${colNotes.length}</span>
-      </div>
-      <div class="kanban-cards">
-        ${colNotes.map(n=>`
-          <div class="note-card" onclick="openNote('${n.id}')">
-            <div class="note-card-title">
-              ${n.folderId ? (() => {const f=ST.folders.find(x=>x.id===n.folderId);return f?`<span style="font-size:10px;border-radius:4px;padding:2px 4px;background:var(--bg3);display:inline-block;margin-bottom:4px;">${f.emoji||'📁'} ${escHtml(f.name)}</span><br>`:''})() : ''}
-              ${escHtml(n.title)||'Untitled'}
-            </div>
-            <div class="note-card-preview">${(n.content||'').replace(/<[^>]*>/g,'').substring(0,60)}...</div>
-            <div class="note-card-footer" style="margin-top:8px;display:flex;justify-content:flex-end;">
-              <select class="status-select" onclick="event.stopPropagation()" onchange="updateNoteStatus('${n.id}', this.value); event.stopPropagation();" style="font-size:10px;background:var(--bg3);color:var(--text3);border:none;border-radius:4px;padding:2px 4px;">
-                ${columns.map(c=>`<option value="${c}" ${n.status===c?'selected':''}>${c}</option>`).join('')}
-              </select>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>`;
-  });
-  
-  html+=`</div>`;
-  el.innerHTML=html;
-}
-
 function updateNoteStatus(id, status){
   const n=ST.notes.find(x=>x.id===id); if(!n) return;
   n.status=status;
@@ -456,13 +462,6 @@ function updateNoteStatus(id, status){
   saveState();
   renderProjectDashboard();
   showToast(`Status updated to ${status}`,'success');
-}
-
-function setProjectView(v,btn){
-  ST.projectView=v;
-  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderProjectDashboard();
 }
 
 function toggleNode(id, e){

@@ -157,11 +157,7 @@
       <!-- TOP BREADCRUMBS -->
       <div id="top-nav">
         <div id="breadcrumbs">
-          <span class="bc-item" onclick="showDashboard()">Home</span>
-          <span class="bc-sep">/</span>
-          <span class="bc-item" id="bc-project">General</span>
-          <span class="bc-sep" id="bc-note-sep">/</span>
-          <span class="bc-item active" id="bc-note">Untitled</span>
+          <span class="bc-item" onclick="showDashboard()" style="cursor:pointer;">Home</span>
         </div>
         <div class="top-nav-actions">
         </div>
@@ -204,10 +200,6 @@
             <button class="btn-primary" onclick="newNote()" style="padding:6px 12px;font-size:12px;">+ Note</button>
           </div>
         </div>
-        <div class="view-toggles" style="margin-bottom:16px;">
-          <button class="toggle-btn active" onclick="setProjectView('list',this)">List</button>
-          <button class="toggle-btn" onclick="setProjectView('kanban',this)">Kanban</button>
-        </div>
 
         <div class="stats-grid compact">
           <div class="stat-card">
@@ -221,7 +213,7 @@
         </div>
 
         <div id="project-content">
-          <!-- List View Table or Kanban columns go here -->
+          <!-- Project list view -->
         </div>
       </div>
 

@@ -34,6 +34,14 @@ function initTiptap() {
         heading: {
           levels: [1, 2, 3],
         },
+        paragraph: {
+          HTMLAttributes: {
+            class: 'editor-paragraph',
+          },
+        },
+        hardBreak: {
+          keepMarks: true,
+        },
         codeBlock: {
           HTMLAttributes: {
             class: 'code-block',
