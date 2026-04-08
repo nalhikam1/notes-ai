@@ -468,6 +468,7 @@ function setProjectView(v,btn){
 function toggleNode(id, e){
   if(e) e.stopPropagation();
   ST.openNodes[id] = !ST.openNodes[id];
+  console.log('Toggle node:', id, 'Open:', ST.openNodes[id]); // Debug
   renderSidebar();
 }
 
@@ -522,11 +523,11 @@ function renderSidebar(){
   ST.projects.forEach(p => {
     const isOpen = ST.openNodes[p.id] || ST.activeProjectId === p.id;
     html += `
-      <div class="tree-row ${ST.activeProjectId === p.id && !ST.activeId ? 'active' : ''}" onclick="openProject('${p.id}')">
-        <div style="display:flex;align-items:center;flex:1;min-width:0;" onclick="toggleNode('${p.id}', event)">
+      <div class="tree-row ${ST.activeProjectId === p.id && !ST.activeId ? 'active' : ''}">
+        <div style="display:flex;align-items:center;flex:1;min-width:0;cursor:pointer;" onclick="toggleNode('${p.id}', event)">
           <span class="tree-arrow ${isOpen ? 'open' : ''}">▶</span>
           <span class="tree-icon">${p.emoji || '📦'}</span>&nbsp;
-          <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(p.name)}</span>
+          <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onclick="openProject('${p.id}'); event.stopPropagation();">${escHtml(p.name)}</span>
         </div>
         <div style="display:flex;gap:2px;">
           <button class="note-menu-btn" onclick="openNewFolder('${p.id}', null, event)" title="New Folder">+</button>
