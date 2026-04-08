@@ -853,9 +853,34 @@ function onEditorKey(e){
   if(!sel.rangeCount) return;
   const range=sel.getRangeAt(0);
 
-  // Find if cursor is in a checklist item
+  // Find if cursor is in a code block
   let node=range.startContainer;
+  let inCodeBlock=null;
+  while(node&&node!==editor){
+    if(node.nodeName==='PRE'||node.nodeName==='CODE'||(node.classList&&node.classList.contains('code-block'))){
+      inCodeBlock=node.nodeName==='PRE'?node:node.closest('pre');
+      break;
+    }
+    node=node.parentNode;
+  }
+
+  // Handle Tab in code block - insert actual tab
+  if(inCodeBlock&&e.key==='Tab'){
+    e.preventDefault();
+    document.execCommand('insertHTML',false,'    '); // 4 spaces
+    return;
+  }
+
+  // Handle Enter in code block - insert newline
+  if(inCodeBlock&&e.key==='Enter'&&!e.shiftKey){
+    e.preventDefault();
+    document.execCommand('insertHTML',false,'\n');
+    return;
+  }
+
+  // Find if cursor is in a checklist item
   let checkDiv=null;
+  node=range.startContainer;
   while(node&&node!==editor){
     if(node.classList&&node.classList.contains('ql-check')){checkDiv=node;break;}
     node=node.parentNode;
@@ -923,15 +948,15 @@ function onEditorKey(e){
     return;
   }
 
-  // Tab outside list/checklist: insert spaces
-  if(e.key==='Tab'&&!inList&&!checkDiv){
+  // Tab outside list/checklist/code: insert spaces
+  if(e.key==='Tab'&&!inList&&!checkDiv&&!inCodeBlock){
     e.preventDefault();
     document.execCommand('insertHTML',false,'&nbsp;&nbsp;&nbsp;&nbsp;');
     return;
   }
 
   // Default Enter: ensure <p> not <div>
-  if(e.key==='Enter'&&!e.shiftKey&&!checkDiv){
+  if(e.key==='Enter'&&!e.shiftKey&&!checkDiv&&!inCodeBlock){
     setTimeout(()=>{
       const sel2=window.getSelection();
       if(sel2.rangeCount){
@@ -948,6 +973,7 @@ function onEditorKey(e){
       }
     },0);
   }
+
 }
 
 // ===== LIST INDENT / OUTDENT =====
@@ -1077,13 +1103,36 @@ function insertCode(){
   const selected=sel.toString();
   const pre=document.createElement('pre');
   const code=document.createElement('code');
-  code.textContent=selected||'kode di sini';
+  
+  // Set initial content with placeholder or selected text
+  code.textContent=selected||'// Tulis kode di sini\n// Tekan Tab untuk indent\n// Tekan Enter untuk baris baru';
+  
+  // Make code editable
+  code.contentEditable='true';
+  
   pre.appendChild(code);
+  
   if(sel.rangeCount){
     const range=sel.getRangeAt(0);
     range.deleteContents();
     range.insertNode(pre);
-  } else { editor.appendChild(pre); }
+    
+    // Focus the code element
+    setTimeout(()=>{
+      code.focus();
+      // Place cursor at end
+      const r=document.createRange();
+      r.selectNodeContents(code);
+      r.collapse(false);
+      const s=window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+    },10);
+  } else { 
+    editor.appendChild(pre);
+    setTimeout(()=>code.focus(),10);
+  }
+  
   scheduleAutoSave();
 }
 function insertHR(){

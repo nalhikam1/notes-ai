@@ -1458,27 +1458,85 @@ body {
   padding: 2px 6px;
   border-radius: 4px;
   color: var(--accent);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .tiptap pre,
-#editor[contenteditable="true"] pre {
+#editor[contenteditable="true"] pre,
+.tiptap .code-block,
+#editor[contenteditable="true"] .code-block {
   background: var(--bg2);
   border: 1px solid var(--border2);
   border-radius: var(--r2);
   padding: 16px;
   margin: 16px 0;
   overflow-x: auto;
+  overflow-y: auto;
   line-height: 1.5;
+  max-height: 500px;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  position: relative;
 }
 
 .tiptap pre code,
-#editor[contenteditable="true"] pre code {
+#editor[contenteditable="true"] pre code,
+.tiptap .code-block code,
+#editor[contenteditable="true"] .code-block code {
   background: none;
   border: none;
   padding: 0;
   font-size: 13px;
   color: var(--text);
   line-height: 1.6;
+  white-space: pre;
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  outline: none;
+  min-height: 1.6em;
+}
+
+/* Make code blocks editable */
+.tiptap pre code[contenteditable="true"],
+#editor[contenteditable="true"] pre code[contenteditable="true"] {
+  cursor: text;
+}
+
+/* Ensure code blocks preserve formatting when editing */
+.tiptap pre[contenteditable="true"],
+#editor[contenteditable="true"] pre[contenteditable="true"],
+.tiptap .code-block[contenteditable="true"],
+#editor[contenteditable="true"] .code-block[contenteditable="true"] {
+  white-space: pre;
+}
+
+/* Code block in Tiptap */
+.tiptap pre.hljs,
+.tiptap pre[class*="language-"] {
+  background: var(--bg2);
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: var(--r2);
+  border: 1px solid var(--border2);
+}
+
+/* Add subtle indicator for code blocks */
+.tiptap pre::before,
+#editor[contenteditable="true"] pre::before {
+  content: 'CODE';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  opacity: 0.5;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .tiptap hr,
