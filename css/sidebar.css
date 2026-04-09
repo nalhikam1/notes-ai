@@ -21,10 +21,12 @@
 }
 
 .logo {
-  font-family: 'Lora', serif;
-  font-size: 19px;
-  font-weight: 600;
-  color: var(--accent);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 
 .sidebar-actions {
@@ -41,18 +43,19 @@
 .search-input {
   width: 100%;
   background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  border: none;
+  border-bottom: 1px solid var(--border2);
+  border-radius: 0;
   padding: 8px 10px;
   color: var(--text);
   font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   outline: none;
   transition: border-color .2s;
 }
 
 .search-input:focus {
-  border-color: var(--accent);
+  border-bottom-color: #000;
 }
 
 .search-input::placeholder {
@@ -159,7 +162,7 @@
   text-align: left;
   transition: all .15s;
   margin-bottom: 1px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   min-height: 36px;
   position: relative;
 }
@@ -179,8 +182,10 @@
 }
 
 .sidebar-item.active {
-  background: var(--accent-dim);
-  color: var(--accent);
+  background: #000;
+  color: #fff;
+  border-left: 3px solid #000;
+  padding-left: 9px;
 }
 
 .sidebar-item.active svg {
@@ -212,8 +217,10 @@
 }
 
 .tree-row.active {
-  background: var(--accent-dim);
-  color: var(--accent);
+  background: #000;
+  color: #fff;
+  border-left: 3px solid #000;
+  padding-left: 9px;
 }
 
 .tree-arrow {
@@ -322,9 +329,9 @@
 
 .persona-badge {
   padding: 8px;
-  background: var(--accent-dim2);
-  border: 1px solid rgba(212, 168, 83, .12);
-  border-radius: var(--r);
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 0;
   font-size: 11px;
   color: var(--text2);
   display: flex;
@@ -335,14 +342,14 @@
 .persona-avatar {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
-  background: var(--accent);
+  border-radius: 0;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  font-weight: 600;
-  color: #0f0f0f;
+  font-weight: 700;
+  color: #fff;
   flex-shrink: 0;
 }
 
@@ -406,20 +413,20 @@
 
 .tmpl-use-btn {
   padding: 5px 12px;
-  background: var(--accent);
+  background: #000;
   border: none;
-  color: #0f0f0f;
+  color: #fff;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0;
   font-size: 11px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
-  transition: all .15s;
+  transition: opacity .15s;
   white-space: nowrap;
 }
 
 .tmpl-use-btn:hover {
-  background: var(--accent2);
+  opacity: 0.8;
 }
 
 .tmpl-del-btn {

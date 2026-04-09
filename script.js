@@ -124,12 +124,12 @@ function migrateOldData(){
   if(data){
     const old=JSON.parse(data);
     if(old.folders && !old.projects){
-      ST.projects = old.folders.map(f=>({id:f.id, name:f.name, emoji:f.emoji||'📁', color:'#d4a853'}));
+      ST.projects = old.folders.map(f=>({id:f.id, name:f.name, emoji:f.emoji||'📁', color:'#000000'}));
     }
   }
   // Ensure default project if none
   if(!ST.projects || !ST.projects.length) {
-    ST.projects = [{id:'p-general',name:'General',emoji:'📦',color:'#d4a853'}];
+    ST.projects = [{id:'p-general',name:'General',emoji:'📦',color:'#000000'}];
   }
   if(!ST.folders) ST.folders = [];
   if(!ST.openNodes) ST.openNodes = {};
@@ -671,8 +671,43 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Mobile toolbar stays sticky at bottom of editor container
-// No need for keyboard detection - sticky positioning handles it automatically
+// ===== MOBILE KEYBOARD HANDLING =====
+// Use visualViewport API to track keyboard and keep toolbar above it
+(function setupKeyboardAwareness() {
+  if (!window.visualViewport) return;
+
+  const bottomBarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bottom-bar-h')) || 56;
+  const mobileToolbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--mobile-toolbar-h')) || 52;
+
+  function onViewportChange() {
+    const toolbar = document.querySelector('.mobile-toolbar');
+    const bottomBar = document.getElementById('bottom-bar');
+    const editorWrap = document.getElementById('editor-wrap');
+    if (!toolbar) return;
+
+    // Calculate how much the keyboard is consuming from the bottom
+    const keyboardOffset = Math.max(0,
+      window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop
+    );
+
+    if (keyboardOffset > 80) {
+      // Keyboard is open: float toolbar just above keyboard, hide bottom nav
+      toolbar.style.bottom = keyboardOffset + 'px';
+      toolbar.style.transition = 'bottom 0.05s linear';
+      if (bottomBar) bottomBar.style.transform = `translateY(${bottomBarH + keyboardOffset}px)`;
+      if (editorWrap) editorWrap.style.paddingBottom = (mobileToolbarH + keyboardOffset + 8) + 'px';
+    } else {
+      // Keyboard is closed: restore positions
+      toolbar.style.bottom = '';
+      toolbar.style.transition = '';
+      if (bottomBar) bottomBar.style.transform = '';
+      if (editorWrap) editorWrap.style.paddingBottom = '';
+    }
+  }
+
+  window.visualViewport.addEventListener('resize', onViewportChange);
+  window.visualViewport.addEventListener('scroll', onViewportChange);
+})();
 
 // ===== TEMPLATES =====
 function saveAsTemplate(){
@@ -748,7 +783,7 @@ function saveFolder(){
     showToast(`Folder "${name}" created ✓`,'success');
   } else {
     // Top level project
-    ST.projects.push({id:uid(), name, emoji, color:'#d4a853'});
+    ST.projects.push({id:uid(), name, emoji, color:'#000000'});
     showToast(`Project "${name}" created ✓`,'success');
   }
   saveState(); closeFolderModal(); renderSidebar();
@@ -1200,7 +1235,7 @@ function showToast(msg,type=''){
 
 // ===== PWA =====
 (function setupPWA(){
-  const m={name:'Quill - AI Notes',short_name:'Quill',start_url:'/',display:'standalone',background_color:'#0f0f0f',theme_color:'#0f0f0f'};
+  const m={name:'FNOTE - AI Notes',short_name:'FNOTE',start_url:'/',display:'standalone',background_color:'#f9f9f9',theme_color:'#f9f9f9'};
   const blob=new Blob([JSON.stringify(m)],{type:'application/json'});
   document.getElementById('manifest-link').href=URL.createObjectURL(blob);
 })();

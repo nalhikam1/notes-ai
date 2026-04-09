@@ -1,21 +1,21 @@
 /* ===== CSS VARIABLES & BASE STYLES ===== */
 :root {
-  /* Colors */
-  --bg: #0f0f0f;
-  --bg2: #161616;
-  --bg3: #1e1e1e;
-  --bg4: #252525;
-  --border: #2a2a2a;
-  --border2: #333;
-  --text: #e8e4dc;
-  --text2: #9a9589;
-  --text3: #5a5550;
-  --accent: #d4a853;
-  --accent2: #b8872d;
-  --accent-dim: rgba(212, 168, 83, 0.12);
-  --accent-dim2: rgba(212, 168, 83, 0.06);
-  --red: #c0392b;
-  --green: #27ae60;
+  /* Colors — Architectural Minimalism (Light, Monochrome) */
+  --bg: #f9f9f9;            /* surface */
+  --bg2: #f3f3f3;           /* sidebar / surface-container-low */
+  --bg3: #eeeeee;           /* surface-container */
+  --bg4: #e8e8e8;           /* surface-container-high */
+  --border: rgba(0,0,0,0.07);
+  --border2: #c6c6c6;       /* outline-variant */
+  --text: #1b1b1b;          /* on-surface */
+  --text2: #474747;         /* on-surface-variant */
+  --text3: #777777;         /* outline */
+  --accent: #000000;        /* primary */
+  --accent2: #303030;       /* inverse-surface */
+  --accent-dim: rgba(0,0,0,0.07);
+  --accent-dim2: rgba(0,0,0,0.04);
+  --red: #ba1a1a;
+  --green: #1a7a40;
   
   /* Dimensions */
   --sidebar-w: 260px;
@@ -23,13 +23,13 @@
   --top-nav-h: 56px;
   --status-bar-h: 30px;
   --toolbar-h: 48px;
-  --bottom-bar-h: 56px;        /* Mobile bottom nav bar */
-  --mobile-toolbar-h: 52px;   /* Mobile formatting toolbar */
+  --bottom-bar-h: 56px;
+  --mobile-toolbar-h: 52px;
   
-  /* Borders & Shadows */
-  --r: 8px;
-  --r2: 12px;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  /* Borders & Shadows — 0px radius, tonal depth only */
+  --r: 0px;
+  --r2: 0px;
+  --shadow: 0 10px 20px rgba(0,0,0,0.10);
 }
 
 /* ===== RESET & BASE ===== */
@@ -43,7 +43,7 @@
 html,
 body {
   height: 100%;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', 'DM Sans', sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
@@ -60,8 +60,8 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border2);
-  border-radius: 2px;
+  background: #c6c6c6;
+  border-radius: 0;
 }
 
 /* ===== ANIMATIONS ===== */

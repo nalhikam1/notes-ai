@@ -18,14 +18,14 @@
   width: 100%;
   background: none;
   border: none;
-  font-family: 'Lora', serif;
-  font-size: 24px;
-  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
   color: var(--text);
   outline: none;
   padding-bottom: 12px;
-  line-height: 1.3;
-  letter-spacing: -.3px;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
 }
 
 #note-title::placeholder {
@@ -40,7 +40,7 @@
   border-top: 1px solid var(--border);
   font-size: 10px;
   color: var(--text3);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Inter', sans-serif;
   flex-wrap: wrap;
 }
 
@@ -58,8 +58,8 @@
 /* ===== TOOLBAR ===== */
 #toolbar {
   padding: 0 8px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg2);
+  border-bottom: none;
+  background: #303030;
   display: flex;
   align-items: center;
   gap: 1px;
@@ -80,18 +80,18 @@
 .tb {
   background: none;
   border: none;
-  color: var(--text2);
+  color: #b0b0b0;
   cursor: pointer;
   min-width: 32px;
   height: 32px;
-  border-radius: var(--r);
+  border-radius: 0;
   font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 2px;
   transition: all .15s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   flex-shrink: 0;
   white-space: nowrap;
@@ -99,13 +99,13 @@
 }
 
 .tb:hover {
-  color: var(--text);
-  background: var(--bg3);
+  color: #fff;
+  background: rgba(255,255,255,0.1);
 }
 
 .tb.on {
-  color: var(--accent);
-  background: var(--accent-dim);
+  color: #fff;
+  background: rgba(255,255,255,0.15);
 }
 
 .tb svg {
@@ -116,7 +116,7 @@
   width: 1px;
   min-width: 1px;
   height: 20px;
-  background: var(--border2);
+  background: rgba(255,255,255,0.15);
   margin: 0 3px;
   flex-shrink: 0;
 }
@@ -134,16 +134,16 @@
 
 .tb-menu {
   position: fixed;
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r2);
+  background: #303030;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 0;
   padding: 4px;
   min-width: 180px;
   z-index: 10000;
   visibility: hidden;
   opacity: 0;
   transform: translateY(-10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
   transition: visibility .2s, opacity .2s, transform .2s;
   pointer-events: none;
 }
@@ -160,22 +160,22 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  border-radius: var(--r);
+  border-radius: 0;
   cursor: pointer;
   font-size: 13px;
-  color: var(--text2);
+  color: #b0b0b0;
   border: none;
   background: none;
   width: 100%;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   text-align: left;
   transition: all .15s;
   white-space: nowrap;
 }
 
 .tb-menu-item:hover {
-  background: var(--bg3);
-  color: var(--text);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
 }
 
 .tb-menu-item svg {
@@ -195,12 +195,12 @@
 .ai-btn {
   padding: 0 12px;
   height: 32px;
-  background: var(--accent-dim);
-  border: 1px solid rgba(212, 168, 83, .3);
-  border-radius: var(--r);
-  color: var(--accent);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 0;
+  color: #fff;
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   cursor: pointer;
   transition: all .2s;
@@ -214,8 +214,8 @@
 }
 
 .ai-btn:hover {
-  background: var(--accent);
-  color: #0f0f0f;
+  background: #fff;
+  color: #303030;
 }
 
 .ai-btn:active {
@@ -224,16 +224,16 @@
 
 .ai-menu {
   position: fixed;
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r2);
+  background: #303030;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 0;
   padding: 6px;
   min-width: 200px;
   z-index: 10000;
   visibility: hidden;
   opacity: 0;
   transform: translateY(-10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
   transition: visibility .2s, opacity .2s, transform .2s;
   pointer-events: none;
 }
@@ -250,21 +250,21 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: var(--r);
+  border-radius: 0;
   cursor: pointer;
   font-size: 13px;
-  color: var(--text2);
+  color: #b0b0b0;
   border: none;
   background: none;
   width: 100%;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   text-align: left;
   transition: all .15s;
 }
 
 .ai-item:hover {
-  background: var(--bg3);
-  color: var(--text);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
 }
 
 .ai-item .ic {
@@ -277,12 +277,12 @@
 /* ===== COLOR PICKER ===== */
 .color-picker-popup {
   position: fixed;
-  background: var(--bg2);
+  background: #fff;
   border: 1px solid var(--border2);
-  border-radius: var(--r2);
+  border-radius: 0;
   padding: 12px;
   z-index: 10000;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .15);
   width: 300px;
 }
 
@@ -326,12 +326,12 @@
 /* ===== SLASH COMMAND MENU ===== */
 .slash-menu {
   position: fixed;
-  background: var(--bg2);
+  background: #fff;
   border: 1px solid var(--border2);
-  border-radius: var(--r2);
+  border-radius: 0;
   padding: 6px;
   z-index: 10000;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
   min-width: 280px;
   max-width: 320px;
   display: none;
@@ -356,7 +356,7 @@
 }
 
 .slash-item.selected {
-  border: 1px solid var(--accent);
+  border: 1px solid #000;
   background: var(--accent-dim);
 }
 
@@ -367,7 +367,7 @@
   align-items: center;
   justify-content: center;
   background: var(--bg3);
-  border-radius: var(--r);
+  border-radius: 0;
   font-size: 14px;
   font-weight: 600;
   color: var(--text2);
@@ -375,8 +375,8 @@
 }
 
 .slash-item.selected .slash-icon {
-  background: var(--accent);
-  color: #0f0f0f;
+  background: #000;
+  color: #fff;
 }
 
 .slash-info {
@@ -411,9 +411,9 @@
   font-size: 16px;
   line-height: 1.85;
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   max-width: 720px;
-  caret-color: var(--accent);
+  caret-color: #000;
   word-wrap: break-word;
   overflow-wrap: break-word;
   margin: 0 auto;
@@ -460,34 +460,34 @@
 /* Headings */
 .tiptap h1,
 #editor[contenteditable="true"] h1 {
-  font-family: 'Lora', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 900;
   margin: 24px 0 12px;
   color: var(--text);
-  line-height: 1.3;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
 }
 
 .tiptap h2,
 #editor[contenteditable="true"] h2 {
-  font-family: 'Lora', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 800;
   margin: 20px 0 10px;
   color: var(--text);
-  line-height: 1.35;
-  letter-spacing: -0.01em;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
 }
 
 .tiptap h3,
 #editor[contenteditable="true"] h3 {
-  font-family: 'Lora', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   margin: 16px 0 8px;
   color: var(--text);
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 /* Paragraphs */
@@ -519,7 +519,6 @@
 .tiptap i,
 #editor[contenteditable="true"] i {
   font-style: italic;
-  font-family: 'Lora', serif;
 }
 
 .tiptap u,
@@ -641,12 +640,13 @@
   width: 17px !important;
   height: 17px !important;
   cursor: pointer !important;
-  border: 2px solid var(--border-color);
-  border-radius: 4px;
-  background-color: var(--secondary-bg);
-  transition: all 0.2s ease;
+  border: 2px solid var(--border2);
+  border-radius: 0;
+  background-color: #fff;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
   margin: 0 !important;
   position: relative;
+  flex-shrink: 0;
 }
 
 .tiptap li[data-type="taskItem"] > label input[type="checkbox"]:checked,
@@ -685,14 +685,13 @@
 /* Blockquote */
 .tiptap blockquote,
 #editor[contenteditable="true"] blockquote {
-  border-left: 3px solid var(--accent);
+  border-left: 4px solid #000;
   padding: 12px 16px;
   margin: 16px 0;
-  background: var(--accent-dim2);
-  border-radius: 0 var(--r) var(--r) 0;
+  background: var(--bg3);
+  border-radius: 0;
   color: var(--text2);
   font-style: italic;
-  font-family: 'Lora', serif;
   font-size: 15px;
 }
 
@@ -710,8 +709,8 @@
   background: var(--bg3);
   border: 1px solid var(--border2);
   padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--accent);
+  border-radius: 0;
+  color: var(--text);
   white-space: pre-wrap;
   word-break: break-word;
 }

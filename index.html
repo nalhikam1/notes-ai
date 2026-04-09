@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0f0f0f">
+  <meta name="theme-color" content="#f9f9f9">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,7 +14,7 @@
   <link rel="shortcut icon" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   
@@ -50,7 +50,7 @@
   <!-- ONBOARDING -->
   <div id="onboarding">
     <div class="onboard-card">
-      <div class="onboard-logo">Fnote</div>
+      <div class="onboard-logo">FNOTE</div>
       <p class="onboard-sub">Notes management dengan AI yang mengenal kamu.</p>
       <div class="step-dots">
         <div class="step-dot active" id="d0"></div>
@@ -106,7 +106,7 @@
           <label class="form-label">Model NVIDIA</label>
           <select class="form-select" id="p-model"></select>
         </div>
-        <button class="btn-primary" onclick="finishOnboarding()">Mulai Fnote ✦</button>
+        <button class="btn-primary" onclick="finishOnboarding()">Mulai FNOTE</button>
         <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
       </div>
     </div>
@@ -120,7 +120,7 @@
     <!-- SIDEBAR -->
     <div id="sidebar">
       <div class="sidebar-header">
-        <div class="logo">Fnote ✦</div>
+        <div class="logo">FNOTE</div>
         <div class="sidebar-actions">
           <button class="icon-btn" onclick="newNote()" title="Note baru">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
@@ -419,21 +419,40 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg>
           </button>
           <div class="mtb-sep"></div>
+
+          <!-- Text formatting direct buttons -->
           <button class="mtb" onclick="tiptapBold()" title="Bold">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
           </button>
           <button class="mtb" onclick="tiptapItalic()" title="Italic">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
           </button>
-          <button class="mtb" onclick="tiptapStrike()" title="Strike">
+          <button class="mtb" onclick="tiptapUnderline()" title="Underline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
+          </button>
+          <button class="mtb" onclick="tiptapStrike()" title="Strikethrough">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.3 4.9c-2.3-.6-4.4-1-6.2-.9-2.7 0-5.3.7-5.3 3.6 0 1.5 1.8 3.3 3.6 3.9h.2m8.2 3.7c.3.4.4.8.4 1.3 0 2.9-2.7 3.6-6.2 3.6-2.3 0-4.4-.3-6.2-.9M4 11.5h16"/></svg>
           </button>
+          <button class="mtb" onclick="tiptapCode()" title="Inline Code">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </button>
           <div class="mtb-sep"></div>
+
+          <!-- Task list (most used — direct button) -->
+          <button class="mtb" onclick="tiptapTaskList()" title="Task List">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </button>
+          <div class="mtb-sep"></div>
+
+          <!-- Dropdown menus -->
           <button class="mtb" onclick="toggleMobileMenu('heading')" title="Heading">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v16M18 4v16M8 12h8"/></svg>
           </button>
-          <button class="mtb" onclick="toggleMobileMenu('list')" title="List">
+          <button class="mtb" onclick="toggleMobileMenu('list')" title="Lists">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+          <button class="mtb" onclick="toggleMobileMenu('align')" title="Align">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
           </button>
           <button class="mtb" onclick="openLinkDialog()" title="Link">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -442,26 +461,34 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
           </button>
           
-          <!-- Mobile Toolbar Menus (inside toolbar for proper positioning) -->
+          <!-- Mobile Toolbar Menus -->
           <div id="mobile-menu-heading" class="mobile-menu">
-            <button class="mobile-menu-item" onclick="tiptapParagraph();closeMobileMenu()">Paragraph</button>
-            <button class="mobile-menu-item" onclick="tiptapHeading(1);closeMobileMenu()">Heading 1</button>
-            <button class="mobile-menu-item" onclick="tiptapHeading(2);closeMobileMenu()">Heading 2</button>
-            <button class="mobile-menu-item" onclick="tiptapHeading(3);closeMobileMenu()">Heading 3</button>
+            <button class="mobile-menu-item" onclick="tiptapParagraph();closeMobileMenu()">¶ Paragraph</button>
+            <button class="mobile-menu-item" onclick="tiptapHeading(1);closeMobileMenu()"><strong>H1 Heading 1</strong></button>
+            <button class="mobile-menu-item" onclick="tiptapHeading(2);closeMobileMenu()"><strong>H2 Heading 2</strong></button>
+            <button class="mobile-menu-item" onclick="tiptapHeading(3);closeMobileMenu()"><strong>H3 Heading 3</strong></button>
           </div>
           
           <div id="mobile-menu-list" class="mobile-menu">
-            <button class="mobile-menu-item" onclick="tiptapBulletList();closeMobileMenu()">Bullet List</button>
-            <button class="mobile-menu-item" onclick="tiptapOrderedList();closeMobileMenu()">Numbered List</button>
-            <button class="mobile-menu-item" onclick="tiptapTaskList();closeMobileMenu()">Task List</button>
+            <button class="mobile-menu-item" onclick="tiptapBulletList();closeMobileMenu()">• Bullet List</button>
+            <button class="mobile-menu-item" onclick="tiptapOrderedList();closeMobileMenu()">1. Numbered List</button>
+            <button class="mobile-menu-item" onclick="tiptapTaskList();closeMobileMenu()">☑ Task List</button>
+          </div>
+
+          <div id="mobile-menu-align" class="mobile-menu">
+            <button class="mobile-menu-item" onclick="tiptapAlign('left');closeMobileMenu()">⬅ Align Left</button>
+            <button class="mobile-menu-item" onclick="tiptapAlign('center');closeMobileMenu()">↔ Align Center</button>
+            <button class="mobile-menu-item" onclick="tiptapAlign('right');closeMobileMenu()">➡ Align Right</button>
+            <button class="mobile-menu-item" onclick="tiptapAlign('justify');closeMobileMenu()">≡ Justify</button>
           </div>
           
           <div id="mobile-menu-more" class="mobile-menu">
-            <button class="mobile-menu-item" onclick="tiptapBlockquote();closeMobileMenu()">Blockquote</button>
-            <button class="mobile-menu-item" onclick="tiptapCodeBlock();closeMobileMenu()">Code Block</button>
-            <button class="mobile-menu-item" onclick="tiptapHR();closeMobileMenu()">Horizontal Rule</button>
-            <button class="mobile-menu-item" onclick="tiptapInsertTable();closeMobileMenu()">Table</button>
-            <button class="mobile-menu-item" onclick="openImageDialog();closeMobileMenu()">Image</button>
+            <button class="mobile-menu-item" onclick="tiptapBlockquote();closeMobileMenu()">" Blockquote</button>
+            <button class="mobile-menu-item" onclick="tiptapCodeBlock();closeMobileMenu()">⌨ Code Block</button>
+            <button class="mobile-menu-item" onclick="tiptapHR();closeMobileMenu()">― Divider</button>
+            <button class="mobile-menu-item" onclick="tiptapInsertTable();closeMobileMenu()">⊞ Table</button>
+            <button class="mobile-menu-item" onclick="openImageDialog();closeMobileMenu()">🖼 Image</button>
+            <button class="mobile-menu-item" onclick="tiptapClearFormat();closeMobileMenu()">✕ Clear Format</button>
           </div>
         </div>
 

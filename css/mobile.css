@@ -82,16 +82,18 @@
     left: 0;
     right: 0;
     height: var(--mobile-toolbar-h);
-    background: var(--bg2);
-    border-top: 1px solid var(--border);
+    background: #303030;
+    border-top: none;
     z-index: 150;
     display: none; /* Hidden by default — shown only when in editor */
     align-items: center;
-    justify-content: space-around;
-    padding: 0 6px;
+    justify-content: flex-start;
+    padding: 0 8px;
     gap: 2px;
     overflow-x: auto;
     scrollbar-width: none;
+    /* Smooth when JS adjusts bottom for keyboard */
+    will-change: bottom;
   }
 
   .mobile-toolbar::-webkit-scrollbar {
@@ -106,11 +108,11 @@
   .mtb {
     background: none;
     border: none;
-    color: var(--text2);
+    color: #b0b0b0;
     cursor: pointer;
     min-width: 38px;
     height: 38px;
-    border-radius: var(--r);
+    border-radius: 0;
     font-size: 14px;
     display: flex;
     align-items: center;
@@ -121,19 +123,19 @@
 
   .mtb:hover,
   .mtb:active {
-    color: var(--text);
-    background: var(--bg3);
+    color: #fff;
+    background: rgba(255,255,255,0.1);
   }
 
   .mtb.on {
-    color: var(--accent);
-    background: var(--accent-dim);
+    color: #fff;
+    background: rgba(255,255,255,0.15);
   }
 
   .mtb-sep {
     width: 1px;
     height: 24px;
-    background: var(--border2);
+    background: rgba(255,255,255,0.15);
     flex-shrink: 0;
   }
 
@@ -143,12 +145,12 @@
     bottom: calc(var(--bottom-bar-h) + var(--mobile-toolbar-h) + 4px);
     left: 8px;
     right: 8px;
-    background: var(--bg2);
+    background: #fff;
     border: 1px solid var(--border2);
-    border-radius: var(--r2);
+    border-radius: 0;
     padding: 6px;
     z-index: 200;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, .4);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, .1);
     display: none;
     max-height: 50vh;
     overflow-y: auto;
@@ -166,10 +168,10 @@
     border: none;
     color: var(--text2);
     font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     text-align: left;
     cursor: pointer;
-    border-radius: var(--r);
+    border-radius: 0;
     transition: all .15s;
   }
 
@@ -186,8 +188,8 @@
     left: 0;
     right: 0;
     height: var(--bottom-bar-h);
-    background: var(--bg2);
-    border-top: 1px solid var(--border);
+    background: #fff;
+    border-top: 1px solid var(--border2);
     z-index: 100;
     display: flex;
     align-items: center;
@@ -207,9 +209,9 @@
     color: var(--text3);
     cursor: pointer;
     padding: 6px 8px;
-    border-radius: var(--r);
+    border-radius: 0;
     font-size: 9px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     transition: all .15s;
     min-width: 52px;
     flex: 1;
@@ -221,7 +223,7 @@
   }
 
   .bb-btn.active {
-    color: var(--accent);
+    color: #000;
   }
 
   .bb-btn:active {
@@ -232,10 +234,10 @@
   .bb-new {
     width: 46px;
     height: 46px;
-    border-radius: 50%;
-    background: var(--accent);
+    border-radius: 0;
+    background: #000;
     border: none;
-    color: #0f0f0f;
+    color: #fff;
     font-size: 26px;
     font-weight: 300;
     cursor: pointer;
@@ -244,14 +246,14 @@
     justify-content: center;
     flex-shrink: 0;
     transition: all .15s;
-    box-shadow: 0 2px 12px rgba(212, 168, 83, 0.45);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     line-height: 1;
     margin-bottom: 2px;
   }
 
   .bb-new:active {
     transform: scale(.92);
-    background: var(--accent2);
+    opacity: 0.8;
   }
 
   /* Adjust editor content area on mobile */

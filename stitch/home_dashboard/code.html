@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c6c6c6",
+                        "background": "#f9f9f9",
+                        "outline": "#777777",
+                        "primary-fixed": "#5e5e5e",
+                        "on-primary-fixed": "#ffffff",
+                        "on-error-container": "#410002",
+                        "on-tertiary-fixed": "#ffffff",
+                        "tertiary-container": "#747474",
+                        "on-primary": "#e2e2e2",
+                        "on-secondary-container": "#1b1b1b",
+                        "on-surface-variant": "#474747",
+                        "on-tertiary-container": "#ffffff",
+                        "on-background": "#1b1b1b",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-container": "#eeeeee",
+                        "surface": "#f9f9f9",
+                        "inverse-primary": "#c6c6c6",
+                        "inverse-surface": "#303030",
+                        "on-tertiary-fixed-variant": "#e2e2e2",
+                        "primary": "#000000",
+                        "primary-fixed-dim": "#474747",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "surface-dim": "#dadada",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-variant": "#e2e2e2",
+                        "on-tertiary": "#e2e2e2",
+                        "on-surface": "#1b1b1b",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-fixed-dim": "#ababab",
+                        "on-primary-container": "#ffffff",
+                        "primary-container": "#3b3b3b",
+                        "tertiary": "#3b3b3b",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "surface-tint": "#5e5e5e",
+                        "secondary": "#5e5e5e",
+                        "tertiary-fixed-dim": "#474747",
+                        "tertiary-fixed": "#5e5e5e",
+                        "secondary-fixed": "#c6c6c6",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e8e8e8",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "inverse-on-surface": "#f1f1f1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+        }
+        /* Editorial text treatments */
+        .editorial-title {
+            letter-spacing: -0.05em;
+            line-height: 0.9;
+        }
+    </style>
+</head>
+<body class="text-on-background">
+<div class="flex h-screen overflow-hidden">
+<!-- SideNavBar - JSON Managed -->
+<aside class="flex flex-col h-full py-8 bg-[#f3f3f3] dark:bg-[#1a1a1a] h-screen w-64 border-none 0px-radius font-['Inter'] font-medium tracking-tight">
+<div class="px-8 mb-12">
+<div class="text-2xl font-black tracking-tighter text-black dark:text-white">ARCHIVE</div>
+<div class="text-[10px] uppercase tracking-widest opacity-40 mt-1">V.1.0</div>
+</div>
+<nav class="flex-1">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-8 py-3 bg-black dark:bg-white text-white dark:text-black border-l-4 border-black dark:border-white transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span>Home</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-8 py-3 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Research</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-8 py-3 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="topic">topic</span>
+<span>Projects</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-8 py-3 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="folder">folder</span>
+<span>Folders</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-8 py-3 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Notes</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="px-8 mt-auto">
+<button class="w-full bg-black dark:bg-white text-white dark:text-black py-4 font-bold uppercase text-xs tracking-widest hover:opacity-90 transition-all 0px-radius">
+                    New Note
+                </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 flex flex-col overflow-y-auto bg-surface relative">
+<!-- TopNavBar - JSON Managed -->
+<header class="flex justify-between items-center w-full px-8 h-16 bg-[#f9f9f9] dark:bg-[#0a0a0a] docked full-width top-0 border-none">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black text-black dark:text-white">ARCHIVE</span>
+<nav class="hidden md:flex gap-6">
+<a class="font-['Inter'] font-bold uppercase text-xs tracking-widest text-black dark:text-white border-b-2 border-black dark:border-white scale-[0.99] transition-transform" href="#">Overview</a>
+<a class="font-['Inter'] font-bold uppercase text-xs tracking-widest text-zinc-500 dark:text-zinc-500 hover:text-black dark:hover:text-white transition-all" href="#">Activities</a>
+<a class="font-['Inter'] font-bold uppercase text-xs tracking-widest text-zinc-500 dark:text-zinc-500 hover:text-black dark:hover:text-white transition-all" href="#">Insights</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-[10px] tracking-widest font-bold uppercase pl-6 w-48" placeholder="SEARCH SYSTEM..." type="text"/>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined cursor-pointer hover:opacity-60 transition-opacity" data-icon="smart_toy">smart_toy</span>
+<span class="material-symbols-outlined cursor-pointer hover:opacity-60 transition-opacity" data-icon="grid_view">grid_view</span>
+<span class="material-symbols-outlined cursor-pointer hover:opacity-60 transition-opacity" data-icon="settings">settings</span>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-12 max-w-7xl w-full mx-auto">
+<!-- Hero Editorial Headline -->
+<section class="mb-20">
+<h1 class="text-[8rem] font-black editorial-title text-primary tracking-tighter uppercase mb-2">
+                        Nexus
+                    </h1>
+<div class="flex justify-between items-end border-t border-primary pt-4">
+<p class="max-w-md text-on-surface-variant font-medium leading-tight">
+                            The centralized repository of architectural thought, research parameters, and active project metadata.
+                        </p>
+<p class="text-xs font-bold tracking-widest uppercase">
+                            Updated: 24.OCT.2023 / 14:32
+                        </p>
+</div>
+</section>
+<!-- Statistics Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-0 mb-20 border border-primary">
+<div class="p-10 bg-surface-container-lowest border-r border-primary">
+<div class="flex justify-between items-start mb-12">
+<span class="text-[10px] font-black uppercase tracking-[0.2em]">Total Notes</span>
+<span class="material-symbols-outlined text-sm">north_east</span>
+</div>
+<div class="text-7xl font-black tracking-tighter">1,284</div>
+<div class="mt-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400">+12 this week</div>
+</div>
+<div class="p-10 bg-surface-container-lowest border-r border-primary">
+<div class="flex justify-between items-start mb-12">
+<span class="text-[10px] font-black uppercase tracking-[0.2em]">Projects</span>
+<span class="material-symbols-outlined text-sm">work_outline</span>
+</div>
+<div class="text-7xl font-black tracking-tighter">42</div>
+<div class="mt-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400">8 In Production</div>
+</div>
+<div class="p-10 bg-primary text-white">
+<div class="flex justify-between items-start mb-12">
+<span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Stored Folders</span>
+<span class="material-symbols-outlined text-sm">folder_open</span>
+</div>
+<div class="text-7xl font-black tracking-tighter">156</div>
+<div class="mt-4 text-[10px] font-bold uppercase tracking-widest text-white/50">Categorized Archive</div>
+</div>
+</section>
+<!-- Activity & Recent Content -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Activity List -->
+<div class="lg:col-span-8">
+<div class="flex items-baseline justify-between mb-8 border-b border-zinc-200 pb-2">
+<h2 class="text-xs font-black uppercase tracking-[0.3em]">Recent Activity</h2>
+<a class="text-[10px] font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity" href="#">View All Registry</a>
+</div>
+<div class="space-y-4">
+<!-- Activity Item 01 -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest border border-transparent hover:border-primary transition-all cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<div>
+<div class="font-bold text-lg tracking-tight">The Brutalist Manifesto.md</div>
+<div class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Modified 2m ago by AI-Sync</div>
+</div>
+</div>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+<!-- Activity Item 02 -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest border border-transparent hover:border-primary transition-all cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="topic">topic</span>
+</div>
+<div>
+<div class="font-bold text-lg tracking-tight">Project: Urban Monolith 2024</div>
+<div class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Status updated to 'Deployment'</div>
+</div>
+</div>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+<!-- Activity Item 03 -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest border border-transparent hover:border-primary transition-all cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+</div>
+<div>
+<div class="font-bold text-lg tracking-tight">Q3 Research Synthesis</div>
+<div class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">3 new annotations found</div>
+</div>
+</div>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Sidebar Content / Pinned -->
+<div class="lg:col-span-4">
+<div class="flex items-baseline justify-between mb-8 border-b border-zinc-200 pb-2">
+<h2 class="text-xs font-black uppercase tracking-[0.3em]">Pinned</h2>
+</div>
+<div class="bg-surface-container-high p-8">
+<ul class="space-y-6">
+<li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-1 before:bg-primary">
+<div class="text-sm font-black uppercase tracking-widest mb-1">Architecture Guidelines</div>
+<div class="text-xs text-on-surface-variant leading-relaxed">The fundamental rules governing the grid and typographic scale.</div>
+</li>
+<li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-1 before:bg-zinc-400">
+<div class="text-sm font-black uppercase tracking-widest mb-1">Color Tokens V2</div>
+<div class="text-xs text-on-surface-variant leading-relaxed">Monochromatic hierarchy for high-density interfaces.</div>
+</li>
+<li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-1 before:bg-zinc-400">
+<div class="text-sm font-black uppercase tracking-widest mb-1">Drafting Logic</div>
+<div class="text-xs text-on-surface-variant leading-relaxed">Automated folder structure for rapid project initiation.</div>
+</li>
+</ul>
+<div class="mt-12 pt-8 border-t border-zinc-300">
+<div class="text-[10px] font-black uppercase tracking-[0.2em] mb-4">Storage Capacity</div>
+<div class="h-1 bg-zinc-300 w-full mb-2">
+<div class="h-full bg-primary w-[72%]"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold uppercase">
+<span>14.2 GB Used</span>
+<span>72%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Fine Print -->
+<footer class="mt-32 pt-8 border-t border-zinc-200 flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+<div>© 2023 Archive Monolith System</div>
+<div class="flex gap-8">
+<a class="hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="hover:text-primary transition-colors" href="#">API Access</a>
+<a class="hover:text-primary transition-colors" href="#">Log Out</a>
+</div>
+</footer>
+</div>
+<!-- Floating AI Assistant Icon -->
+<button class="fixed bottom-12 right-12 w-16 h-16 bg-primary text-white flex items-center justify-center hover:scale-105 transition-transform 0px-radius shadow-2xl z-50">
+<span class="material-symbols-outlined text-3xl" data-weight="fill">smart_toy</span>
+</button>
+</main>
+</div>
+</body></html>

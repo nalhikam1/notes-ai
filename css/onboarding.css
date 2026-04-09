@@ -15,30 +15,25 @@
   width: 100%;
   max-width: 460px;
   padding: 40px 36px;
-  background: var(--bg2);
+  background: #fff;
   border: 1px solid var(--border2);
-  border-radius: 16px;
+  border-radius: 0;
   position: relative;
   overflow: hidden;
 }
 
 .onboard-card::before {
-  content: '';
-  position: absolute;
-  top: -60px;
-  right: -60px;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(212, 168, 83, 0.15) 0%, transparent 70%);
-  pointer-events: none;
+  display: none;
 }
 
 .onboard-logo {
-  font-family: 'Lora', serif;
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--accent);
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000;
   margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
 .onboard-sub {
@@ -80,7 +75,7 @@
 }
 
 .step-dot.active {
-  background: var(--accent);
+  background: #000;
 }
 
 .provider-grid {
@@ -92,12 +87,12 @@
 
 .provider-btn {
   padding: 11px 10px;
-  background: var(--bg3);
+  background: #fff;
   border: 1px solid var(--border2);
-  border-radius: var(--r);
+  border-radius: 0;
   color: var(--text2);
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all .2s;
   text-align: left;
@@ -105,12 +100,12 @@
 }
 
 .provider-btn:hover {
-  border-color: var(--accent);
+  border-color: #000;
   color: var(--text);
 }
 
 .provider-btn.active {
-  border-color: var(--accent);
+  border-color: #000;
   background: var(--accent-dim);
-  color: var(--accent);
+  color: #000;
 }
