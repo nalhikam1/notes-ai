@@ -398,7 +398,12 @@ function tiptapCode() {
 
 function tiptapCodeBlock() {
   if (useTiptap && editor) {
-    editor.chain().focus().toggleCodeBlock().run();
+    editor.chain()
+      .focus()
+      .insertContent('<pre><code></code></pre>')
+      .insertContent('<p></p>') // Add empty paragraph after
+      .focus()
+      .run();
   } else {
     document.execCommand('formatBlock', false, '<pre>');
   }
@@ -407,7 +412,12 @@ function tiptapCodeBlock() {
 // Horizontal rule
 function tiptapHR() {
   if (useTiptap && editor) {
-    editor.chain().focus().setHorizontalRule().run();
+    editor.chain()
+      .focus()
+      .setHorizontalRule()
+      .insertContent('<p></p>') // Add empty paragraph after
+      .focus()
+      .run();
   } else {
     document.execCommand('insertHorizontalRule', false, null);
   }
@@ -416,7 +426,12 @@ function tiptapHR() {
 // Table
 function tiptapInsertTable() {
   if (useTiptap && editor) {
-    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    editor.chain()
+      .focus()
+      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+      .insertContent('<p></p>') // Add empty paragraph after
+      .focus()
+      .run();
   } else {
     // Fallback: insert a simple HTML table
     const html = '<table><thead><tr><th>Header 1</th><th>Header 2</th><th>Header 3</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td></tr><tr><td>Cell 4</td><td>Cell 5</td><td>Cell 6</td></tr></tbody></table>';

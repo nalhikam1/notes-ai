@@ -1858,6 +1858,12 @@ body {
   margin: 12px 0 !important;
 }
 
+.tiptap ul[data-type="taskList"]::before,
+#editor[contenteditable="true"] ul[data-type="taskList"]::before {
+  display: none !important;
+  content: none !important;
+}
+
 .tiptap ul[data-type="taskList"] li,
 #editor[contenteditable="true"] ul[data-type="taskList"] li,
 .tiptap ul[data-type="taskList"] > li {
@@ -1871,11 +1877,7 @@ body {
 }
 
 .tiptap ul[data-type="taskList"] li::marker,
-#editor[contenteditable="true"] ul[data-type="taskList"] li::marker {
-  display: none !important;
-  content: '' !important;
-}
-
+#editor[contenteditable="true"] ul[data-type="taskList"] li::marker,
 .tiptap ul[data-type="taskList"] li::before,
 #editor[contenteditable="true"] ul[data-type="taskList"] li::before {
   display: none !important;
@@ -1887,6 +1889,8 @@ body {
   flex: 0 0 auto;
   margin-top: 4px;
   user-select: none;
+  margin-right: 0;
+  padding: 0;
 }
 
 .tiptap ul[data-type="taskList"] li > label input[type="checkbox"],
@@ -1939,6 +1943,13 @@ body {
 #editor[contenteditable="true"] ul[data-type="taskList"] li[data-checked="true"] > div {
   text-decoration: line-through;
   color: var(--text3);
+}
+
+/* Remove any default list styling from task list */
+.tiptap ul[data-type="taskList"] li > p,
+#editor[contenteditable="true"] ul[data-type="taskList"] li > p {
+  margin: 0;
+  display: inline;
 }
 
 
