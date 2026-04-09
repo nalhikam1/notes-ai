@@ -533,12 +533,13 @@
 }
 
 /* Lists */
-.tiptap ul,
-#editor[contenteditable="true"] ul {
+.tiptap ul:not([data-type="taskList"]),
+#editor[contenteditable="true"] ul:not([data-type="taskList"]) {
   margin: 12px 0;
   padding-left: 24px;
   list-style-type: disc;
 }
+
 
 .tiptap ol,
 #editor[contenteditable="true"] ol {
@@ -566,50 +567,67 @@
 }
 
 /* Task List - Tiptap native TaskList/TaskItem */
-.tiptap ul[data-type="taskList"] {
+.tiptap ul[data-type="taskList"],
+#editor[contenteditable="true"] ul[data-type="taskList"] {
   list-style: none !important;
+  list-style-type: none !important; /* Explicitly reset */
   padding: 0 !important;
   margin: 16px 0 !important;
 }
 
-.tiptap li[data-type="taskItem"] {
+.tiptap li[data-type="taskItem"],
+#editor[contenteditable="true"] li[data-type="taskItem"] {
   display: flex !important;
   align-items: flex-start !important;
   list-style: none !important;
+  list-style-type: none !important; /* Force reset per item */
   margin-bottom: 8px !important;
   padding: 0 !important;
 }
 
-/* Hard reset for markers */
+/* Hard reset for all markers and pseudo-bullets */
+.tiptap ul[data-type="taskList"] > li::marker,
+.tiptap ul[data-type="taskList"] > li::before,
 .tiptap li[data-type="taskItem"]::marker,
-.tiptap li[data-type="taskItem"]::before {
+.tiptap li[data-type="taskItem"]::before,
+#editor[contenteditable="true"] li[data-type="taskItem"]::marker,
+#editor[contenteditable="true"] li[data-type="taskItem"]::before {
   content: none !important;
   display: none !important;
+  list-style-type: none !important;
 }
 
-.tiptap li[data-type="taskItem"] > label {
+.tiptap li[data-type="taskItem"] > label,
+#editor[contenteditable="true"] li[data-type="taskItem"] > label {
   flex-shrink: 0 !important;
   margin: 4px 12px 0 0 !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
+  user-select: none;
 }
 
-.tiptap li[data-type="taskItem"] > label input[type="checkbox"] {
+.tiptap li[data-type="taskItem"] > label input[type="checkbox"],
+#editor[contenteditable="true"] li[data-type="taskItem"] > label input[type="checkbox"] {
   width: 18px !important;
   height: 18px !important;
   cursor: pointer !important;
   accent-color: var(--accent) !important;
+  margin: 0 !important; /* Kill default margins */
 }
 
-.tiptap li[data-type="taskItem"] > div {
+.tiptap li[data-type="taskItem"] > div,
+#editor[contenteditable="true"] li[data-type="taskItem"] > div {
   flex: 1 1 auto !important;
+  min-width: 0;
 }
 
-.tiptap li[data-type="taskItem"][data-checked="true"] > div {
+.tiptap li[data-type="taskItem"][data-checked="true"] > div,
+#editor[contenteditable="true"] li[data-type="taskItem"][data-checked="true"] > div {
   text-decoration: line-through !important;
   opacity: 0.6 !important;
 }
+
 
 /* Blockquote */
 .tiptap blockquote,

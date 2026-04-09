@@ -34,7 +34,9 @@
   padding: 0;
   max-width: none;
   overflow: hidden;
+  min-width: 450px; /* Ensure editor remains usable when assistant is open */
 }
+
 
 #editor-view[style*="display:none"],
 #editor-view[style*="display: none"] {
