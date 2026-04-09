@@ -1151,6 +1151,13 @@ body {
   display: none;
 }
 
+/* Wrapper for toolbar to handle overflow properly */
+#toolbar-wrapper {
+  position: relative;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
 .tb {
   background: none;
   border: none;
@@ -1188,16 +1195,13 @@ body {
 
 /* Toolbar Dropdown */
 .tb-dropdown {
-  position: relative;
+  position: static;
   display: inline-flex;
   flex-shrink: 0;
 }
 
 .tb-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 4px;
+  position: fixed;
   background: var(--bg2);
   border: 1px solid var(--border2);
   border-radius: var(--r2);
@@ -1262,7 +1266,7 @@ body {
 
 /* AI Dropdown - Desktop */
 .ai-drop {
-  position: relative;
+  position: static;
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
@@ -1300,10 +1304,7 @@ body {
 }
 
 .ai-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 4px;
+  position: fixed;
   background: var(--bg2);
   border: 1px solid var(--border2);
   border-radius: var(--r2);
