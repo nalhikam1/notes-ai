@@ -340,10 +340,13 @@ function deleteProject(id,e){
   ST.folders=ST.folders.filter(f=>f.projectId!==id);
   ST.notes=ST.notes.filter(n=>n.projectId!==id);
   
+  saveState();
+  
   if(ST.activeProjectId===id){
     showDashboard();
+    renderSidebar();
   } else {
-    saveState(); renderSidebar();
+    renderSidebar();
     if(ST.viewType === 'dashboard') renderGlobalDashboard();
   }
   showToast('Project dihapus');

@@ -413,7 +413,7 @@
   color: var(--text);
   font-family: 'Inter', sans-serif;
   max-width: 720px;
-  caret-color: #000;
+  caret-color: #d4a853;
   word-wrap: break-word;
   overflow-wrap: break-word;
   margin: 0 auto;
@@ -437,6 +437,7 @@
   outline: none;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  caret-color: #d4a853;
 }
 
 .tiptap p.is-editor-empty:first-child::before {
