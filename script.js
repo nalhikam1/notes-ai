@@ -124,6 +124,8 @@ function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.style.display='none');
   document.getElementById(`${v}-view`).style.display='flex';
   updateBreadcrumbs();
+  // Toggle mobile formatting toolbar visibility
+  document.body.classList.toggle('editor-active', v === 'editor');
 }
 
 function showDashboard(){
@@ -573,11 +575,19 @@ function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function toggleSidebar(){
   const s=document.getElementById('sidebar');
   const o=document.getElementById('sidebar-overlay');
-  if(s.classList.contains('open')){s.classList.remove('open');o.classList.remove('show');}
-  else{s.classList.add('open');o.classList.add('show');}
+  const isMobile = window.innerWidth <= 900;
+  if(isMobile) {
+    // Mobile: use .show class with transform
+    if(s.classList.contains('show')){s.classList.remove('show');o.classList.remove('show');}
+    else{s.classList.add('show');o.classList.add('show');}
+  } else {
+    // Desktop (shouldn't be called but guard)
+    if(s.classList.contains('open')){s.classList.remove('open');}
+    else{s.classList.add('open');}
+  }
 }
 function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar').classList.remove('show','open');
   document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
@@ -790,116 +800,9 @@ function removeFromFolder(noteId){
   showToast('Dikeluarkan dari folder');
 }
 
-// ===== EDITOR - CORE =====
-function fmt(cmd){document.getElementById('editor').focus();document.execCommand(cmd,false,null);}
-function fmtBlock(tag){document.getElementById('editor').focus();document.execCommand('formatBlock',false,tag);}
-
-// ===== CHECKLIST =====
-function insertChecklist(){
-  const editor=document.getElementById('editor');
-  editor.focus();
-  const item=createCheckItem('');
-  const sel=window.getSelection();
-  if(sel.rangeCount){
-    const range=sel.getRangeAt(0);
-    let node=range.startContainer;
-    while(node&&node!==editor&&!['P','DIV','H1','H2','H3','LI','BLOCKQUOTE'].includes(node.nodeName)){
-      node=node.parentNode;
-    }
-    if(node&&node!==editor) node.after(item);
-    else { range.deleteContents(); range.insertNode(item); }
-  } else {
-    editor.appendChild(item);
-  }
-  // setTimeout for mobile - let DOM settle before focusing
-  setTimeout(()=>focusCheckText(item), 20);
-  scheduleAutoSave();
-}
-
-function focusCheckText(item){
-  const span=item.querySelector('.ql-check-text');
-  if(!span) return;
-  span.focus();
-  try{
-    const r=document.createRange();
-    const node=span.childNodes.length?span.childNodes[0]:span;
-    r.setStart(node,0); r.collapse(true);
-    const sel=window.getSelection();
-    sel.removeAllRanges(); sel.addRange(r);
-  }catch(ex){}
-}
-
-function createCheckItem(text, checked){
-  const div=document.createElement('div');
-  div.className='ql-check'+(checked?' done':'');
-  div.setAttribute('data-check','1');
-  if(checked) div.setAttribute('data-checked','1');
-  const box=document.createElement('span');
-  box.className='ql-check-box';
-  box.setAttribute('contenteditable','false');
-  box.addEventListener('click',function(e){
-    e.preventDefault(); e.stopPropagation();
-    const done=div.classList.toggle('done');
-    if(done) div.setAttribute('data-checked','1');
-    else div.removeAttribute('data-checked');
-    scheduleAutoSave();
-  });
-  const span=document.createElement('span');
-  span.className='ql-check-text';
-  span.contentEditable='true';
-  // Use zero-width space so mobile browser treats it as focusable text node
-  span.textContent=text||'\u200B';
-  // Tap on row → focus text span
-  div.addEventListener('click',function(e){
-    if(e.target===div){ span.focus(); }
-  });
-  div.appendChild(box);
-  div.appendChild(span);
-  return div;
-}
-
-// Re-attach click listeners to checklist items after loading from storage
-function reattachChecklistListeners(){
-  document.querySelectorAll('#editor .ql-check').forEach(div=>{
-    if(div.getAttribute('data-checked')==='1') div.classList.add('done');
-    let box=div.querySelector('.ql-check-box');
-    if(!box){
-      // Legacy: had <input type=checkbox>, replace with custom box
-      const oldCb=div.querySelector('input[type=checkbox]');
-      box=document.createElement('span');
-      box.className='ql-check-box';
-      box.setAttribute('contenteditable','false');
-      if(oldCb){
-        if(oldCb.checked){ div.classList.add('done'); div.setAttribute('data-checked','1'); }
-        oldCb.replaceWith(box);
-      } else { div.prepend(box); }
-    }
-    // Re-attach by replacing (clears old listeners)
-    const newBox=box.cloneNode(true);
-    box.replaceWith(newBox);
-    newBox.addEventListener('click',function(e){
-      e.preventDefault(); e.stopPropagation();
-      const done=div.classList.toggle('done');
-      if(done) div.setAttribute('data-checked','1');
-      else div.removeAttribute('data-checked');
-      scheduleAutoSave();
-    });
-    // Ensure text span is editable & has focusable content
-    let span=div.querySelector('.ql-check-text');
-    if(!span){
-      span=document.createElement('span');
-      span.className='ql-check-text';
-      div.appendChild(span);
-    }
-    span.contentEditable='true';
-    if(!span.textContent) span.textContent='\u200B';
-    // Tap on row → focus span
-    div.onclick=function(e){ if(e.target===div) span.focus(); };
-  });
-}
-
-// KEY HANDLER
-// ===== EDITOR EVENTS =====
+// ===== EDITOR EVENTS (called by Tiptap onUpdate) =====
+// Note: most editor handling is done by Tiptap natively.
+// These are utility helpers called from tiptap-setup.js onUpdate callback.
 function onEditorInput() {
   scheduleAutoSave();
   updateWordCount();
@@ -911,299 +814,14 @@ function onEditorInput() {
   }
 }
 
-function onEditorKey(e){
-  const editor=document.getElementById('editor');
-  const sel=window.getSelection();
-  if(!sel.rangeCount) return;
-  const range=sel.getRangeAt(0);
+// ===== INSERT HELPERS — delegate to Tiptap =====
+function insertChecklist() { if(typeof tiptapTaskList==='function') tiptapTaskList(); }
+function insertTable()     { if(typeof tiptapInsertTable==='function') tiptapInsertTable(); }
+function insertCode()      { if(typeof tiptapCodeBlock==='function') tiptapCodeBlock(); }
+function insertHR()        { if(typeof tiptapHR==='function') tiptapHR(); }
+function listIndent()      { try{ editor&&editor.chain().focus().sinkListItem('listItem').run(); }catch(e){} }
+function listOutdent()     { try{ editor&&editor.chain().focus().liftListItem('listItem').run(); }catch(e){} }
 
-  // Find if cursor is in a code block
-  let node=range.startContainer;
-  let inCodeBlock=null;
-  while(node&&node!==editor){
-    if(node.nodeName==='PRE'||node.nodeName==='CODE'||(node.classList&&node.classList.contains('code-block'))){
-      inCodeBlock=node.nodeName==='PRE'?node:node.closest('pre');
-      break;
-    }
-    node=node.parentNode;
-  }
-
-  // Handle Tab in code block - insert actual tab
-  if(inCodeBlock&&e.key==='Tab'){
-    e.preventDefault();
-    document.execCommand('insertHTML',false,'    '); // 4 spaces
-    return;
-  }
-
-  // Handle Enter in code block - insert newline
-  if(inCodeBlock&&e.key==='Enter'&&!e.shiftKey){
-    e.preventDefault();
-    document.execCommand('insertHTML',false,'\n');
-    return;
-  }
-
-  // Find if cursor is in a checklist item
-  let checkDiv=null;
-  node=range.startContainer;
-  while(node&&node!==editor){
-    if(node.classList&&node.classList.contains('ql-check')){checkDiv=node;break;}
-    node=node.parentNode;
-  }
-
-  // Find if cursor is in a list item (for Tab indent)
-  let inList=false;
-  let listNode=range.startContainer;
-  while(listNode&&listNode!==editor){
-    if(listNode.nodeName==='LI'){inList=true;break;}
-    listNode=listNode.parentNode;
-  }
-
-  if(checkDiv){
-    if(e.key==='Enter'){
-      e.preventDefault();
-      const textSpan=checkDiv.querySelector('.ql-check-text');
-      const text=textSpan?(textSpan.textContent.replace(/\u200B/g,'')):'';
-      if(!text.trim()){
-        // Second enter on empty item → exit to paragraph
-        const p=document.createElement('p'); p.innerHTML='<br>';
-        checkDiv.after(p); checkDiv.remove();
-        setTimeout(()=>{
-          try{
-            const r=document.createRange(); r.setStart(p,0); r.collapse(true);
-            const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
-            p.focus();
-          }catch(ex){}
-        },0);
-      } else {
-        // Has text → make new checklist item
-        const newItem=createCheckItem('');
-        checkDiv.after(newItem);
-        setTimeout(()=>focusCheckText(newItem), 20);
-      }
-      scheduleAutoSave(); return;
-    }
-    if(e.key==='Backspace'){
-      const textSpan=checkDiv.querySelector('.ql-check-text');
-      if(textSpan&&!textSpan.textContent.replace(/\u200B/g,'')){
-        e.preventDefault();
-        const prev=checkDiv.previousElementSibling;
-        const p=document.createElement('p'); p.innerHTML='<br>';
-        checkDiv.before(p); checkDiv.remove();
-        setTimeout(()=>{
-          try{
-            const r=document.createRange(); r.setStart(p,0); r.collapse(true);
-            const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
-          }catch(ex){}
-        },0);
-        scheduleAutoSave(); return;
-      }
-    }
-    if(e.key==='Tab'){
-      e.preventDefault();
-      return;
-    }
-  }
-
-  // Tab: indent/outdent list items
-  if(e.key==='Tab'&&inList){
-    e.preventDefault();
-    if(e.shiftKey) document.execCommand('outdent',false,null);
-    else document.execCommand('indent',false,null);
-    return;
-  }
-
-  // Tab outside list/checklist/code: insert spaces
-  if(e.key==='Tab'&&!inList&&!checkDiv&&!inCodeBlock){
-    e.preventDefault();
-    document.execCommand('insertHTML',false,'&nbsp;&nbsp;&nbsp;&nbsp;');
-    return;
-  }
-
-  // Default Enter: ensure <p> not <div>
-  if(e.key==='Enter'&&!e.shiftKey&&!checkDiv&&!inCodeBlock){
-    setTimeout(()=>{
-      const sel2=window.getSelection();
-      if(sel2.rangeCount){
-        const n=sel2.getRangeAt(0).startContainer;
-        let block=n.nodeType===3?n.parentNode:n;
-        while(block&&block!==editor&&block.parentNode!==editor) block=block.parentNode;
-        if(block&&block.nodeName==='DIV'&&block!==editor){
-          const p=document.createElement('p');
-          p.innerHTML=block.innerHTML||'<br>';
-          block.replaceWith(p);
-          const r2=document.createRange(); r2.setStart(p,0); r2.collapse(true);
-          sel2.removeAllRanges(); sel2.addRange(r2);
-        }
-      }
-    },0);
-  }
-
-}
-
-// ===== LIST INDENT / OUTDENT =====
-function listIndent(){
-  document.getElementById('editor').focus();
-  document.execCommand('indent',false,null);
-}
-function listOutdent(){
-  document.getElementById('editor').focus();
-  document.execCommand('outdent',false,null);
-}
-
-// ===== TABLE with toolbar =====
-function insertTable(){
-  const editor=document.getElementById('editor');
-  editor.focus();
-  const wrap=document.createElement('div');
-  wrap.className='table-wrap'; wrap.style.position='relative';
-  wrap.innerHTML=`<table contenteditable="false">
-    <thead><tr><th contenteditable="true">Kolom 1</th><th contenteditable="true">Kolom 2</th><th contenteditable="true">Kolom 3</th></tr></thead>
-    <tbody>
-      <tr><td contenteditable="true">Data</td><td contenteditable="true">Data</td><td contenteditable="true">Data</td></tr>
-      <tr><td contenteditable="true">Data</td><td contenteditable="true">Data</td><td contenteditable="true">Data</td></tr>
-    </tbody>
-  </table>`;
-  const sel=window.getSelection();
-  if(sel.rangeCount){
-    const range=sel.getRangeAt(0);
-    let node=range.startContainer;
-    while(node&&node!==editor&&node.parentNode!==editor){node=node.parentNode;}
-    if(node&&node!==editor) node.after(wrap);
-    else editor.appendChild(wrap);
-  } else { editor.appendChild(wrap); }
-  // Show toolbar on cell focus
-  wrap.addEventListener('focusin',e=>{
-    if(e.target.tagName==='TD'||e.target.tagName==='TH') showTableToolbar(wrap,e.target);
-  });
-  wrap.addEventListener('focusout',e=>{
-    setTimeout(()=>{
-      if(!wrap.contains(document.activeElement)) hideTableToolbar();
-    },150);
-  });
-  scheduleAutoSave();
-}
-
-let tableToolbarEl=null;
-function showTableToolbar(wrap,cell){
-  hideTableToolbar();
-  const tb=document.createElement('div');
-  tb.className='table-toolbar';
-  tb.innerHTML=`
-    <button onclick="tableAddRow(event)">+ Baris</button>
-    <button onclick="tableAddCol(event)">+ Kolom</button>
-    <div class="t-sep"></div>
-    <button class="danger" onclick="tableDelRow(event)">- Baris</button>
-    <button class="danger" onclick="tableDelCol(event)">- Kolom</button>
-    <div class="t-sep"></div>
-    <button class="danger" onclick="tableDelete(event)">🗑 Hapus Tabel</button>`;
-  tb.style.cssText='position:fixed;top:0;left:0;'; // temp
-  document.body.appendChild(tb);
-  // Position
-  const wr=wrap.getBoundingClientRect();
-  const tbr=tb.getBoundingClientRect();
-  const top=Math.max(4,wr.top-tbr.height-6);
-  const left=Math.min(wr.left, window.innerWidth-tbr.width-8);
-  tb.style.cssText=`position:fixed;top:${top}px;left:${left}px;z-index:200;`;
-  tb.dataset.wrap=wrap.dataset.id||(wrap.dataset.id=uid());
-  tableToolbarEl=tb;
-  window._activeTableWrap=wrap;
-}
-function hideTableToolbar(){
-  if(tableToolbarEl){tableToolbarEl.remove();tableToolbarEl=null;}
-}
-function getActiveTable(){return window._activeTableWrap;}
-function tableAddRow(e){
-  e.preventDefault(); e.stopPropagation();
-  const w=getActiveTable(); if(!w) return;
-  const tbody=w.querySelector('tbody'); if(!tbody) return;
-  const lastRow=tbody.lastElementChild;
-  const cols=lastRow?lastRow.querySelectorAll('td').length:3;
-  const tr=document.createElement('tr');
-  for(let i=0;i<cols;i++){const td=document.createElement('td');td.contentEditable='true';td.textContent='';tr.appendChild(td);}
-  tbody.appendChild(tr);
-  scheduleAutoSave();
-}
-function tableAddCol(e){
-  e.preventDefault(); e.stopPropagation();
-  const w=getActiveTable(); if(!w) return;
-  const rows=w.querySelectorAll('tr');
-  rows.forEach((row,i)=>{
-    const cell=i===0?document.createElement('th'):document.createElement('td');
-    cell.contentEditable='true'; cell.textContent=i===0?'Kolom':'';
-    row.appendChild(cell);
-  });
-  scheduleAutoSave();
-}
-function tableDelRow(e){
-  e.preventDefault(); e.stopPropagation();
-  const w=getActiveTable(); if(!w) return;
-  const tbody=w.querySelector('tbody'); if(!tbody) return;
-  const rows=tbody.querySelectorAll('tr');
-  if(rows.length>1) rows[rows.length-1].remove();
-  else showToast('Minimal 1 baris','error');
-  scheduleAutoSave();
-}
-function tableDelCol(e){
-  e.preventDefault(); e.stopPropagation();
-  const w=getActiveTable(); if(!w) return;
-  const rows=w.querySelectorAll('tr');
-  const cols=rows[0]?rows[0].querySelectorAll('th,td').length:0;
-  if(cols<=1){showToast('Minimal 1 kolom','error');return;}
-  rows.forEach(r=>{const cells=r.querySelectorAll('th,td');if(cells.length)cells[cells.length-1].remove();});
-  scheduleAutoSave();
-}
-function tableDelete(e){
-  e.preventDefault(); e.stopPropagation();
-  const w=getActiveTable(); if(!w) return;
-  w.remove(); hideTableToolbar();
-  scheduleAutoSave();
-}
-
-// ===== OTHER INSERTS =====
-function insertCode(){
-  const editor=document.getElementById('editor');
-  editor.focus();
-  const sel=window.getSelection();
-  const selected=sel.toString();
-  const pre=document.createElement('pre');
-  const code=document.createElement('code');
-  
-  // Set initial content with placeholder or selected text
-  code.textContent=selected||'// Tulis kode di sini\n// Tekan Tab untuk indent\n// Tekan Enter untuk baris baru';
-  
-  // Make code editable
-  code.contentEditable='true';
-  
-  pre.appendChild(code);
-  
-  if(sel.rangeCount){
-    const range=sel.getRangeAt(0);
-    range.deleteContents();
-    range.insertNode(pre);
-    
-    // Focus the code element
-    setTimeout(()=>{
-      code.focus();
-      // Place cursor at end
-      const r=document.createRange();
-      r.selectNodeContents(code);
-      r.collapse(false);
-      const s=window.getSelection();
-      s.removeAllRanges();
-      s.addRange(r);
-    },10);
-  } else { 
-    editor.appendChild(pre);
-    setTimeout(()=>code.focus(),10);
-  }
-  
-  scheduleAutoSave();
-}
-function insertHR(){
-  document.getElementById('editor').focus();
-  document.execCommand('insertHTML',false,'<hr><p><br></p>');
-  scheduleAutoSave();
-}
 
 // ===== AI DROPDOWN (desktop) =====
 function toggleAIMenu(e){
@@ -1348,10 +966,27 @@ async function aiAction(action){
 function toggleChat(){
   const rs=document.getElementById('right-sidebar');
   if(!rs) return;
-  rs.classList.toggle('hidden');
-  if(!rs.classList.contains('hidden')){
-    updateChatHistory();
-    if(ST.rsTab==='toc') updateTOC();
+  const isMobile = window.innerWidth <= 900;
+  if(isMobile){
+    // Mobile: use .show + transform system (hidden stays for display fallback)
+    const isShown = rs.classList.contains('show');
+    if(isShown){
+      rs.classList.remove('show');
+    } else {
+      rs.classList.add('show');
+      updateChatHistory();
+      if(ST.rsTab==='toc') updateTOC();
+    }
+    // Overlay for mobile
+    const overlay = document.getElementById('sidebar-overlay');
+    if(overlay) overlay.classList.toggle('show', rs.classList.contains('show'));
+  } else {
+    // Desktop: use .hidden = display:none
+    rs.classList.toggle('hidden');
+    if(!rs.classList.contains('hidden')){
+      updateChatHistory();
+      if(ST.rsTab==='toc') updateTOC();
+    }
   }
 }
 
@@ -1682,9 +1317,15 @@ if(loadState()){
   initApp();
 }
 
-// Close table toolbar when clicking outside
-document.addEventListener('click',e=>{
-  if(tableToolbarEl&&!tableToolbarEl.contains(e.target)&&!e.target.closest('table')){
-    hideTableToolbar();
+// Close open dropdowns/menus when clicking outside
+document.addEventListener('click', e => {
+  // Close toolbar dropdowns (Tiptap menus)
+  if (typeof closeToolbarDropdown === 'function') {
+    const openMenus = document.querySelectorAll('.tb-menu.show, .ai-menu.show');
+    openMenus.forEach(m => {
+      if (!m.contains(e.target) && !e.target.closest('[onclick*="toggleToolbarDropdown"]')) {
+        m.classList.remove('show');
+      }
+    });
   }
 });

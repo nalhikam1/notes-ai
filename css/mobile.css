@@ -1,9 +1,14 @@
 /* ===== MOBILE RESPONSIVE ===== */
 
 @media (max-width: 900px) {
-  /* Workspace padding for mobile toolbar */
+  /* Workspace padding — account for nav bar + status bar */
   #workspace {
-    padding-bottom: calc(var(--status-bar-h) + var(--bottom-bar-h));
+    padding-bottom: var(--bottom-bar-h);
+  }
+
+  /* When editor is active, also account for mobile formatting toolbar */
+  #editor-view {
+    padding-bottom: var(--mobile-toolbar-h);
   }
 
   /* Hide desktop toolbar */
@@ -38,41 +43,64 @@
     bottom: 0;
     z-index: 200;
     transform: translateX(-100%);
+    transition: transform .25s ease;
   }
 
   #sidebar.show {
     transform: translateX(0);
   }
 
-  /* Right sidebar mobile */
+  /* Right sidebar mobile — toggle via .show class */
   #right-sidebar {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
+    width: 100% !important;
+    max-width: 360px;
     z-index: 200;
+    transform: translateX(100%);
+    transition: transform .25s ease;
+  }
+
+  /* On mobile we use .show class (not .hidden) to control right sidebar */
+  #right-sidebar.show {
+    transform: translateX(0) !important;
+  }
+
+  /* Override hidden class on mobile — use show/transform system instead */
+  #right-sidebar.hidden {
+    display: flex !important;
     transform: translateX(100%);
   }
 
-  #right-sidebar.show {
-    transform: translateX(0);
-  }
-
-  /* Mobile toolbar */
+  /* ===== MOBILE FORMATTING TOOLBAR ===== */
+  /* Only visible inside editor view */
   .mobile-toolbar {
     position: fixed;
-    bottom: var(--status-bar-h);
+    bottom: var(--bottom-bar-h);
     left: 0;
     right: 0;
-    height: var(--bottom-bar-h);
+    height: var(--mobile-toolbar-h);
     background: var(--bg2);
     border-top: 1px solid var(--border);
     z-index: 150;
-    display: flex;
+    display: none; /* Hidden by default — shown only when in editor */
     align-items: center;
     justify-content: space-around;
-    padding: 0 8px;
-    gap: 4px;
+    padding: 0 6px;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .mobile-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Show mobile toolbar only when in editor view (body.editor-active set by JS) */
+  body.editor-active .mobile-toolbar {
+    display: flex;
   }
 
   .mtb {
@@ -80,8 +108,8 @@
     border: none;
     color: var(--text2);
     cursor: pointer;
-    min-width: 40px;
-    height: 40px;
+    min-width: 38px;
+    height: 38px;
     border-radius: var(--r);
     font-size: 14px;
     display: flex;
@@ -109,10 +137,10 @@
     flex-shrink: 0;
   }
 
-  /* Mobile menu */
+  /* Mobile menu — sheet popping up above toolbar */
   .mobile-menu {
     position: fixed;
-    bottom: calc(var(--status-bar-h) + var(--bottom-bar-h) + 8px);
+    bottom: calc(var(--bottom-bar-h) + var(--mobile-toolbar-h) + 4px);
     left: 8px;
     right: 8px;
     background: var(--bg2);
@@ -151,7 +179,7 @@
     color: var(--text);
   }
 
-  /* Mobile bottom bar */
+  /* ===== MOBILE BOTTOM NAV BAR ===== */
   #bottom-bar {
     position: fixed;
     bottom: 0;
@@ -164,66 +192,27 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 0 8px;
+    padding: 0 4px;
+    /* Account for safe area on iOS */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .bb-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     background: none;
     border: none;
     color: var(--text3);
     cursor: pointer;
-    padding: 8px 12px;
+    padding: 6px 8px;
     border-radius: var(--r);
-    font-size: 10px;
+    font-size: 9px;
     font-family: 'DM Sans', sans-serif;
     transition: all .15s;
-    min-width: 60px;
-  }
-
-  .bb-btn svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  .bb-btn.active {
-    color: var(--accent);
-    background: var(--accent-dim);
-  }
-
-  .bb-btn:hover,
-  .bb-btn:active {
-    color: var(--text);
-    background: var(--bg3);
-  }
-
-  /* FAB new note button */
-  .bb-new {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: none;
-    color: #0f0f0f;
-    font-size: 28px;
-    font-weight: 300;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all .15s;
-    box-shadow: 0 2px 12px rgba(212, 168, 83, 0.4);
-    line-height: 1;
-  }
-
-  .bb-new:hover,
-  .bb-new:active {
-    background: var(--accent2);
-    transform: scale(0.95);
+    min-width: 52px;
+    flex: 1;
   }
 
   .bb-icon {
@@ -231,7 +220,41 @@
     line-height: 1;
   }
 
-  /* Adjust editor for mobile */
+  .bb-btn.active {
+    color: var(--accent);
+  }
+
+  .bb-btn:active {
+    transform: scale(.94);
+  }
+
+  /* FAB new note button */
+  .bb-new {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    color: #0f0f0f;
+    font-size: 26px;
+    font-weight: 300;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all .15s;
+    box-shadow: 0 2px 12px rgba(212, 168, 83, 0.45);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .bb-new:active {
+    transform: scale(.92);
+    background: var(--accent2);
+  }
+
+  /* Adjust editor content area on mobile */
   #editor {
     max-width: 100%;
     padding: 0 4px;
@@ -293,13 +316,13 @@
     height: 48px;
   }
 
-  /* Hide mobile class elements on desktop */
+  /* Hide settings on mobile sidebar header */
   .hide-m {
     display: none !important;
   }
 }
 
-/* Desktop only */
+/* ===== DESKTOP ONLY ===== */
 @media (min-width: 901px) {
   .mobile-toolbar {
     display: none !important;
@@ -318,14 +341,14 @@
   }
 }
 
-/* Tablet adjustments */
+/* ===== TABLET ===== */
 @media (min-width: 600px) and (max-width: 900px) {
   #sidebar {
     width: 280px;
   }
 
   #right-sidebar {
-    width: 320px;
+    max-width: 340px !important;
   }
 
   .stats-grid.compact {
@@ -337,7 +360,7 @@
   }
 }
 
-/* Small mobile */
+/* ===== SMALL MOBILE (< 400px) ===== */
 @media (max-width: 400px) {
   #note-title {
     font-size: 18px;
@@ -349,33 +372,29 @@
   }
 
   .mtb {
-    min-width: 36px;
+    min-width: 32px;
     height: 36px;
   }
 
   .bb-btn {
-    min-width: 50px;
-    font-size: 9px;
-  }
-
-  .bb-btn svg {
-    width: 20px;
-    height: 20px;
+    min-width: 44px;
+    font-size: 8px;
   }
 }
 
-/* Landscape mobile */
+/* ===== LANDSCAPE MOBILE ===== */
 @media (max-height: 500px) and (orientation: landscape) {
-  .mobile-toolbar {
-    height: 60px;
-  }
-
-  #workspace {
-    padding-bottom: calc(var(--status-bar-h) + 60px);
+  :root {
+    --mobile-toolbar-h: 44px;
+    --bottom-bar-h: 48px;
   }
 
   .mobile-menu {
-    bottom: calc(var(--status-bar-h) + 68px);
+    bottom: calc(var(--bottom-bar-h) + var(--mobile-toolbar-h) + 4px);
     max-height: 40vh;
+  }
+
+  #note-title {
+    font-size: 18px;
   }
 }

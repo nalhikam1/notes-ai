@@ -23,7 +23,8 @@
   --top-nav-h: 56px;
   --status-bar-h: 30px;
   --toolbar-h: 48px;
-  --bottom-bar-h: 100px;
+  --bottom-bar-h: 56px;        /* Mobile bottom nav bar */
+  --mobile-toolbar-h: 52px;   /* Mobile formatting toolbar */
   
   /* Borders & Shadows */
   --r: 8px;
