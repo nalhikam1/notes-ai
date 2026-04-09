@@ -1,14 +1,17 @@
 /* ===== RIGHT SIDEBAR (CHAT) ===== */
 #right-sidebar {
   width: var(--rs-w);
+  min-width: var(--rs-w);  /* Never let it shrink */
+  max-width: 380px;
   background: var(--bg2);
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   overflow: hidden;
-  transition: transform .25s ease;
+  transition: width .25s ease, transform .25s ease;
 }
+
 
 .rs-header {
   padding: 14px 16px;
