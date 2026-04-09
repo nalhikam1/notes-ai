@@ -2,6 +2,118 @@
 let editor = null;
 let useTiptap = false;
 
+// ===== SLASH COMMAND EXTENSION =====
+const SlashCommand = {
+  name: 'slashCommand',
+  
+  addProseMirrorPlugins() {
+    return [
+      new window.tiptapPm.state.Plugin({
+        key: new window.tiptapPm.state.PluginKey('slashCommand'),
+        
+        state: {
+          init() {
+            return { active: false, range: null, query: '' };
+          },
+          
+          apply(tr, state) {
+            const { selection } = tr;
+            const { $from } = selection;
+            
+            // Check if we're at the start of a line or after whitespace
+            const textBefore = $from.parent.textBetween(
+              Math.max(0, $from.parentOffset - 20),
+              $from.parentOffset,
+              null,
+              '\ufffc'
+            );
+            
+            // Match "/" at start of line or after space
+            const match = textBefore.match(/(?:^|\s)(\/[\w]*)$/);
+            
+            if (match) {
+              const query = match[1].slice(1); // Remove the "/"
+              const from = $from.pos - match[1].length;
+              const to = $from.pos;
+              
+              return {
+                active: true,
+                range: { from, to },
+                query: query.toLowerCase()
+              };
+            }
+            
+            return { active: false, range: null, query: '' };
+          }
+        },
+        
+        props: {
+          handleKeyDown(view, event) {
+            const state = this.getState(view.state);
+            
+            if (!state.active) return false;
+            
+            // Handle arrow keys and enter when menu is active
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Enter' || event.key === 'Escape') {
+              const menu = document.getElementById('slash-menu');
+              if (menu && menu.style.display === 'block') {
+                event.preventDefault();
+                
+                if (event.key === 'Escape') {
+                  hideSlashMenu();
+                  return true;
+                }
+                
+                const items = menu.querySelectorAll('.slash-item');
+                let currentIndex = -1;
+                
+                items.forEach((item, i) => {
+                  if (item.classList.contains('selected')) {
+                    currentIndex = i;
+                  }
+                });
+                
+                if (event.key === 'ArrowDown') {
+                  currentIndex = (currentIndex + 1) % items.length;
+                } else if (event.key === 'ArrowUp') {
+                  currentIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
+                } else if (event.key === 'Enter') {
+                  if (currentIndex >= 0 && items[currentIndex]) {
+                    items[currentIndex].click();
+                  }
+                  return true;
+                }
+                
+                items.forEach((item, i) => {
+                  item.classList.toggle('selected', i === currentIndex);
+                });
+                
+                return true;
+              }
+            }
+            
+            return false;
+          }
+        },
+        
+        view() {
+          return {
+            update: (view) => {
+              const state = this.spec.state.apply(view.state.tr, this.getState(view.state));
+              
+              if (state.active) {
+                showSlashMenu(view, state.range, state.query);
+              } else {
+                hideSlashMenu();
+              }
+            }
+          };
+        }
+      })
+    ];
+  }
+};
+
 function initTiptap() {
   try {
     // Check if Tiptap libraries are loaded
@@ -122,10 +234,13 @@ function initTiptap() {
     if (Placeholder) {
       extensions.push(
         Placeholder.configure({
-          placeholder: 'Mulai menulis...',
+          placeholder: '', // Empty placeholder - no text shown
         })
       );
     }
+
+    // Add slash command extension
+    extensions.push(SlashCommand);
 
     editor = new Editor({
       element: document.getElementById('editor'),
@@ -159,6 +274,164 @@ function initTiptap() {
     initFallbackEditor();
     return null;
   }
+}
+
+// ===== SLASH COMMAND MENU =====
+const slashCommands = [
+  { 
+    title: 'Heading 1', 
+    icon: 'H1', 
+    description: 'Large heading',
+    keywords: ['h1', 'heading', 'title'],
+    action: () => tiptapHeading(1)
+  },
+  { 
+    title: 'Heading 2', 
+    icon: 'H2', 
+    description: 'Medium heading',
+    keywords: ['h2', 'heading', 'subtitle'],
+    action: () => tiptapHeading(2)
+  },
+  { 
+    title: 'Heading 3', 
+    icon: 'H3', 
+    description: 'Small heading',
+    keywords: ['h3', 'heading'],
+    action: () => tiptapHeading(3)
+  },
+  { 
+    title: 'Bullet List', 
+    icon: '•', 
+    description: 'Unordered list',
+    keywords: ['bullet', 'list', 'ul', 'unordered'],
+    action: () => tiptapBulletList()
+  },
+  { 
+    title: 'Numbered List', 
+    icon: '1.', 
+    description: 'Ordered list',
+    keywords: ['number', 'numbered', 'list', 'ol', 'ordered'],
+    action: () => tiptapOrderedList()
+  },
+  { 
+    title: 'Task List', 
+    icon: '☑', 
+    description: 'Checklist',
+    keywords: ['task', 'todo', 'check', 'checkbox'],
+    action: () => tiptapTaskList()
+  },
+  { 
+    title: 'Quote', 
+    icon: '"', 
+    description: 'Blockquote',
+    keywords: ['quote', 'blockquote', 'citation'],
+    action: () => tiptapBlockquote()
+  },
+  { 
+    title: 'Code Block', 
+    icon: '</>', 
+    description: 'Code snippet',
+    keywords: ['code', 'block', 'snippet', 'pre'],
+    action: () => tiptapCodeBlock()
+  },
+  { 
+    title: 'Divider', 
+    icon: '—', 
+    description: 'Horizontal line',
+    keywords: ['divider', 'hr', 'line', 'separator'],
+    action: () => tiptapHR()
+  },
+  { 
+    title: 'Table', 
+    icon: '⊞', 
+    description: 'Insert table',
+    keywords: ['table', 'grid'],
+    action: () => tiptapInsertTable()
+  }
+];
+
+function showSlashMenu(view, range, query) {
+  let menu = document.getElementById('slash-menu');
+  
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'slash-menu';
+    menu.className = 'slash-menu';
+    document.body.appendChild(menu);
+  }
+  
+  // Filter commands based on query
+  const filtered = query 
+    ? slashCommands.filter(cmd => 
+        cmd.title.toLowerCase().includes(query) ||
+        cmd.keywords.some(k => k.includes(query))
+      )
+    : slashCommands;
+  
+  if (filtered.length === 0) {
+    hideSlashMenu();
+    return;
+  }
+  
+  // Render menu items
+  menu.innerHTML = filtered.map((cmd, index) => `
+    <div class="slash-item ${index === 0 ? 'selected' : ''}" data-index="${index}">
+      <div class="slash-icon">${cmd.icon}</div>
+      <div class="slash-info">
+        <div class="slash-title">${cmd.title}</div>
+        <div class="slash-desc">${cmd.description}</div>
+      </div>
+    </div>
+  `).join('');
+  
+  // Add click handlers
+  menu.querySelectorAll('.slash-item').forEach((item, index) => {
+    item.addEventListener('click', () => {
+      executeSlashCommand(view, range, filtered[index]);
+    });
+    
+    item.addEventListener('mouseenter', () => {
+      menu.querySelectorAll('.slash-item').forEach(i => i.classList.remove('selected'));
+      item.classList.add('selected');
+    });
+  });
+  
+  // Position menu
+  const coords = view.coordsAtPos(range.from);
+  menu.style.display = 'block';
+  menu.style.top = (coords.bottom + 8) + 'px';
+  menu.style.left = coords.left + 'px';
+  
+  // Adjust if menu goes off screen
+  setTimeout(() => {
+    const rect = menu.getBoundingClientRect();
+    if (rect.right > window.innerWidth) {
+      menu.style.left = (window.innerWidth - rect.width - 20) + 'px';
+    }
+    if (rect.bottom > window.innerHeight) {
+      menu.style.top = (coords.top - rect.height - 8) + 'px';
+    }
+  }, 0);
+}
+
+function hideSlashMenu() {
+  const menu = document.getElementById('slash-menu');
+  if (menu) {
+    menu.style.display = 'none';
+  }
+}
+
+function executeSlashCommand(view, range, command) {
+  // Delete the "/" and query text
+  view.dispatch(
+    view.state.tr.deleteRange(range.from, range.to)
+  );
+  
+  // Execute the command
+  setTimeout(() => {
+    command.action();
+    hideSlashMenu();
+  }, 0);
 }
 
 // Fallback to contenteditable if Tiptap fails

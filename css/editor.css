@@ -1,0 +1,741 @@
+/* ===== EDITOR VIEW ===== */
+#editor-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ===== NOTE HEADER ===== */
+#note-header {
+  padding: 16px 20px 0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+#note-title {
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: 'Lora', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  padding-bottom: 12px;
+  line-height: 1.3;
+  letter-spacing: -.3px;
+}
+
+#note-title::placeholder {
+  color: var(--text3);
+}
+
+.meta-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 0;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+#meta-saved {
+  margin-left: auto;
+  color: var(--green);
+}
+
+/* ===== TOOLBAR ===== */
+#toolbar {
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  overflow-x: auto;
+  overflow-y: visible;
+  flex-shrink: 0;
+  height: var(--toolbar-h);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 50;
+}
+
+#toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.tb {
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  min-width: 32px;
+  height: 32px;
+  border-radius: var(--r);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: all .15s;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0 6px;
+}
+
+.tb:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.tb.on {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.tb svg {
+  flex-shrink: 0;
+}
+
+.tb-sep {
+  width: 1px;
+  min-width: 1px;
+  height: 20px;
+  background: var(--border2);
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+.tb-spacer {
+  flex: 1;
+}
+
+/* ===== TOOLBAR DROPDOWN ===== */
+.tb-dropdown {
+  position: static;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.tb-menu {
+  position: fixed;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  padding: 4px;
+  min-width: 180px;
+  z-index: 10000;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+  transition: visibility .2s, opacity .2s, transform .2s;
+  pointer-events: none;
+}
+
+.tb-menu.show {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tb-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--r);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text2);
+  border: none;
+  background: none;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+  transition: all .15s;
+  white-space: nowrap;
+}
+
+.tb-menu-item:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.tb-menu-item svg {
+  flex-shrink: 0;
+  opacity: .7;
+}
+
+/* ===== AI DROPDOWN ===== */
+.ai-drop {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.ai-btn {
+  padding: 0 12px;
+  height: 32px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(212, 168, 83, .3);
+  border-radius: var(--r);
+  color: var(--accent);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  position: relative;
+  z-index: 101;
+  pointer-events: auto;
+}
+
+.ai-btn:hover {
+  background: var(--accent);
+  color: #0f0f0f;
+}
+
+.ai-btn:active {
+  transform: scale(0.98);
+}
+
+.ai-menu {
+  position: fixed;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  padding: 6px;
+  min-width: 200px;
+  z-index: 10000;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+  transition: visibility .2s, opacity .2s, transform .2s;
+  pointer-events: none;
+}
+
+.ai-menu.show {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.ai-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text2);
+  border: none;
+  background: none;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+  transition: all .15s;
+}
+
+.ai-item:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.ai-item .ic {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ===== COLOR PICKER ===== */
+.color-picker-popup {
+  position: fixed;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  padding: 12px;
+  z-index: 10000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+  width: 300px;
+}
+
+.color-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.color-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform .1s;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+}
+
+.color-picker-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+/* ===== SLASH COMMAND MENU ===== */
+.slash-menu {
+  position: fixed;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  padding: 6px;
+  z-index: 10000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+  min-width: 280px;
+  max-width: 320px;
+  display: none;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.slash-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+
+.slash-item:hover,
+.slash-item.selected {
+  background: var(--bg3);
+}
+
+.slash-item.selected {
+  border: 1px solid var(--accent);
+  background: var(--accent-dim);
+}
+
+.slash-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg3);
+  border-radius: var(--r);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text2);
+  flex-shrink: 0;
+}
+
+.slash-item.selected .slash-icon {
+  background: var(--accent);
+  color: #0f0f0f;
+}
+
+.slash-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.slash-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.slash-desc {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* ===== EDITOR CONTENT ===== */
+#editor-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--bg);
+  -webkit-overflow-scrolling: touch;
+}
+
+#editor {
+  min-height: 200px;
+  outline: none;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  max-width: 720px;
+  caret-color: var(--accent);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  margin: 0 auto;
+}
+
+/* Contenteditable fallback */
+#editor[contenteditable="true"] {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+#editor[contenteditable="true"]:empty::before {
+  content: '';
+  color: var(--text3);
+  pointer-events: none;
+}
+
+/* ===== TIPTAP STYLES ===== */
+.tiptap {
+  outline: none;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  content: '';
+  color: var(--text3);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+.tiptap > *,
+#editor[contenteditable="true"] > * {
+  max-width: 100%;
+}
+
+.tiptap,
+#editor[contenteditable="true"] {
+  overflow-x: hidden;
+}
+
+/* Headings */
+.tiptap h1,
+#editor[contenteditable="true"] h1 {
+  font-family: 'Lora', serif;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 24px 0 12px;
+  color: var(--text);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.tiptap h2,
+#editor[contenteditable="true"] h2 {
+  font-family: 'Lora', serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 20px 0 10px;
+  color: var(--text);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.tiptap h3,
+#editor[contenteditable="true"] h3 {
+  font-family: 'Lora', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+/* Paragraphs */
+.tiptap p,
+#editor[contenteditable="true"] p {
+  margin: 0 0 16px 0;
+  line-height: 1.75;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  color: var(--text);
+}
+
+.tiptap p:last-child,
+#editor[contenteditable="true"] p:last-child {
+  margin-bottom: 0;
+}
+
+/* Text formatting */
+.tiptap strong,
+#editor[contenteditable="true"] strong,
+.tiptap b,
+#editor[contenteditable="true"] b {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tiptap em,
+#editor[contenteditable="true"] em,
+.tiptap i,
+#editor[contenteditable="true"] i {
+  font-style: italic;
+  font-family: 'Lora', serif;
+}
+
+.tiptap u,
+#editor[contenteditable="true"] u {
+  text-decoration: underline;
+}
+
+.tiptap s,
+#editor[contenteditable="true"] s {
+  text-decoration: line-through;
+}
+
+/* Lists */
+.tiptap ul,
+#editor[contenteditable="true"] ul {
+  margin: 12px 0;
+  padding-left: 24px;
+  list-style-type: disc;
+}
+
+.tiptap ol,
+#editor[contenteditable="true"] ol {
+  margin: 12px 0;
+  padding-left: 24px;
+  list-style-type: decimal;
+}
+
+.tiptap li,
+#editor[contenteditable="true"] li {
+  margin-bottom: 6px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.tiptap li:last-child,
+#editor[contenteditable="true"] li:last-child {
+  margin-bottom: 0;
+}
+
+.tiptap li p,
+#editor[contenteditable="true"] li p {
+  margin: 0;
+  display: inline;
+}
+
+/* Task List */
+.tiptap ul[data-type="taskList"],
+#editor[contenteditable="true"] ul[data-type="taskList"] {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.tiptap ul[data-type="taskList"] li,
+#editor[contenteditable="true"] ul[data-type="taskList"] li {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.tiptap ul[data-type="taskList"] li::before,
+.tiptap ul[data-type="taskList"] li::after,
+.tiptap ul[data-type="taskList"] li::marker,
+#editor[contenteditable="true"] ul[data-type="taskList"] li::before,
+#editor[contenteditable="true"] ul[data-type="taskList"] li::after,
+#editor[contenteditable="true"] ul[data-type="taskList"] li::marker {
+  display: none !important;
+  content: none !important;
+}
+
+.tiptap ul[data-type="taskList"] li > label,
+#editor[contenteditable="true"] ul[data-type="taskList"] li > label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.tiptap ul[data-type="taskList"] li > label > input[type="checkbox"],
+#editor[contenteditable="true"] ul[data-type="taskList"] li > label > input[type="checkbox"] {
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  margin-top: 4px !important;
+  cursor: pointer !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.tiptap ul[data-type="taskList"] li > label > div,
+#editor[contenteditable="true"] ul[data-type="taskList"] li > label > div {
+  flex: 1 !important;
+}
+
+/* Blockquote */
+.tiptap blockquote,
+#editor[contenteditable="true"] blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 12px 16px;
+  margin: 16px 0;
+  background: var(--accent-dim2);
+  border-radius: 0 var(--r) var(--r) 0;
+  color: var(--text2);
+  font-style: italic;
+  font-family: 'Lora', serif;
+  font-size: 15px;
+}
+
+.tiptap blockquote p,
+#editor[contenteditable="true"] blockquote p {
+  margin: 0;
+  color: var(--text2);
+}
+
+/* Code */
+.tiptap code,
+#editor[contenteditable="true"] code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tiptap pre,
+#editor[contenteditable="true"] pre {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  margin: 16px 0;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.tiptap pre code,
+#editor[contenteditable="true"] pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+}
+
+/* Links */
+.tiptap a,
+#editor[contenteditable="true"] a {
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: all .2s;
+  word-break: break-word;
+}
+
+.tiptap a:hover,
+#editor[contenteditable="true"] a:hover {
+  color: var(--accent2);
+  text-decoration-thickness: 2px;
+}
+
+/* Images */
+.tiptap img,
+#editor[contenteditable="true"] img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--r);
+  margin: 10px 0;
+  display: block;
+}
+
+/* Horizontal Rule */
+.tiptap hr,
+#editor[contenteditable="true"] hr {
+  border: none;
+  border-top: 1px solid var(--border2);
+  margin: 24px 0;
+}
+
+/* Tables */
+.tiptap table,
+#editor[contenteditable="true"] table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+  overflow: hidden;
+  border-radius: var(--r);
+  border: 1px solid var(--border2);
+}
+
+.tiptap th,
+.tiptap td,
+#editor[contenteditable="true"] th,
+#editor[contenteditable="true"] td {
+  border: 1px solid var(--border2);
+  padding: 8px 12px;
+  text-align: left;
+  min-width: 100px;
+}
+
+.tiptap th,
+#editor[contenteditable="true"] th {
+  background: var(--bg3);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tiptap td,
+#editor[contenteditable="true"] td {
+  background: var(--bg2);
+}

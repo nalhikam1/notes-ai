@@ -51,13 +51,8 @@ function finishOnboarding(){
     lang:document.getElementById('p-lang').value
   };
   ST.ai={provider:'nvidia',model:document.getElementById('p-model').value};
-  // Default templates
-  ST.templates=[
-    {id:uid(),name:'Meeting Notes',desc:'Catatan rapat',content:'<h2>Meeting Notes</h2><p><strong>Tanggal:</strong> &nbsp;</p><p><strong>Peserta:</strong> &nbsp;</p><hr><h3>Agenda</h3><ul><li>Item 1</li></ul><h3>Diskusi</h3><p>Tulis hasil diskusi di sini...</p><h3>Action Items</h3><ul><li>Action item 1</li></ul>'},
-    {id:uid(),name:'Weekly Review',desc:'Review mingguan',content:'<h2>Weekly Review</h2><p><strong>Minggu:</strong> &nbsp;</p><h3>Selesai minggu ini</h3><ul><li>Item 1</li></ul><h3>Masih berjalan</h3><ul><li>Item 1</li></ul><h3>Target minggu depan</h3><ul><li>Target 1</li></ul>'},
-    {id:uid(),name:'Idea Dump',desc:'Brainstorming bebas',content:'<h2>Idea Dump</h2><p><strong>Topik:</strong> &nbsp;</p><hr><h3>Raw Ideas</h3><ul><li>Ide 1</li></ul><h3>Paling menarik</h3><p>Tulis ide terbaik di sini...</p>'},
-    {id:uid(),name:'Daily Journal',desc:'Jurnal harian',content:'<h2>Daily Journal</h2><p><strong>Mood:</strong> 😊</p><hr><h3>Hari ini</h3><p>Ceritakan harimu...</p><h3>Hal yang disyukuri</h3><ul><li>Syukur 1</li></ul><h3>Yang dipelajari</h3><p>Tulis di sini...</p>'}
-  ];
+  // No default templates - user starts fresh
+  ST.templates = [];
   saveState();
   document.getElementById('onboarding').style.display='none';
   document.getElementById('app').style.display='flex';

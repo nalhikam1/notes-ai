@@ -5,6 +5,7 @@ Modern note-taking application with AI assistance powered by NVIDIA NIM.
 ## Features
 
 - 📝 Rich text editor with Tiptap
+- ⚡ Slash commands (/) for quick formatting
 - 🤖 AI-powered writing assistance (NVIDIA models)
 - 📁 Project and folder organization
 - 💬 AI chat assistant
@@ -151,14 +152,21 @@ The app uses NVIDIA NIM with the following models:
 1. **First Time Setup**: Complete onboarding (name, role, preferences, AI model)
 2. **Create Projects**: Organize your notes into projects
 3. **Write Notes**: Use the rich text editor with formatting tools
-4. **AI Assistance**: 
+4. **Slash Commands**: Type "/" to quickly insert:
+   - Headings (H1, H2, H3)
+   - Lists (Bullet, Numbered, Task)
+   - Quote blocks
+   - Code blocks
+   - Tables
+   - Dividers
+5. **AI Assistance**: 
    - Use "AI Fill" dropdown for quick actions (write, continue, improve, etc.)
    - Chat with AI assistant about your notes
-5. **Cloud Sync**: 
+6. **Cloud Sync**: 
    - Automatic sync when signed in with Google
    - Real-time sync across devices
    - Guest mode uses local storage only
-6. **Export/Import**: Backup your data via Settings (works offline)
+7. **Export/Import**: Backup your data via Settings (works offline)
 
 ## API Endpoint
 
