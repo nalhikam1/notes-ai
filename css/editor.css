@@ -606,8 +606,9 @@
   align-items: flex-start !important;
   list-style: none !important;
   list-style-type: none !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 4px !important;
   padding: 0 !important;
+  position: relative;
 }
 
 
@@ -626,7 +627,7 @@
 .tiptap li[data-type="taskItem"] > label,
 #editor[contenteditable="true"] li[data-type="taskItem"] > label {
   flex-shrink: 0 !important;
-  margin: 4px 12px 0 0 !important;
+  margin: 3px 10px 0 0 !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
@@ -635,23 +636,49 @@
 
 .tiptap li[data-type="taskItem"] > label input[type="checkbox"],
 #editor[contenteditable="true"] li[data-type="taskItem"] > label input[type="checkbox"] {
-  width: 18px !important;
-  height: 18px !important;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 17px !important;
+  height: 17px !important;
   cursor: pointer !important;
-  accent-color: var(--accent) !important;
-  margin: 0 !important; /* Kill default margins */
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--secondary-bg);
+  transition: all 0.2s ease;
+  margin: 0 !important;
+  position: relative;
+}
+
+.tiptap li[data-type="taskItem"] > label input[type="checkbox"]:checked,
+#editor[contenteditable="true"] li[data-type="taskItem"] > label input[type="checkbox"]:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tiptap li[data-type="taskItem"] > label input[type="checkbox"]:checked::after,
+#editor[contenteditable="true"] li[data-type="taskItem"] > label input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .tiptap li[data-type="taskItem"] > div,
 #editor[contenteditable="true"] li[data-type="taskItem"] > div {
   flex: 1 1 auto !important;
   min-width: 0;
+  line-height: 1.5;
 }
 
 .tiptap li[data-type="taskItem"][data-checked="true"] > div,
 #editor[contenteditable="true"] li[data-type="taskItem"][data-checked="true"] > div {
   text-decoration: line-through !important;
-  opacity: 0.6 !important;
+  opacity: 0.5 !important;
+  color: var(--text-secondary);
 }
 
 

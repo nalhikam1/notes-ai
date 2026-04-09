@@ -638,8 +638,8 @@ function tiptapTaskList() {
       editor.chain().focus().toggleTaskList().run();
     });
   } else {
-    // Fallback: insert a simple checkbox list item
-    const html = '<ul><li><input type="checkbox"> Task item</li></ul>';
+    // Fallback: insert a task list that matches our CSS
+    const html = '<ul data-type="taskList"><li data-type="taskItem"><label><input type="checkbox"></label><div>Task item</div></li></ul>';
     document.execCommand('insertHTML', false, html);
   }
 }
