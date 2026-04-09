@@ -240,9 +240,8 @@ function initTiptap() {
       );
     }
 
-    if (Markdown) {
-      extensions.push(Markdown);
-    }
+    // Note: tiptap-markdown extension removed from runtime - storage uses HTML.
+    // Markdown INPUT rules (typing - [ ] etc.) work via TaskItem/StarterKit built-in rules.
 
     editor = new Editor({
       element: document.getElementById('editor'),
@@ -468,13 +467,10 @@ function initFallbackEditor() {
 // Get editor content as Markdown
 function getEditorHTML() {
   if (useTiptap && editor) {
-    if (editor.storage.markdown) {
-      return editor.storage.markdown.getMarkdown();
-    }
     return editor.getHTML();
   } else {
     const editorEl = document.getElementById('editor');
-    return editorEl ? (editorEl.textContent || editorEl.innerText) : '';
+    return editorEl ? editorEl.innerHTML : '';
   }
 }
 
@@ -488,14 +484,26 @@ function getEditorText() {
   }
 }
 
-// Set editor content from Markdown
+// Set editor content - handles both HTML and legacy Markdown string content
 function setEditorHTML(content) {
   if (useTiptap && editor) {
-    editor.commands.setContent(content || '');
+    if (!content || content.trim() === '') {
+      editor.commands.setContent('');
+      return;
+    }
+    // Detect if stored content is HTML or legacy markdown text
+    const isHTML = content.trim().startsWith('<');
+    if (isHTML) {
+      editor.commands.setContent(content);
+    } else {
+      // Legacy markdown format - convert to HTML via marked then set
+      const html = (typeof marked !== 'undefined') ? marked.parse(content) : `<p>${content}</p>`;
+      editor.commands.setContent(html);
+    }
   } else {
     const editorEl = document.getElementById('editor');
     if (editorEl) {
-      editorEl.innerText = content || 'Mulai menulis...';
+      editorEl.innerHTML = content || '<p>Mulai menulis...</p>';
     }
   }
 }
@@ -643,16 +651,9 @@ function tiptapTaskList() {
       editor.chain().focus().toggleTaskList().run();
     });
   } else {
-    // Fallback: insert a task list that matches Markdown syntax
-    const selection = window.getSelection();
-    if (selection.rangeCount) {
-      const range = selection.getRangeAt(0);
-      const textNode = document.createTextNode("- [ ] Task item");
-      range.deleteContents();
-      range.insertNode(textNode);
-      range.setStartAfter(textNode);
-      range.setEndAfter(textNode);
-    }
+    // Fallback: insert proper HTML task list
+    const html = '<ul data-type="taskList"><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div>Task item</div></li></ul>';
+    document.execCommand('insertHTML', false, html);
   }
 }
 
