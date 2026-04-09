@@ -24,12 +24,36 @@ let onbStep=0;
 
 // ===== ONBOARDING =====
 function nextStep(){
-  if(onbStep===0&&!document.getElementById('p-name').value.trim()){showToast('Masukkan nama dulu','error');return;}
-  document.getElementById(`s${onbStep}`).classList.remove('active');
-  document.getElementById(`d${onbStep}`).classList.remove('active');
+  console.log('Moving to next step. Current step:', onbStep);
+  if(onbStep===0&&!document.getElementById('p-name').value.trim()){
+    showToast('Masukkan nama dulu','error');
+    console.warn('Validation failed: Name is empty');
+    return;
+  }
+  
+  const currentS = document.getElementById(`s${onbStep}`);
+  const currentD = document.getElementById(`d${onbStep}`);
+  
+  if (currentS) currentS.classList.remove('active');
+  if (currentD) currentD.classList.remove('active');
+  
   onbStep++;
-  document.getElementById(`s${onbStep}`).classList.add('active');
-  document.getElementById(`d${onbStep}`).classList.add('active');
+  console.log('New step:', onbStep);
+  
+  const nextS = document.getElementById(`s${onbStep}`);
+  const nextD = document.getElementById(`d${onbStep}`);
+  
+  if (nextS) {
+    nextS.classList.add('active');
+  } else {
+    console.error(`Element s${onbStep} not found!`);
+  }
+  
+  if (nextD) {
+    nextD.classList.add('active');
+  } else {
+    console.warn(`Element d${onbStep} not found!`);
+  }
 }
 function prevStep(){
   document.getElementById(`s${onbStep}`).classList.remove('active');
