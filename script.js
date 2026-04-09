@@ -1073,55 +1073,9 @@ function updateChatHistory(){
     return;
   }
   
-  container.innerHTML = history.map(m => `
-    <div class="chat-msg ${m.role}">
-      <div class="chat-msg-content">${marked.parse(m.content)}</div>
-    </div>
-  `).join('');
-  
+  container.innerHTML = '';
+  history.forEach(m => appendChatMsg(container, m.role, m.content));
   container.scrollTop = container.scrollHeight;
-}
-  
-  const msg=inp.value.trim();
-  const noteId=ST.activeId;
-  const msgsEl=document.getElementById('chat-messages');
-  const btn=document.querySelector('.chat-send');
-  
-  if(!ST.chatHistory[noteId]) ST.chatHistory[noteId]=[];
-  ST.chatHistory[noteId].push({role:'user',content:msg});
-  
-  appendChatMsg(msgsEl,'user',msg);
-  inp.value=''; inp.style.height='auto';
-  if(btn) btn.disabled=true;
-  
-  const typing=appendTyping(msgsEl);
-  const note=ST.notes.find(n=>n.id===noteId);
-  const liveText = document.getElementById('editor').innerText || '';
-  const ctx=`Konteks note aktif:\nJudul: "${note?.title||'Untitled'}"\nIsi:\n${liveText.substring(0,3000)}\n---\n`;
-  const hist=ST.chatHistory[noteId];
-  const apiMsgs=hist.length===1
-    ?[{role:'user',content:ctx+msg}]
-    :[{role:'user',content:ctx+hist[0].content},...hist.slice(1)];
-    
-  try{
-    const res=await callAI(apiMsgs);
-    typing.remove();
-    ST.chatHistory[noteId].push({role:'assistant',content:res});
-    appendChatMsg(msgsEl,'ai',res);
-  }catch(err){
-    typing.remove();
-    appendChatMsg(msgsEl,'ai','⚠️ '+err.message);
-  }finally{
-    if(btn) btn.disabled=false;
-  }
-}
-
-function updateChatHistory(){
-  const msgs=document.getElementById('chat-messages');
-  if(!msgs) return;
-  const hist=ST.chatHistory[ST.activeId] || [];
-  msgs.innerHTML = hist.length === 0 ? '<div id="chat-empty">Hi 👋. Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>' : '';
-  hist.forEach(m=>appendChatMsg(msgs, m.role, m.content));
 }
 
 function appendChatMsg(container,role,content){
