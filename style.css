@@ -342,7 +342,6 @@ body {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  padding-bottom: var(--status-bar-h);
 }
 
 #workspace {
@@ -1339,6 +1338,7 @@ body {
   padding: 16px 20px 0;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  background: var(--bg);
 }
 
 #note-title {
@@ -2767,7 +2767,7 @@ body {
 /* Mobile Floating Toolbar */
 .mobile-toolbar {
   display: none;
-  position: fixed;
+  position: relative;
   bottom: 0;
   left: 0;
   right: 0;
@@ -2780,7 +2780,7 @@ body {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-  transition: bottom 0.2s ease;
+  flex-shrink: 0;
 }
 
 .mobile-toolbar::-webkit-scrollbar {
@@ -2819,10 +2819,11 @@ body {
 
 .mobile-menu {
   display: none;
-  position: fixed;
-  bottom: 60px;
+  position: absolute;
+  bottom: 100%;
   left: 8px;
   right: 8px;
+  margin-bottom: 8px;
   background: var(--bg2);
   border: 1px solid var(--border2);
   border-radius: var(--r2);
@@ -2865,8 +2866,26 @@ body {
     display: flex;
   }
   
+  #editor-view {
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  #note-header {
+    flex-shrink: 0;
+  }
+  
   #editor-wrap {
-    padding-bottom: 70px;
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-toolbar {
+    flex-shrink: 0;
   }
 }
 
@@ -2908,7 +2927,7 @@ body {
   #right-sidebar {
     position: fixed;
     top: 0;
-    bottom: var(--bottom-bar-h);
+    bottom: var(--status-bar-h);
     right: 0;
     width: 100%;
     z-index: 85;
@@ -2926,10 +2945,6 @@ body {
     display: none !important;
   }
 
-  #editor-wrap {
-    padding-bottom: calc(var(--bottom-bar-h) + 16px);
-  }
-
   #note-header {
     padding: 14px 16px 0;
   }
@@ -2945,6 +2960,19 @@ body {
   .meta-bar {
     font-size: 10px;
     gap: 8px;
+  }
+  
+  #workspace {
+    padding-bottom: calc(var(--status-bar-h) + var(--bottom-bar-h));
+  }
+  
+  .view {
+    padding-bottom: 20px;
+  }
+  
+  #dashboard-view,
+  #project-view {
+    padding-bottom: 40px;
   }
 }
 
