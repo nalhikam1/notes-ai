@@ -785,11 +785,7 @@ function toggleToolbarDropdown(e, menuId) {
   if (isShown) {
     menu.classList.remove('show');
   } else {
-    // Position the menu right below the button
-    const rect = btn.getBoundingClientRect();
-    menu.style.top = (rect.bottom + 6) + 'px';
-    menu.style.left = rect.left + 'px';
-    
+    // Just toggle show class - CSS handles positioning with position: absolute
     menu.classList.add('show');
     
     // Close on outside click

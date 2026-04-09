@@ -1218,12 +1218,7 @@ function toggleAIMenu(e){
   if(isShown){
     menu.classList.remove('show');
   } else {
-    // Position the menu right below the button using fixed positioning
-    const rect=btn.getBoundingClientRect();
-    menu.style.top=(rect.bottom+6)+'px';
-    menu.style.right=(window.innerWidth-rect.right)+'px';
-    menu.style.left='auto';
-    
+    // Just toggle show class - CSS handles positioning with position: absolute
     menu.classList.add('show');
     setTimeout(()=>{
       const closeMenu=(evt)=>{
