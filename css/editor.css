@@ -532,20 +532,45 @@
   text-decoration: line-through;
 }
 
-/* Lists */
+/* Lists - Reset all lists first to avoid double bullets */
+.tiptap ul,
+.tiptap ol,
+.tiptap li,
+#editor[contenteditable="true"] ul,
+#editor[contenteditable="true"] ol,
+#editor[contenteditable="true"] li {
+  list-style: none !important;
+  list-style-type: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Bullet List - Restore only for standard lists */
 .tiptap ul:not([data-type="taskList"]),
 #editor[contenteditable="true"] ul:not([data-type="taskList"]) {
   margin: 12px 0;
   padding-left: 24px;
-  list-style-type: disc;
+  list-style-type: disc !important; /* Force restore */
 }
 
+.tiptap ul:not([data-type="taskList"]) li,
+#editor[contenteditable="true"] ul:not([data-type="taskList"]) li {
+  list-style: inherit !important;
+  display: list-item !important;
+}
 
+/* Ordered List - Restore only for ol */
 .tiptap ol,
 #editor[contenteditable="true"] ol {
   margin: 12px 0;
   padding-left: 24px;
-  list-style-type: decimal;
+  list-style-type: decimal !important; /* Force restore */
+}
+
+.tiptap ol li,
+#editor[contenteditable="true"] ol li {
+  list-style: inherit !important;
+  display: list-item !important;
 }
 
 .tiptap li,
@@ -570,7 +595,7 @@
 .tiptap ul[data-type="taskList"],
 #editor[contenteditable="true"] ul[data-type="taskList"] {
   list-style: none !important;
-  list-style-type: none !important; /* Explicitly reset */
+  list-style-type: none !important;
   padding: 0 !important;
   margin: 16px 0 !important;
 }
@@ -580,10 +605,11 @@
   display: flex !important;
   align-items: flex-start !important;
   list-style: none !important;
-  list-style-type: none !important; /* Force reset per item */
+  list-style-type: none !important;
   margin-bottom: 8px !important;
   padding: 0 !important;
 }
+
 
 /* Hard reset for all markers and pseudo-bullets */
 .tiptap ul[data-type="taskList"] > li::marker,
