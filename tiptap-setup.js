@@ -140,6 +140,7 @@ function initTiptap() {
     const { Highlight } = window.tiptapHighlight || {};
     const { Link } = window.tiptapLink || {};
     const { Image } = window.tiptapImage || {};
+    const { Markdown } = window.tiptapMarkdown || {};
 
     const extensions = [
       StarterKit.configure({
@@ -239,8 +240,9 @@ function initTiptap() {
       );
     }
 
-    // Add slash command extension
-    extensions.push(SlashCommand);
+    if (Markdown) {
+      extensions.push(Markdown);
+    }
 
     editor = new Editor({
       element: document.getElementById('editor'),
@@ -463,13 +465,16 @@ function initFallbackEditor() {
   }
 }
 
-// Get editor content as HTML
+// Get editor content as Markdown
 function getEditorHTML() {
   if (useTiptap && editor) {
+    if (editor.storage.markdown) {
+      return editor.storage.markdown.getMarkdown();
+    }
     return editor.getHTML();
   } else {
     const editorEl = document.getElementById('editor');
-    return editorEl ? editorEl.innerHTML : '';
+    return editorEl ? (editorEl.textContent || editorEl.innerText) : '';
   }
 }
 
@@ -483,14 +488,14 @@ function getEditorText() {
   }
 }
 
-// Set editor content from HTML
-function setEditorHTML(html) {
+// Set editor content from Markdown
+function setEditorHTML(content) {
   if (useTiptap && editor) {
-    editor.commands.setContent(html || '');
+    editor.commands.setContent(content || '');
   } else {
     const editorEl = document.getElementById('editor');
     if (editorEl) {
-      editorEl.innerHTML = html || '<p>Mulai menulis...</p>';
+      editorEl.innerText = content || 'Mulai menulis...';
     }
   }
 }
@@ -638,9 +643,16 @@ function tiptapTaskList() {
       editor.chain().focus().toggleTaskList().run();
     });
   } else {
-    // Fallback: insert a task list that matches our CSS
-    const html = '<ul data-type="taskList"><li data-type="taskItem"><label><input type="checkbox"></label><div>Task item</div></li></ul>';
-    document.execCommand('insertHTML', false, html);
+    // Fallback: insert a task list that matches Markdown syntax
+    const selection = window.getSelection();
+    if (selection.rangeCount) {
+      const range = selection.getRangeAt(0);
+      const textNode = document.createTextNode("- [ ] Task item");
+      range.deleteContents();
+      range.insertNode(textNode);
+      range.setStartAfter(textNode);
+      range.setEndAfter(textNode);
+    }
   }
 }
 

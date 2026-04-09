@@ -891,13 +891,13 @@ function buildSysPrompt(){
 Gaya komunikasi: ${styles[p.style]||'natural'}. Gunakan ${langs[p.lang]||'Bahasa Indonesia'}.
 
 PENTING - Aturan Formatting:
-1. Tulis konten yang PADAT dan LANGSUNG ke inti
-2. JANGAN gunakan spasi berlebihan atau line break ganda
-3. Gunakan markdown yang BERSIH dan MINIMAL
-4. Untuk list: langsung tulis item tanpa spasi ekstra
-5. Untuk paragraf: pisahkan dengan 1 line break saja
-6. HINDARI formatting yang berlebihan
-7. Tulis konten yang berkualitas tinggi dan langsung berguna`;
+1. Tulis konten dalam format Markdown yang BERSIH.
+2. JANGAN gunakan spasi berlebihan atau line break ganda.
+3. Gunakan markdown yang BERSIH dan MINIMAL.
+4. Untuk list: langsung tulis item tanpa spasi ekstra.
+5. Untuk paragraf: pisahkan dengan 1 line break saja.
+6. HINDARI formatting yang berlebihan.
+7. Selalu kembalikan konten dalam Markdown murni, tanpa pembungkus seperti \`\`\`markdown \`\`\`.`;
 }
 
 // ===== AI API CALL (via Vercel API) =====
@@ -913,6 +913,16 @@ async function callAI(messages){
   const data=await resp.json();
   if(!resp.ok) throw new Error(data?.error||`HTTP ${resp.status}`);
   return data.text;
+}
+
+function cleanAIContent(text) {
+  return text
+    .replace(/^```markdown\n?/i, '')
+    .replace(/\n?```$/, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\s+$/gm, '')
+    .replace(/^\s+/gm, '')
+    .trim();
 }
 
 // ===== AI ACTIONS =====
@@ -937,13 +947,13 @@ async function aiAction(action){
   try{
     const result=await callAI([{role:'user',content:prompts[action]}]);
     
-    // Clean the markdown result before parsing
-    const cleanedResult = result
-      .replace(/\n{3,}/g, '\n\n')  // Remove excessive line breaks
-      .replace(/\s+$/gm, '')        // Remove trailing spaces
-      .replace(/^\s+/gm, '')        // Remove leading spaces
-      .trim();
+    // Clean the markdown result
+    const cleanedResult = cleanAIContent(result);
     
+    // Tiptap handles markdown via its Extension, but if we have the Markdown extension, 
+    // we should use the appropriate way to insert it.
+    // The current implementation uses marked.parse(html) then inserts HTML.
+    // We'll keep this but ensure formatting is clean.
     const html=marked.parse(cleanedResult);
     
     // Use Tiptap functions to insert content
@@ -998,6 +1008,55 @@ async function sendChat(){
   const inp=document.getElementById('chat-input');
   if(!inp || !inp.value.trim()) return;
   if(!ST.activeId){showToast('Buka note dulu','error');return;}
+
+  const text=inp.value.trim();
+  inp.value=''; inp.style.height='auto';
+  
+  const ctxTitle = document.getElementById('note-title').value || 'Untitled';
+  const ctxContent = getEditorText();
+  
+  const history = ST.chatHistory[ST.activeId] || [];
+  history.push({role:'user', content:text});
+  ST.chatHistory[ST.activeId] = history;
+  
+  updateChatHistory();
+  
+  try {
+    const messages = [
+      {role: 'system', content: `Context Note Aktif:\nJudul: ${ctxTitle}\nIsi:\n${ctxContent}`},
+      ...history
+    ];
+    
+    const result = await callAI(messages);
+    const cleanedResult = cleanAIContent(result);
+    
+    history.push({role:'assistant', content:cleanedResult});
+    ST.chatHistory[ST.activeId] = history;
+    updateChatHistory();
+    saveState();
+  } catch(err) {
+    showToast('AI Error: '+err.message, 'error');
+  }
+}
+
+function updateChatHistory(){
+  const container = document.getElementById('chat-messages');
+  if(!container) return;
+  
+  const history = ST.chatHistory[ST.activeId] || [];
+  if(history.length === 0){
+    container.innerHTML = '<div id="chat-empty">Hi 👋. Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>';
+    return;
+  }
+  
+  container.innerHTML = history.map(m => `
+    <div class="chat-msg ${m.role}">
+      <div class="chat-msg-content">${marked.parse(m.content)}</div>
+    </div>
+  `).join('');
+  
+  container.scrollTop = container.scrollHeight;
+}
   
   const msg=inp.value.trim();
   const noteId=ST.activeId;
