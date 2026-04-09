@@ -351,6 +351,7 @@ body {
   min-width: 0;
   position: relative;
   background: var(--bg);
+  padding-bottom: var(--status-bar-h);
 }
 
 .view {
@@ -362,6 +363,18 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+/* Editor view specific layout */
+#editor-view {
+  padding: 0;
+  max-width: none;
+  overflow: hidden;
+}
+
+#editor-view[style*="display:none"],
+#editor-view[style*="display: none"] {
+  display: none !important;
 }
 
 @media (max-width: 900px) {
@@ -1402,6 +1415,7 @@ body {
   caret-color: var(--accent);
   word-wrap: break-word;
   overflow-wrap: break-word;
+  margin: 0 auto;
 }
 
 /* Contenteditable fallback styles */
@@ -2767,20 +2781,26 @@ body {
 /* Mobile Floating Toolbar */
 .mobile-toolbar {
   display: none;
-  position: relative;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg2);
-  border-top: 1px solid var(--border2);
-  padding: 8px;
-  gap: 4px;
-  z-index: 100;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  #editor-view .mobile-toolbar {
+    display: flex;
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg2);
+    border-top: 1px solid var(--border2);
+    padding: 8px;
+    gap: 4px;
+    z-index: 100;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+  }
 }
 
 .mobile-toolbar::-webkit-scrollbar {
@@ -2862,12 +2882,9 @@ body {
     display: none;
   }
   
-  .mobile-toolbar {
-    display: flex;
-  }
-  
   #editor-view {
-    display: flex !important;
+    padding: 0;
+    display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
@@ -2880,12 +2897,8 @@ body {
   #editor-wrap {
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 16px;
+    padding: 20px;
     -webkit-overflow-scrolling: touch;
-  }
-  
-  .mobile-toolbar {
-    flex-shrink: 0;
   }
 }
 
@@ -2962,17 +2975,17 @@ body {
     gap: 8px;
   }
   
-  #workspace {
-    padding-bottom: calc(var(--status-bar-h) + var(--bottom-bar-h));
-  }
-  
   .view {
-    padding-bottom: 20px;
+    padding: 20px 16px;
   }
   
   #dashboard-view,
   #project-view {
     padding-bottom: 40px;
+  }
+  
+  #editor-wrap {
+    padding: 20px 16px;
   }
 }
 
