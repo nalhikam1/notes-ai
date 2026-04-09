@@ -565,57 +565,90 @@
   display: inline;
 }
 
-/* Task List */
+/* Task List - Tiptap native TaskList/TaskItem */
+/* Reset bullet from parent ul rule */
 .tiptap ul[data-type="taskList"],
 #editor[contenteditable="true"] ul[data-type="taskList"] {
   list-style: none !important;
-  padding-left: 0 !important;
-  margin-left: 0 !important;
+  padding-left: 4px !important;
+  margin: 8px 0 !important;
 }
 
-.tiptap ul[data-type="taskList"] li,
-#editor[contenteditable="true"] ul[data-type="taskList"] li {
+/* The li itself — no bullet, flex row */
+.tiptap ul[data-type="taskList"] > li,
+.tiptap li[data-type="taskItem"],
+#editor[contenteditable="true"] ul[data-type="taskList"] > li,
+#editor[contenteditable="true"] li[data-type="taskItem"] {
   display: flex !important;
   align-items: flex-start !important;
   gap: 8px !important;
   list-style: none !important;
+  list-style-type: none !important;
   padding-left: 0 !important;
   margin-left: 0 !important;
+  margin-bottom: 6px;
 }
 
-.tiptap ul[data-type="taskList"] li::before,
-.tiptap ul[data-type="taskList"] li::after,
-.tiptap ul[data-type="taskList"] li::marker,
-#editor[contenteditable="true"] ul[data-type="taskList"] li::before,
-#editor[contenteditable="true"] ul[data-type="taskList"] li::after,
-#editor[contenteditable="true"] ul[data-type="taskList"] li::marker {
+/* Kill the bullet marker completely */
+.tiptap li[data-type="taskItem"]::before,
+.tiptap li[data-type="taskItem"]::after,
+.tiptap li[data-type="taskItem"]::marker,
+.tiptap ul[data-type="taskList"] > li::before,
+.tiptap ul[data-type="taskList"] > li::after,
+.tiptap ul[data-type="taskList"] > li::marker,
+#editor[contenteditable="true"] li[data-type="taskItem"]::before,
+#editor[contenteditable="true"] li[data-type="taskItem"]::after,
+#editor[contenteditable="true"] li[data-type="taskItem"]::marker {
   display: none !important;
   content: none !important;
 }
 
-.tiptap ul[data-type="taskList"] li > label,
-#editor[contenteditable="true"] ul[data-type="taskList"] li > label {
+/* Label wraps checkbox + text content */
+.tiptap li[data-type="taskItem"] > label,
+#editor[contenteditable="true"] li[data-type="taskItem"] > label {
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   gap: 8px !important;
-  flex: 1 !important;
+  width: 100% !important;
+  cursor: pointer !important;
   margin: 0 !important;
   padding: 0 !important;
 }
 
-.tiptap ul[data-type="taskList"] li > label > input[type="checkbox"],
-#editor[contenteditable="true"] ul[data-type="taskList"] li > label > input[type="checkbox"] {
+/* The actual checkbox */
+.tiptap li[data-type="taskItem"] > label > input[type="checkbox"],
+#editor[contenteditable="true"] li[data-type="taskItem"] > label > input[type="checkbox"] {
   flex-shrink: 0 !important;
-  margin: 0 !important;
-  margin-top: 4px !important;
-  cursor: pointer !important;
   width: 16px !important;
   height: 16px !important;
+  margin: 3px 0 0 0 !important;
+  cursor: pointer !important;
+  accent-color: var(--accent) !important;
+  border-radius: 3px !important;
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
 }
 
-.tiptap ul[data-type="taskList"] li > label > div,
-#editor[contenteditable="true"] ul[data-type="taskList"] li > label > div {
+/* Text content div inside label */
+.tiptap li[data-type="taskItem"] > label > div,
+#editor[contenteditable="true"] li[data-type="taskItem"] > label > div {
   flex: 1 !important;
+  min-width: 0 !important;
+  line-height: 1.65 !important;
+}
+
+/* Checked state — dim the text */
+.tiptap li[data-type="taskItem"][data-checked="true"] > label > div,
+#editor[contenteditable="true"] li[data-type="taskItem"][data-checked="true"] > label > div {
+  text-decoration: line-through !important;
+  opacity: 0.5 !important;
+}
+
+/* Nested task lists */
+.tiptap li[data-type="taskItem"] ul[data-type="taskList"],
+#editor[contenteditable="true"] li[data-type="taskItem"] ul[data-type="taskList"] {
+  margin-top: 4px !important;
+  padding-left: 20px !important;
 }
 
 /* Blockquote */
