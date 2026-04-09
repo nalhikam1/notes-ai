@@ -200,6 +200,37 @@
     background: var(--bg3);
   }
 
+  /* FAB new note button */
+  .bb-new {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    color: #0f0f0f;
+    font-size: 28px;
+    font-weight: 300;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all .15s;
+    box-shadow: 0 2px 12px rgba(212, 168, 83, 0.4);
+    line-height: 1;
+  }
+
+  .bb-new:hover,
+  .bb-new:active {
+    background: var(--accent2);
+    transform: scale(0.95);
+  }
+
+  .bb-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
   /* Adjust editor for mobile */
   #editor {
     max-width: 100%;

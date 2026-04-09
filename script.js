@@ -109,7 +109,9 @@ function migrateOldData(){
   }
   if(!ST.folders) ST.folders = [];
   if(!ST.openNodes) ST.openNodes = {};
-}function updatePersonaBadge(){
+}
+
+function updatePersonaBadge(){
   const p=ST.persona; if(!p) return;
   document.getElementById('p-avatar').textContent=p.name.charAt(0).toUpperCase();
   document.getElementById('p-name-badge').textContent=p.name;
@@ -129,7 +131,9 @@ function showDashboard(){
   ST.activeId=null;
   showView('dashboard');
   renderGlobalDashboard();
-  document.getElementById('menu-home').classList.add('active');
+  // menu-home hanya ada jika elemen tersebut ada
+  const menuHome = document.getElementById('menu-home');
+  if(menuHome) menuHome.classList.add('active');
 }
 
 function openProject(id){
@@ -772,7 +776,7 @@ function openMoveModal(noteId){
 function moveNoteToFolder(noteId,folderId){
   const n=ST.notes.find(x=>x.id===noteId); if(!n) return;
   n.folderId=folderId;
-  ST.openFolders[folderId]=true; // auto-open destination folder
+  ST.openNodes[folderId]=true; // auto-open destination folder
   saveState(); renderSidebar();
   document.getElementById('move-modal').style.display='none';
   const f=ST.folders.find(x=>x.id===folderId);
@@ -1238,34 +1242,26 @@ function closeAIMenu(){
 }
 
 // ===== MOBILE SHEETS =====
-function openMobileAI(){document.getElementById('ai-sheet').classList.add('open');}
-function closeMobileAI(){document.getElementById('ai-sheet').classList.remove('open');}
-function openMobileChat(){
-  const sheet=document.getElementById('chat-sheet');
-  sheet.classList.add('open');
-  updateChatCtx();
-  // Sync messages from desktop chat history
-  renderMobileChatHistory();
+function openMobileAI(){
+  const sheet=document.getElementById('ai-sheet');
+  if(sheet) sheet.classList.add('open');
 }
-function closeMobileChat(){document.getElementById('chat-sheet').classList.remove('open');}
+function closeMobileAI(){
+  const sheet=document.getElementById('ai-sheet');
+  if(sheet) sheet.classList.remove('open');
+}
+function openMobileChat(){
+  // On mobile, toggle the right sidebar (same as desktop chat)
+  toggleChat();
+}
+function closeMobileChat(){
+  const rs=document.getElementById('right-sidebar');
+  if(rs && !rs.classList.contains('hidden')) rs.classList.add('hidden');
+}
 
 function renderMobileChatHistory(){
-  if(!ST.activeId) return;
-  const hist=ST.chatHistory[ST.activeId]||[];
-  const msgsEl=document.getElementById('chat-messages-m');
-  msgsEl.innerHTML='';
-  if(!hist.length){
-    msgsEl.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">Belum ada chat untuk note ini.</div>';
-    return;
-  }
-  hist.forEach(m=>{
-    const div=document.createElement('div');
-    div.className=`chat-msg ${m.role==='user'?'user':'ai'}`;
-    const content=m.role==='assistant'?marked.parse(m.content):escHtml(m.content).replace(/\n/g,'<br>');
-    div.innerHTML=`<div class="chat-bubble">${content}</div>`;
-    msgsEl.appendChild(div);
-  });
-  msgsEl.scrollTop=msgsEl.scrollHeight;
+  // Mobile chat uses same #chat-messages element via toggleChat
+  updateChatHistory();
 }
 
 // ===== SYSTEM PROMPT =====
@@ -1540,9 +1536,10 @@ function showToast(msg,type=''){
 function setRSTab(tab, el){
   ST.rsTab=tab;
   document.querySelectorAll('.rs-tab').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   document.querySelectorAll('.rs-view').forEach(v=>v.style.display='none');
-  document.getElementById(`rs-${tab}`).style.display='flex';
+  const tabEl = document.getElementById(`rs-${tab}`);
+  if(tabEl) tabEl.style.display='flex';
   if(tab==='toc') updateTOC();
 }
 
@@ -1568,8 +1565,10 @@ function updateStatusBar(){
 
 function updateTOC(){
   const ed=document.getElementById('editor');
+  if(!ed) return;
   const heads=ed.querySelectorAll('h1, h2, h3');
   const el=document.getElementById('toc-content');
+  if(!el) return; // toc-content element doesn't exist in current layout
   if(!heads.length){el.innerHTML='<p style="padding:16px;color:var(--text3);font-size:12px;">No headings found.</p>';return;}
   
   el.innerHTML = Array.from(heads).map((h,i)=>{
