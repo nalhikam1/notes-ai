@@ -1848,108 +1848,105 @@ body {
   margin: 8px 0;
 }
 
-/* Tiptap Task List - High specificity to override defaults */
+/* Tiptap Task List - Remove ALL list styling */
 .tiptap ul[data-type="taskList"],
-#editor[contenteditable="true"] ul[data-type="taskList"],
-.tiptap ul[data-type="taskList"] {
+.tiptap ul[data-type="taskList"] * {
   list-style: none !important;
+  list-style-type: none !important;
+}
+
+.tiptap ul[data-type="taskList"] {
   padding: 0 !important;
   padding-left: 0 !important;
   margin: 12px 0 !important;
 }
 
 .tiptap ul[data-type="taskList"]::before,
-#editor[contenteditable="true"] ul[data-type="taskList"]::before {
+.tiptap ul[data-type="taskList"]::after {
   display: none !important;
   content: none !important;
 }
 
-.tiptap ul[data-type="taskList"] li,
-#editor[contenteditable="true"] ul[data-type="taskList"] li,
-.tiptap ul[data-type="taskList"] > li {
+.tiptap ul[data-type="taskList"] li {
   display: flex !important;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: flex-start !important;
+  gap: 10px !important;
   margin: 4px 0 !important;
-  padding: 2px 0;
+  padding: 2px 0 !important;
   list-style: none !important;
   list-style-type: none !important;
 }
 
 .tiptap ul[data-type="taskList"] li::marker,
-#editor[contenteditable="true"] ul[data-type="taskList"] li::marker,
 .tiptap ul[data-type="taskList"] li::before,
-#editor[contenteditable="true"] ul[data-type="taskList"] li::before {
+.tiptap ul[data-type="taskList"] li::after {
   display: none !important;
   content: none !important;
 }
 
-.tiptap ul[data-type="taskList"] li > label,
-#editor[contenteditable="true"] ul[data-type="taskList"] li > label {
-  flex: 0 0 auto;
-  margin-top: 4px;
+.tiptap ul[data-type="taskList"] li > label {
+  flex: 0 0 auto !important;
+  margin: 4px 0 0 0 !important;
+  padding: 0 !important;
   user-select: none;
-  margin-right: 0;
-  padding: 0;
+  display: flex !important;
+  align-items: center !important;
 }
 
-.tiptap ul[data-type="taskList"] li > label input[type="checkbox"],
-#editor[contenteditable="true"] ul[data-type="taskList"] li > label input[type="checkbox"],
-#editor[contenteditable="true"] input[type="checkbox"] {
-  width: 17px;
-  height: 17px;
-  border: 2px solid var(--border2);
-  border-radius: 4px;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .15s;
-  margin: 0;
+.tiptap ul[data-type="taskList"] li > label::before,
+.tiptap ul[data-type="taskList"] li > label::after {
+  display: none !important;
+  content: none !important;
 }
 
-.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:hover,
-#editor[contenteditable="true"] ul[data-type="taskList"] li > label input[type="checkbox"]:hover,
-#editor[contenteditable="true"] input[type="checkbox"]:hover {
-  border-color: var(--accent);
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"] {
+  width: 17px !important;
+  height: 17px !important;
+  border: 2px solid var(--border2) !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all .15s !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
 }
 
-.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked,
-#editor[contenteditable="true"] ul[data-type="taskList"] li > label input[type="checkbox"]:checked,
-#editor[contenteditable="true"] input[type="checkbox"]:checked {
-  background: var(--accent);
-  border-color: var(--accent);
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:hover {
+  border-color: var(--accent) !important;
 }
 
-.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after,
-#editor[contenteditable="true"] ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after,
-#editor[contenteditable="true"] input[type="checkbox"]:checked::after {
-  content: '✓';
-  font-size: 11px;
-  font-weight: 700;
-  color: #0f0f0f;
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
 }
 
-.tiptap ul[data-type="taskList"] li > div,
-#editor[contenteditable="true"] ul[data-type="taskList"] li > div {
-  flex: 1;
-  min-width: 0;
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
+  content: '✓' !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #0f0f0f !important;
+  display: block !important;
 }
 
-.tiptap ul[data-type="taskList"] li[data-checked="true"] > div,
-#editor[contenteditable="true"] ul[data-type="taskList"] li[data-checked="true"] > div {
-  text-decoration: line-through;
-  color: var(--text3);
+.tiptap ul[data-type="taskList"] li > div {
+  flex: 1 !important;
+  min-width: 0 !important;
 }
 
-/* Remove any default list styling from task list */
-.tiptap ul[data-type="taskList"] li > p,
-#editor[contenteditable="true"] ul[data-type="taskList"] li > p {
-  margin: 0;
-  display: inline;
+.tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through !important;
+  color: var(--text3) !important;
+}
+
+.tiptap ul[data-type="taskList"] li > p {
+  margin: 0 !important;
+  display: inline !important;
 }
 
 
@@ -2859,16 +2856,15 @@ body {
 
 .mobile-menu {
   display: none;
-  position: absolute;
-  bottom: 100%;
+  position: fixed;
+  bottom: 60px;
   left: 8px;
   right: 8px;
-  margin-bottom: 8px;
   background: var(--bg2);
   border: 1px solid var(--border2);
   border-radius: var(--r2);
   padding: 4px;
-  z-index: 101;
+  z-index: 200;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
   max-height: 200px;
   overflow-y: auto;
@@ -2891,6 +2887,7 @@ body {
   border-radius: var(--r);
   transition: background .15s;
   -webkit-tap-highlight-color: transparent;
+  display: block;
 }
 
 .mobile-menu-item:active {
