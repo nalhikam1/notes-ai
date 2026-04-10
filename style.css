@@ -3317,6 +3317,24 @@ input[type="file"].modal-in::-webkit-file-upload-button:hover {
   opacity: 1;
 }
 
+/* Tooltip-like title for folder action buttons */
+.folder-act-btn { position: relative; }
+
+/* Template folder hint inside template modal */
+.tpl-folder-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: color-mix(in srgb, var(--ac) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ac) 30%, transparent);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ac);
+  margin-bottom: 12px;
+}
+
 /* DASHBOARD */
 #es.dashboard {
   flex: 1;

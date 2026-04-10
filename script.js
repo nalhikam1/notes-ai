@@ -190,6 +190,18 @@ function subscribeCloud() {
     S.notes.forEach((n) => (localById[n.id] = n));
     const cloudById = {};
     cloudNotes.forEach((n) => (cloudById[n.id] = n));
+
+    // Dorong catatan lokal ke Firestore jika belum ada di cloud,
+    // atau jika versi lokal lebih baru dari versi cloud.
+    Object.keys(localById).forEach((id) => {
+      const local = localById[id];
+      const cloud = cloudById[id];
+      if (!local) return;
+      if (!cloud || (local.modified || 0) > (cloud.modified || 0)) {
+        cloudSave(local);
+      }
+    });
+
     const allIds = new Set([
       ...Object.keys(localById),
       ...Object.keys(cloudById),
@@ -1026,7 +1038,10 @@ function hideInlineCreate() {
 
 btnFolder?.addEventListener("click", () => showInlineCreate("folder"));
 btnTpl?.addEventListener("click", () => {
+  _pendingNoteFolderId = null;
   renderTemplates();
+  const hint = document.getElementById('tpl-folder-hint');
+  if (hint) hint.style.display = 'none';
   document.getElementById("modal-tpl").classList.add("on");
 });
 btnDashboard?.addEventListener("click", () => {
@@ -1889,7 +1904,20 @@ function openMediaModal(tab) {
 }
 
 function openTemplatesModal() {
+  // When opened from slash menu, inherit the active note's folder
+  const activeNote = S.notes.find(n => n.id === S.active);
+  _pendingNoteFolderId = activeNote?.folder || null;
   renderTemplates();
+  const hint = document.getElementById('tpl-folder-hint');
+  if (hint) {
+    if (_pendingNoteFolderId) {
+      const folder = S.folders.find(f => f.id === _pendingNoteFolderId);
+      hint.textContent = '📁 Akan disimpan ke: ' + (folder ? folder.name : _pendingNoteFolderId);
+      hint.style.display = '';
+    } else {
+      hint.style.display = 'none';
+    }
+  }
   document.getElementById("modal-tpl").classList.add("on");
 }
 
@@ -2263,7 +2291,25 @@ document.getElementById("tpl-search")?.addEventListener("keydown", (e) => {
 
 function useTemplate(i) {
   closeModal("modal-tpl");
-  createNote(null, TEMPLATES[i]);
+  const folderId = _pendingNoteFolderId;
+  _pendingNoteFolderId = null;
+  createNote(folderId, TEMPLATES[i]);
+}
+
+function openTemplateForFolder(folderId) {
+  _pendingNoteFolderId = folderId;
+  renderTemplates();
+  const hint = document.getElementById('tpl-folder-hint');
+  if (hint) {
+    if (folderId) {
+      const folder = S.folders.find(f => f.id === folderId);
+      hint.textContent = '📁 Akan disimpan ke: ' + (folder ? folder.name : folderId);
+      hint.style.display = '';
+    } else {
+      hint.style.display = 'none';
+    }
+  }
+  document.getElementById('modal-tpl').classList.add('on');
 }
 
 document.getElementById("mf-ok").addEventListener("click", () => {
@@ -2328,10 +2374,13 @@ function renderTree() {
         <span style="flex:1">${escapeHTML(f.name)}</span>
         <span style="font-size:9px;color:var(--tx3)">${fn.length}</span>
         <div class="folder-acts">
-   <button class="ib" title="New Note" onclick="event.stopPropagation();createNote('${f.id}')">
+   <button class="ib folder-act-btn" title="Catatan Baru" onclick="event.stopPropagation();createNote('${f.id}')">
      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
    </button>
-   <button class="ib" title="Options" onclick="showFolderCtx(event, '${f.id}')">
+   <button class="ib folder-act-btn" title="Dari Template" onclick="event.stopPropagation();openTemplateForFolder('${f.id}')">
+     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>
+   </button>
+   <button class="ib folder-act-btn" title="Opsi Folder" onclick="showFolderCtx(event, '${f.id}')">
      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
    </button>
  </div>
@@ -2411,20 +2460,68 @@ function showFolderCtx(e, id) {
   m.classList.add("on");
 }
 
+document.getElementById("fctx-new").onclick = () => {
+  document.getElementById("fctx").classList.remove("on");
+  createNote(S.fctxId);
+};
+
+document.getElementById("fctx-tpl").onclick = () => {
+  document.getElementById("fctx").classList.remove("on");
+  openTemplateForFolder(S.fctxId);
+};
+
 document.getElementById("fctx-ren").onclick = () => {
   const f = S.folders.find((x) => x.id === S.fctxId);
   if (!f) return;
-  const name = prompt("Rename folder:", f.name);
-  if (name && name.trim()) {
-    f.name = name.trim();
+  document.getElementById("fctx").classList.remove("on");
+  openRenameFolderModal(f);
+};
+
+function openRenameFolderModal(folder) {
+  const input = document.getElementById("rename-folder-in");
+  const modal = document.getElementById("modal-rename-folder");
+  const label = document.getElementById("rename-folder-label");
+  if (!input || !modal) {
+    // Fallback to prompt if modal not found
+    const name = prompt("Rename folder:", folder.name);
+    if (name && name.trim()) {
+      folder.name = name.trim();
+      saveLocal();
+      if (window._fb && S.user) window._fb.saveFolders(S.user.uid, S.folders).then(saveLocal);
+      renderFolderOpts();
+      renderTree();
+    }
+    return;
+  }
+  if (label) label.textContent = 'Rename: ' + escapeHTML(folder.name);
+  input.value = folder.name;
+  modal.dataset.folderId = folder.id;
+  modal.classList.add("on");
+  setTimeout(() => { input.focus(); input.select(); }, 60);
+}
+
+document.getElementById("rename-folder-ok")?.addEventListener("click", () => {
+  const modal = document.getElementById("modal-rename-folder");
+  const input = document.getElementById("rename-folder-in");
+  const folderId = modal?.dataset.folderId;
+  const newName = input?.value.trim();
+  if (!newName) { toast("Nama tidak boleh kosong"); input?.focus(); return; }
+  const folder = S.folders.find(f => f.id === folderId);
+  if (folder) {
+    folder.name = newName;
     saveLocal();
     if (window._fb && S.user) window._fb.saveFolders(S.user.uid, S.folders).then(saveLocal);
     renderFolderOpts();
     renderTree();
-    toast("Folder renamed");
+    toast("Folder diubah");
   }
-  document.getElementById("fctx").classList.remove("on");
-};
+  closeModal("modal-rename-folder");
+});
+
+document.getElementById("rename-folder-in")?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); document.getElementById("rename-folder-ok")?.click(); }
+  if (e.key === "Escape") closeModal("modal-rename-folder");
+});
 
 document.getElementById("fctx-del").onclick = () => {
   if (!confirm("Hapus folder ini? \n\nSemua catatan di dalamnya akan dipindah ke daftar utama (Unsorted)."))
