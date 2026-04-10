@@ -251,6 +251,44 @@ function initTiptap() {
         attributes: {
           class: 'tiptap',
         },
+        handleKeyDown(view, event) {
+          // Handle Tab/Shift+Tab for list nesting
+          if (event.key === 'Tab') {
+            const { state, dispatch } = view;
+            const { $from } = state.selection;
+            
+            // Check if we're inside a list item
+            let inList = false;
+            for (let d = $from.depth; d > 0; d--) {
+              const node = $from.node(d);
+              if (node.type.name === 'listItem' || node.type.name === 'taskItem') {
+                inList = true;
+                break;
+              }
+            }
+            
+            if (inList) {
+              event.preventDefault();
+              if (event.shiftKey) {
+                // Lift (outdent)
+                if (editor.can().liftListItem('listItem')) {
+                  editor.chain().focus().liftListItem('listItem').run();
+                } else if (editor.can().liftListItem('taskItem')) {
+                  editor.chain().focus().liftListItem('taskItem').run();
+                }
+              } else {
+                // Sink (indent)
+                if (editor.can().sinkListItem('listItem')) {
+                  editor.chain().focus().sinkListItem('listItem').run();
+                } else if (editor.can().sinkListItem('taskItem')) {
+                  editor.chain().focus().sinkListItem('taskItem').run();
+                }
+              }
+              return true;
+            }
+          }
+          return false;
+        },
       },
       onUpdate: ({ editor }) => {
         // Trigger auto-save and word count update
@@ -268,6 +306,10 @@ function initTiptap() {
 
     useTiptap = true;
     console.log('Tiptap initialized successfully');
+    
+    // Initialize lightbox for images
+    initLightbox();
+    
     return editor;
   } catch (error) {
     console.error('Failed to initialize Tiptap:', error);
@@ -972,15 +1014,210 @@ function tiptapUnlink() {
 }
 
 // ===== IMAGE =====
-function openImageDialog() {
-  const url = prompt('Enter image URL:', 'https://');
-  if (url && url !== 'https://') {
-    if (useTiptap && editor) {
-      editor.chain().focus().setImage({ src: url }).run();
-    } else {
-      document.execCommand('insertImage', false, url);
-    }
+// Cache for Cloudinary config fetched from server
+let _cloudinaryConfig = null;
+
+async function fetchCloudinaryConfig() {
+  if (_cloudinaryConfig) return _cloudinaryConfig;
+  try {
+    const res = await fetch('/api/cloudinary-sign');
+    if (!res.ok) return null;
+    _cloudinaryConfig = await res.json();
+    return _cloudinaryConfig;
+  } catch (e) {
+    console.warn('Cloudinary config not available:', e);
+    return null;
   }
+}
+
+function openImageDialog() {
+  document.getElementById('image-url-input').value = '';
+  // Check cloudinary availability from server
+  const btn = document.getElementById('btn-cloudinary-upload');
+  if (btn) {
+    btn.textContent = 'Checking...';
+    btn.disabled = true;
+    fetchCloudinaryConfig().then(cfg => {
+      if (cfg && cfg.cloudName && cfg.apiKey) {
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload Image';
+        btn.disabled = false;
+        btn.style.display = 'flex';
+      } else {
+        btn.style.display = 'none';
+      }
+    });
+  }
+  document.getElementById('image-upload-modal').style.display = 'flex';
+}
+
+function closeImageUploadModal() {
+  document.getElementById('image-upload-modal').style.display = 'none';
+}
+
+function insertImageFromUrl() {
+  const url = document.getElementById('image-url-input').value.trim();
+  if (!url) { showToast('Masukkan URL gambar', 'error'); return; }
+  if (useTiptap && editor) {
+    editor.chain().focus().setImage({ src: url }).run();
+  } else {
+    document.execCommand('insertImage', false, url);
+  }
+  closeImageUploadModal();
+}
+
+async function uploadImageCloudinary() {
+  if (typeof cloudinary === 'undefined' || !cloudinary.createUploadWidget) {
+    showToast('Cloudinary widget belum loaded', 'error');
+    return;
+  }
+
+  // Get signed params from server
+  let signData;
+  try {
+    const res = await fetch('/api/cloudinary-sign', { method: 'POST' });
+    if (!res.ok) {
+      const err = await res.json();
+      showToast(err.error || 'Server error', 'error');
+      return;
+    }
+    signData = await res.json();
+  } catch (e) {
+    showToast('Gagal koneksi ke server', 'error');
+    return;
+  }
+
+  const widget = cloudinary.createUploadWidget({
+    cloudName: signData.cloudName,
+    apiKey: signData.apiKey,
+    uploadSignature: signData.signature,
+    uploadSignatureTimestamp: signData.timestamp,
+    folder: signData.folder,
+    sources: ['local', 'url', 'camera'],
+    multiple: true,
+    maxFiles: 10,
+    resourceType: 'image',
+    clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'],
+    maxFileSize: 10000000, // 10MB
+    styles: {
+      palette: {
+        window: '#1a1a1a',
+        windowBorder: '#333',
+        tabIcon: '#d4a853',
+        menuIcons: '#999',
+        textDark: '#000',
+        textLight: '#fff',
+        link: '#d4a853',
+        action: '#d4a853',
+        inactiveTabIcon: '#666',
+        error: '#e74c3c',
+        inProgress: '#d4a853',
+        complete: '#27ae60',
+        sourceBg: '#222'
+      }
+    }
+  }, (error, result) => {
+    if (error) {
+      console.error('Upload error:', error);
+      showToast('Upload gagal: ' + (error.message || 'Unknown error'), 'error');
+      return;
+    }
+    if (result.event === 'success') {
+      const url = result.info.secure_url;
+      if (useTiptap && editor) {
+        editor.chain().focus().setImage({ src: url, alt: result.info.original_filename || '' }).run();
+      } else {
+        document.execCommand('insertImage', false, url);
+      }
+      closeImageUploadModal();
+    }
+  });
+  
+  widget.open();
+}
+
+// ===== LIGHTBOX =====
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+function initLightbox() {
+  // Delegate click on images inside editor
+  const editorWrap = document.getElementById('editor-wrap');
+  if (!editorWrap) return;
+  
+  editorWrap.addEventListener('click', (e) => {
+    const img = e.target.closest('img');
+    if (!img) return;
+    
+    // Collect all images in editor
+    const editorEl = document.getElementById('editor');
+    if (!editorEl) return;
+    
+    lightboxImages = Array.from(editorEl.querySelectorAll('img')).map(i => i.src);
+    if (lightboxImages.length === 0) return;
+    
+    lightboxIndex = lightboxImages.indexOf(img.src);
+    if (lightboxIndex === -1) lightboxIndex = 0;
+    
+    openLightbox();
+  });
+  
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const lb = document.getElementById('image-lightbox');
+    if (!lb || lb.style.display === 'none') return;
+    
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') navigateLightbox(-1);
+    else if (e.key === 'ArrowRight') navigateLightbox(1);
+  });
+}
+
+function openLightbox() {
+  const lb = document.getElementById('image-lightbox');
+  if (!lb) return;
+  
+  updateLightboxImage();
+  lb.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  if (e && e.target !== e.currentTarget) return;
+  const lb = document.getElementById('image-lightbox');
+  if (lb) lb.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function navigateLightbox(dir) {
+  if (lightboxImages.length <= 1) return;
+  lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+  updateLightboxImage();
+}
+
+function updateLightboxImage() {
+  const img = document.getElementById('lightbox-img');
+  const counter = document.getElementById('lightbox-counter');
+  if (img) img.src = lightboxImages[lightboxIndex] || '';
+  if (counter) counter.textContent = `${lightboxIndex + 1} / ${lightboxImages.length}`;
+  
+  // Show/hide nav buttons
+  const prev = document.querySelector('.lightbox-prev');
+  const next = document.querySelector('.lightbox-next');
+  if (prev) prev.style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+  if (next) next.style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+}
+
+function downloadLightboxImage() {
+  if (!lightboxImages[lightboxIndex]) return;
+  const url = lightboxImages[lightboxIndex];
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'image-' + (lightboxIndex + 1) + '.' + (url.split('.').pop().split('?')[0] || 'png');
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 // ===== CLEAR FORMATTING =====
