@@ -1,0 +1,909 @@
+/* ═══════════════════════════════════════════
+   MOBILE BUG FIXES - Jurnal PM v2.2.1
+   Fixes for all reported mobile issues
+   ═══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   BUG FIX #3 & #10: Guest Banner - Ultra Compact Single Line
+   ══════════════════════════════════════════ */
+#guest-banner {
+  display: none;
+  background: var(--acdim);
+  border: 1px solid var(--acbrd);
+  border-radius: 6px;
+  max-width: 740px;
+  margin: 0 auto 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--tx2);
+  animation: fadeIn 0.3s var(--ease);
+  align-items: center !important;
+  gap: 12px;
+  position: relative;
+}
+
+#guest-banner.on {
+  display: flex;
+}
+
+.guest-banner-icon {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.guest-banner-text {
+  font-size: 11px;
+  color: var(--tx2);
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.guest-banner-btn {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  white-space: nowrap;
+  background: var(--ac);
+  color: var(--bg);
+  flex-shrink: 0;
+}
+
+.guest-banner-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.guest-banner-close {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  color: var(--tx3);
+  padding: 0;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.guest-banner-close:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* Mobile adjustments for banner */
+@media (max-width: 768px) {
+  #guest-banner {
+    padding: 5px 8px;
+    font-size: 10px;
+    margin: 0 8px 6px;
+    max-width: calc(100% - 16px);
+    border-radius: 5px;
+    gap: 10px;
+  }
+  
+  .guest-banner-icon {
+    font-size: 13px;
+  }
+  
+  .guest-banner-text {
+    font-size: 10px;
+  }
+  
+  .guest-banner-btn {
+    padding: 3px 8px;
+    font-size: 9px;
+  }
+  
+  .guest-banner-close {
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+}
+
+/* Extra small mobile - minimal */
+@media (max-width: 480px) {
+  #guest-banner {
+    padding: 4px 6px;
+    gap: 8px;
+  }
+  
+  .guest-banner-icon {
+    font-size: 12px;
+  }
+  
+  .guest-banner-text {
+    font-size: 9px;
+  }
+  
+  .guest-banner-btn {
+    padding: 2px 6px;
+    font-size: 8px;
+  }
+  
+  .guest-banner-close {
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #8: Bottom Status Bar - Always Visible
+   ══════════════════════════════════════════ */
+#sb2 {
+  position: sticky;
+  bottom: 0;
+  height: 32px; /* Slightly taller for mobile */
+  background: var(--bg2);
+  border-top: 1px solid var(--bd2);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 16px;
+  font-size: 10px;
+  color: var(--tx3);
+  font-family: var(--fmono);
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  #sb2 {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 36px;
+    padding: 0 12px;
+    gap: 12px;
+    font-size: 9px;
+    z-index: 100;
+    background: var(--bg2);
+    border-top: 2px solid var(--bd);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+  }
+  
+  #sb2 span {
+    white-space: nowrap;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #5: Dashboard Layout - Mobile Responsive
+   ══════════════════════════════════════════ */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 32px 0;
+  width: 100%;
+  max-width: 700px;
+}
+
+.dash-card {
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  padding: 28px 20px;
+  text-align: center;
+  transition: all 0.3s var(--ease);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  .dash-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 24px 0;
+    padding: 0 16px;
+    max-width: 100%;
+  }
+  
+  .dash-card {
+    padding: 16px 12px;
+    border-radius: 16px;
+    gap: 6px;
+  }
+  
+  .dash-num {
+    font-size: 1.8rem !important;
+  }
+  
+  .dash-lbl {
+    font-size: 9px !important;
+    letter-spacing: 0.5px;
+  }
+  
+  #es {
+    padding: 24px 16px !important;
+  }
+  
+  #es p {
+    font-size: 14px;
+  }
+  
+  .es-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 12px;
+  }
+  
+  .dash-card {
+    padding: 14px 10px;
+    border-radius: 12px;
+    gap: 4px;
+  }
+  
+  .dash-num {
+    font-size: 1.5rem !important;
+  }
+  
+  .dash-lbl {
+    font-size: 8px !important;
+    letter-spacing: 0.3px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #4: Slash Menu - Position Above on Mobile
+   ══════════════════════════════════════════ */
+#slash {
+  min-width: 210px;
+  padding: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  #slash {
+    min-width: 240px;
+    max-width: 90vw;
+    max-height: 280px;
+    /* Position will be handled by JavaScript to appear above cursor */
+    /* when keyboard is open */
+  }
+  
+  .si {
+    padding: 10px 12px; /* Larger touch targets */
+    font-size: 13px;
+  }
+  
+  .si-ico {
+    font-size: 16px;
+    width: 28px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #9: Image Modal - Responsive
+   ══════════════════════════════════════════ */
+#modal-lightbox .modal {
+  width: auto;
+  max-width: 90vw;
+  max-height: 90vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#lb-img {
+  max-width: 100%;
+  max-height: 70vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  #modal-lightbox .modal {
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 16px;
+  }
+  
+  #lb-img {
+    max-height: 60vh;
+    border-radius: 8px;
+  }
+  
+  .modal-acts {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .modal-acts .btn-ok,
+  .modal-acts .btn-c {
+    width: 100%;
+    padding: 12px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #1: Blockquote Styling Fix
+   ══════════════════════════════════════════ */
+.content-area blockquote {
+  border-left: 4px solid var(--ac);
+  padding: 12px 20px;
+  margin: 20px 0;
+  font-style: italic;
+  color: var(--tx2);
+  background: var(--acdim);
+  border-radius: 0 8px 8px 0;
+  position: relative;
+}
+
+.content-area blockquote::before {
+  content: '"';
+  font-size: 3em;
+  color: var(--ac);
+  opacity: 0.3;
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-family: var(--fhead);
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .content-area blockquote {
+    padding: 10px 16px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #2: Text Color Picker - Better Visibility
+   ══════════════════════════════════════════ */
+.csw {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid var(--bd);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  transition: 0.2s;
+}
+
+.csw:hover {
+  border-color: var(--ac);
+  transform: scale(1.1);
+}
+
+.csw-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 0 0 2px 2px;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .csw {
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+  }
+  
+  .csw-bar {
+    height: 5px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #6: Mobile-Friendly Touch Targets
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Minimum 44x44px touch targets */
+  .ib {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+  
+  .tbb {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+  
+  .sb-btn {
+    min-height: 44px;
+    padding: 10px;
+  }
+  
+  /* Toolbar improvements */
+  #tb {
+    height: 52px;
+    min-height: 52px;
+    padding: 0 8px;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #tb::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .tbsel {
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  /* Top bar */
+  #top {
+    height: 52px;
+    min-height: 52px;
+    padding: 0 12px;
+  }
+  
+  /* Sidebar buttons */
+  .sb-acts {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .sb-btn {
+    height: 44px;
+  }
+  
+  /* Modal buttons */
+  .btn-ok,
+  .btn-c,
+  .btn-guest {
+    min-height: 44px;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #7: Admin Section - Mobile Fix
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #admin-section {
+    padding: 12px;
+  }
+  
+  #admin-section .btn-guest {
+    width: 100%;
+    padding: 14px;
+    font-size: 14px;
+  }
+  
+  /* Ensure admin buttons don't overlap */
+  #settings {
+    padding-bottom: 60px; /* Space for bottom bar */
+  }
+}
+
+/* ══════════════════════════════════════════
+   GENERAL MOBILE IMPROVEMENTS
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Editor padding */
+  #ew {
+    padding: 32px 20px 80px; /* Extra bottom padding for status bar */
+  }
+  
+  #ed {
+    padding-bottom: 100px;
+  }
+  
+  /* Sidebar improvements */
+  #sb {
+    width: 85%;
+    max-width: 320px;
+  }
+  
+  #pp {
+    width: 85%;
+    max-width: 320px;
+  }
+  
+  /* Modal improvements */
+  .modal {
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+  }
+  
+  .modal-t {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  
+  /* Settings panel */
+  #settings {
+    width: 85%;
+    max-width: 320px;
+  }
+  
+  /* Context menus */
+  #ctx,
+  #fctx {
+    min-width: 180px;
+  }
+  
+  .ci {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  /* Search results */
+  #sr {
+    max-height: 240px;
+  }
+  
+  .sr-i {
+    padding: 12px 14px;
+  }
+  
+  .sr-t {
+    font-size: 13px;
+  }
+  
+  .sr-p {
+    font-size: 12px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   LANDSCAPE MOBILE FIXES
+   ══════════════════════════════════════════ */
+@media (max-width: 900px) and (orientation: landscape) {
+  #ew {
+    padding: 24px 16px 60px;
+  }
+  
+  #tb {
+    height: 48px;
+    min-height: 48px;
+  }
+  
+  #top {
+    height: 48px;
+    min-height: 48px;
+  }
+  
+  #sb2 {
+    height: 32px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   SMALL MOBILE (< 480px)
+   ══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  #guest-banner {
+    font-size: 11px;
+    padding: 14px 44px 14px 16px;
+  }
+  
+  #ew {
+    padding: 24px 16px 80px;
+  }
+  
+  .modal {
+    width: 95%;
+    padding: 16px;
+  }
+  
+  #sb,
+  #pp,
+  #settings {
+    width: 90%;
+    max-width: 100%;
+  }
+  
+  .dash-grid {
+    padding: 0 12px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   ACCESSIBILITY IMPROVEMENTS
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Focus states for touch */
+  .tbb:focus,
+  .ib:focus,
+  .sb-btn:focus,
+  .btn-ok:focus,
+  .btn-c:focus {
+    outline: 2px solid var(--ac);
+    outline-offset: 2px;
+  }
+  
+  /* Active states */
+  .tbb:active,
+  .ib:active,
+  .sb-btn:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+/* ══════════════════════════════════════════
+   PREVENT ZOOM ON INPUT FOCUS (iOS)
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents iOS zoom */
+  }
+  
+  .pp-in,
+  .modal-in,
+  .auth-in,
+  .tpl-search-in {
+    font-size: 16px !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   SAFE AREA INSETS (iPhone X+)
+   ══════════════════════════════════════════ */
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    #sb2 {
+      padding-left: max(14px, env(safe-area-inset-left));
+      padding-right: max(14px, env(safe-area-inset-right));
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    #top {
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    #sb,
+    #pp {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+}
+
+/* ══════════════════════════════════════════
+   ANIMATION PERFORMANCE
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Reduce animations on mobile for better performance */
+  * {
+    animation-duration: 0.2s !important;
+  }
+  
+  .modal-bg,
+  .fpanel,
+  #slash {
+    animation-duration: 0.15s !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   PRINT STYLES (Bonus)
+   ══════════════════════════════════════════ */
+@media print {
+  #sb,
+  #pp,
+  #tb,
+  #top,
+  #sb2,
+  #guest-banner,
+  .modal-bg,
+  #settings {
+    display: none !important;
+  }
+  
+  #ew {
+    padding: 0;
+  }
+  
+  #ed {
+    max-width: 100%;
+    padding: 0;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #11: Toast Notification Position (Mobile)
+   Pindah ke tengah agar tidak tertutup keyboard
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #toast {
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%) translateY(60px);
+    z-index: 10000;
+    max-width: 85%;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+    opacity: 0;
+  }
+  
+  #toast.on {
+    transform: translateX(-50%) translateY(-50%);
+    opacity: 1;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #13: Dropdown Formatting Position (Mobile)
+   Ganti native select dengan custom button + menu
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Hide native select on mobile */
+  #tb-hd {
+    display: none !important;
+  }
+  
+  /* Show custom heading button */
+  #btn-heading-mobile {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 100px;
+    padding: 8px 12px;
+    background: var(--bg3);
+    border: 1px solid var(--bd);
+    border-radius: 4px;
+    color: var(--tx);
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.12s;
+  }
+  
+  #btn-heading-mobile:hover {
+    background: var(--bghov);
+    border-color: var(--ac);
+  }
+  
+  #btn-heading-mobile svg {
+    width: 10px;
+    height: 10px;
+    opacity: 0.6;
+  }
+}
+
+/* Desktop - hide custom button, show native select */
+@media (min-width: 769px) {
+  #btn-heading-mobile {
+    display: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #13: Toast Stuck Issue
+   Pastikan toast auto-hide dengan timeout
+   ══════════════════════════════════════════ */
+#toast {
+  pointer-events: none; /* Tidak bisa di-click */
+  user-select: none;
+}
+
+#toast.on {
+  pointer-events: none; /* Tetap tidak bisa di-click saat muncul */
+}
+
+/* ══════════════════════════════════════════
+   BUG FIX #14: Sidebar UI Improvements
+   - Hamburger menu di sidebar header
+   - Logout icon tidak membingungkan
+   ══════════════════════════════════════════ */
+
+/* Tombol hamburger di sidebar header */
+#btn-tsb-sidebar {
+  margin-left: auto;
+  display: none; /* Hidden di desktop */
+  min-width: 32px;
+  min-height: 32px;
+  padding: 6px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+#btn-tsb-sidebar:hover {
+  opacity: 1;
+}
+
+/* Show hamburger button di mobile */
+@media (max-width: 900px) {
+  #btn-tsb-sidebar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Sync dot lebih kecil di mobile */
+  .sync-dot {
+    margin-right: 8px;
+  }
+}
+
+/* Sidebar header layout improvement */
+.sb-head {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 16px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.sb-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Logout button - tooltip sudah jelas */
+#btn-signout {
+  position: relative;
+  /* Tooltip "Sign Out" sudah jelas, bukan "Close" atau "Tutup" */
+}
+
+/* Tooltip improvement untuk mobile */
+@media (max-width: 768px) {
+  .ib[title]::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg3);
+    color: var(--tx1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 1000;
+  }
+  
+  .ib[title]:active::after {
+    opacity: 1;
+  }
+}

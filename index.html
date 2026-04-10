@@ -1,736 +1,853 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jurnal Persaudaraan Matahari — Hening Everyday</title>
+    <meta name="description" content="Aplikasi jurnaling Persaudaraan Matahari, Kenali diri dan pola heningmu" />
+    <meta name="keywords" content="Jurnal, Persaudaraan Matahari, Hening, Spiritual, Meditasi, Pencatatan Harian, Kesadaran diri" />
+    <meta name="author" content="Persaudaraan Matahari" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#f9f9f9">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Fnote</title>
-  <link rel="manifest" href="#" id="manifest-link">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="shortcut icon" href="favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
-    rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  
-  <!-- Cloudinary Upload Widget -->
-  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-  
-  <!-- Tiptap Editor - Using unpkg for better compatibility -->
-  <script src="https://unpkg.com/@tiptap/core@2.1.13/dist/tiptap-core.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/pm@2.1.13/dist/tiptap-pm.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/starter-kit@2.1.13/dist/tiptap-starter-kit.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-underline@2.1.13/dist/tiptap-extension-underline.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-text-style@2.1.13/dist/tiptap-extension-text-style.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-color@2.1.13/dist/tiptap-extension-color.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-highlight@2.1.13/dist/tiptap-extension-highlight.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-text-align@2.1.13/dist/tiptap-extension-text-align.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-link@2.1.13/dist/tiptap-extension-link.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-image@2.1.13/dist/tiptap-extension-image.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-table@2.1.13/dist/tiptap-extension-table.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-table-row@2.1.13/dist/tiptap-extension-table-row.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-table-cell@2.1.13/dist/tiptap-extension-table-cell.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-table-header@2.1.13/dist/tiptap-extension-table-header.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-task-list@2.1.13/dist/tiptap-extension-task-list.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-task-item@2.1.13/dist/tiptap-extension-task-item.umd.min.js"></script>
-  <script src="https://unpkg.com/@tiptap/extension-placeholder@2.1.13/dist/tiptap-extension-placeholder.umd.min.js"></script>
-  
-  <link rel="stylesheet" href="style.css">
-</head>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://persaudaraanmatahari.org/jurnaling" />
+    <meta property="og:title" content="Jurnal Persaudaraan Matahari — Hening Everyday" />
+    <meta property="og:description" content="Praktikkan hening harian dan catat perjalanan spiritual Anda dalam aplikasi jurnaling yang aman dan privat." />
+    <meta property="og:image" content="https://res.cloudinary.com/dkbm0b4nm/image/upload/v1774473638/logo-pm_j8wu6u.png" />
 
-<body>
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://persaudaraanmatahari.org/jurnaling" />
+    <meta property="twitter:title" content="Jurnal Persaudaraan Matahari — Hening Everyday" />
+    <meta property="twitter:description" content="Aplikasi jurnaling eksklusif untuk pencatatan spiritual harian anggota Persaudaraan Matahari." />
+    <meta property="twitter:image" content="https://res.cloudinary.com/dkbm0b4nm/image/upload/v1774473638/logo-pm_j8wu6u.png" />
 
-  <!-- ONBOARDING -->
-  <div id="onboarding">
-    <div class="onboard-card">
-      <div class="onboard-logo">FNOTE</div>
-      <p class="onboard-sub">Notes management dengan AI yang mengenal kamu.</p>
-      <div class="step-dots">
-        <div class="step-dot active" id="d0"></div>
-        <div class="step-dot" id="d1"></div>
-        <div class="step-dot" id="d2"></div>
-      </div>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dkbm0b4nm/image/upload/v1774473638/logo-pm_j8wu6u.png" />
+    <link rel="apple-touch-icon" href="https://res.cloudinary.com/dkbm0b4nm/image/upload/v1774473638/logo-pm_j8wu6u.png" />
 
-      <div class="onboard-step active" id="s0">
-        <div class="step-label">Langkah 1 · Persona</div>
-        <div class="form-group">
-          <label class="form-label">Nama kamu</label>
-          <input class="form-input" id="p-name" placeholder="e.g. Naufal..." type="text" autocomplete="given-name">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Role / Pekerjaan</label>
-          <input class="form-input" id="p-role" placeholder="e.g. Business Analyst, Mahasiswa...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tentang kamu (opsional)</label>
-          <textarea class="form-textarea" id="p-about"
-            placeholder="Keahlian, fokus kerja, atau hal lain yang relevan..."></textarea>
-        </div>
-        <button class="btn-primary" onclick="nextStep()">Lanjut →</button>
-      </div>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Roboto:wght@300;400;500;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Open+Sans:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;500&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Fira+Sans:ital,wght@0,400;0,600;1,400&family=Lato:ital,wght@0,400;0,700;1,400&family=Raleway:ital,wght@0,400;0,700;1,400&family=Roboto+Slab:wght@400;700&family=Spectral:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style-mobile-fixes.css" />
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
-      <div class="onboard-step" id="s1">
-        <div class="step-label">Langkah 2 · Preferensi AI</div>
-        <div class="form-group">
-          <label class="form-label">Gaya komunikasi AI</label>
-          <select class="form-select" id="p-style">
-            <option value="casual">Santai & Friendly</option>
-            <option value="professional">Profesional & Formal</option>
-            <option value="concise">Singkat & To the Point</option>
-            <option value="detailed">Detail & Komprehensif</option>
-            <option value="creative">Kreatif & Eksploratif</option>
-          </select>
+    <!-- DOMPurify for XSS prevention -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+  </head>
+  <body>
+    <!-- Auth Screen -->
+    <div id="auth">
+      <div class="auth-wrap">
+        <div class="auth-logo">
+          <img src="https://res.cloudinary.com/dkbm0b4nm/image/upload/v1774473638/logo-pm_j8wu6u.png" alt="Logo">
         </div>
-        <div class="form-group">
-          <label class="form-label">Bahasa</label>
-          <select class="form-select" id="p-lang">
-            <option value="id">Bahasa Indonesia</option>
-            <option value="en">English</option>
-            <option value="mixed">Mixed (Campur)</option>
-          </select>
-        </div>
-        <button class="btn-primary" onclick="nextStep()">Lanjut →</button>
-        <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
-      </div>
-
-      <div class="onboard-step" id="s2">
-        <div class="step-label">Langkah 3 · Pilih Model AI</div>
-        <div class="form-group">
-          <label class="form-label">Model NVIDIA</label>
-          <select class="form-select" id="p-model"></select>
-        </div>
-        <button class="btn-primary" onclick="finishOnboarding()">Mulai FNOTE</button>
-        <button class="btn-secondary" onclick="prevStep()">← Kembali</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MAIN APP -->
-  <div id="app" style="display:none">
-    <!-- Sidebar overlay (mobile) -->
-    <div id="sidebar-overlay" onclick="closeSidebar()"></div>
-
-    <!-- SIDEBAR -->
-    <div id="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">FNOTE</div>
-        <div class="sidebar-actions">
-          <button class="icon-btn" onclick="newNote()" title="Note baru">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          </button>
-          <button class="icon-btn hide-m" onclick="openSettings()" title="Settings">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="sidebar-search">
-        <input class="search-input" id="search-input" placeholder="Quick open..." oninput="renderSidebar()">
-      </div>
-      
-      <!-- Scrollable Content Area -->
-      <div class="sidebar-scroll">
-        <!-- Projects Section -->
-        <div class="sidebar-section">
-          <div class="section-header" onclick="toggleSection('projects')">
-            <span class="section-arrow" id="arrow-projects">▼</span>
-            <span class="section-header-title">Projects</span>
-            <button class="section-action" onclick="openNewFolder(null, null, event); event.stopPropagation();" title="New Project">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            </button>
-          </div>
-          <div class="section-content" id="section-projects">
-            <div id="sidebar-content"></div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="sidebar-footer">
-        <!-- Auth Section -->
-        <div id="auth-section" style="padding:10px;border-bottom:1px solid var(--border);"></div>
+        <h1 class="auth-h">Persaudaraan Matahari</h1>
+        <p class="auth-sub">Hening Everyday</p>
         
-        <div class="persona-badge" id="persona-badge">
-          <div class="persona-avatar" id="p-avatar">?</div>
-          <div>
-            <div class="persona-name" id="p-name-badge">-</div>
-            <div class="persona-role" id="p-role-badge">-</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- WORKSPACE -->
-    <div id="workspace">
-      <!-- TOP BREADCRUMBS -->
-      <div id="top-nav">
-        <div id="breadcrumbs">
-          <span class="bc-item" onclick="showDashboard()" style="cursor:pointer;">Home</span>
-        </div>
-        <div class="top-nav-actions">
-        </div>
-      </div>
-
-      <!-- VIEW: GLOBAL DASHBOARD -->
-      <div id="dashboard-view" class="view">
-        <div class="view-header">
-          <h1>Overview</h1>
-          <button class="btn-primary" onclick="openNewFolder()" style="width:auto;padding:8px 16px;">+ New
-            project</button>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Projects</div>
-            <div class="stat-value" id="stats-projects">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Documents</div>
-            <div class="stat-value" id="stats-docs">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Word Count</div>
-            <div class="stat-value" id="stats-words">0</div>
-          </div>
-        </div>
-
-        <div class="section-title">My Projects</div>
-        <div id="projects-grid" class="projects-grid"></div>
-      </div>
-
-      <!-- VIEW: PROJECT DASHBOARD -->
-      <div id="project-view" class="view" style="display:none">
-        <div class="view-header">
-          <h1 id="pv-title">Project Title</h1>
-          <div class="view-actions" style="display:flex;gap:8px;align-items:center;">
-            <button class="btn-secondary" onclick="openNewFolder(null, null, event)"
-              style="padding:6px 12px;font-size:12px;">+ Folder</button>
-            <button class="btn-primary" onclick="newNote()" style="padding:6px 12px;font-size:12px;">+ Note</button>
-          </div>
-        </div>
-
-        <div class="stats-grid compact">
-          <div class="stat-card">
-            <div class="stat-label">Files</div>
-            <div class="stat-value" id="pv-files">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Words</div>
-            <div class="stat-value" id="pv-words">0</div>
-          </div>
-        </div>
-
-        <div id="project-content">
-          <!-- Project list view -->
-        </div>
-      </div>
-
-      <!-- VIEW: EDITOR (The old #main) -->
-      <div id="editor-view" class="view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
-        <!-- Note Header -->
-        <div id="note-header">
-          <input type="text" id="note-title" placeholder="Untitled" oninput="scheduleAutoSave()">
-          <div class="meta-bar">
-            <div class="meta-item">🕐 <span id="meta-time">-</span></div>
-            <div class="meta-item">📅 <span id="meta-date">-</span></div>
-            <div class="meta-item">📝 <span id="meta-words">0 kata</span></div>
-            <div class="meta-item" id="meta-saved"></div>
-          </div>
+        <!-- Tab Switch -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login">Masuk</button>
+          <button class="auth-tab" data-tab="register">Daftar</button>
         </div>
         
-        <!-- TOOLBAR (scrollable horizontal) -->
-        <div id="toolbar">
-          <!-- Undo/Redo -->
-          <button class="tb" onclick="tiptapUndo()" title="Undo (Ctrl+Z)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
-          </button>
-          <button class="tb" onclick="tiptapRedo()" title="Redo (Ctrl+Y)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg>
-          </button>
-          <div class="tb-sep"></div>
-          
-          <!-- Heading Dropdown -->
-          <div class="tb-dropdown">
-            <button class="tb" onclick="toggleToolbarDropdown(event, 'heading-menu')" title="Heading">
-              H<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        <!-- Login Form -->
+        <div id="login-form" class="auth-form">
+          <input type="email" id="auth-email" class="auth-in" placeholder="Email" autocomplete="email">
+          <div class="pass-wrap">
+            <input type="password" id="auth-pass" class="auth-in" placeholder="Kata Sandi" autocomplete="current-password">
+            <button type="button" id="btn-toggle-pass" class="pass-toggle" aria-label="Tampilkan kata sandi">
+              <svg id="eye-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
-            <div class="tb-menu" id="heading-menu">
-              <button class="tb-menu-item" onclick="tiptapParagraph();closeToolbarDropdown()">Paragraph</button>
-              <button class="tb-menu-item" onclick="tiptapHeading(1);closeToolbarDropdown()"><strong>Heading 1</strong></button>
-              <button class="tb-menu-item" onclick="tiptapHeading(2);closeToolbarDropdown()"><strong>Heading 2</strong></button>
-              <button class="tb-menu-item" onclick="tiptapHeading(3);closeToolbarDropdown()"><strong>Heading 3</strong></button>
-            </div>
           </div>
-          <div class="tb-sep"></div>
-          
-          <!-- Text formatting -->
-          <button class="tb" onclick="tiptapBold()" title="Bold (Ctrl+B)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
-          </button>
-          <button class="tb" onclick="tiptapItalic()" title="Italic (Ctrl+I)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
-          </button>
-          <button class="tb" onclick="tiptapStrike()" title="Strikethrough">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.3 4.9c-2.3-.6-4.4-1-6.2-.9-2.7 0-5.3.7-5.3 3.6 0 1.5 1.8 3.3 3.6 3.9h.2m8.2 3.7c.3.4.4.8.4 1.3 0 2.9-2.7 3.6-6.2 3.6-2.3 0-4.4-.3-6.2-.9M4 11.5h16"/></svg>
-          </button>
-          <button class="tb" onclick="tiptapUnderline()" title="Underline (Ctrl+U)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
-          </button>
-          <button class="tb" onclick="tiptapCode()" title="Inline code">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </button>
-          <div class="tb-sep"></div>
-          
-          <!-- Text color & highlight -->
-          <button class="tb" onclick="openColorPicker('text')" title="Text color">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16"/><path d="m6 16 6-12 6 12"/><path d="M8 12h8"/></svg>
-          </button>
-          <button class="tb" onclick="openColorPicker('highlight')" title="Highlight">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
-          </button>
-          <div class="tb-sep"></div>
-          
-          <!-- List Dropdown -->
-          <div class="tb-dropdown">
-            <button class="tb" onclick="toggleToolbarDropdown(event, 'list-menu')" title="Lists">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="tb-menu" id="list-menu">
-              <button class="tb-menu-item" onclick="tiptapBulletList();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                Bullet List
-              </button>
-              <button class="tb-menu-item" onclick="tiptapOrderedList();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
-                Ordered List
-              </button>
-              <button class="tb-menu-item" onclick="tiptapTaskList();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                Task List
-              </button>
-              <div style="border-top:1px solid rgba(255,255,255,0.12);margin:4px 0;"></div>
-              <button class="tb-menu-item" onclick="tiptapIndent();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="8" x2="21" y2="8"/><line x1="7" y1="12" x2="21" y2="12"/><line x1="7" y1="16" x2="21" y2="16"/><polyline points="3 12 5 14 3 16"/></svg>
-                Indent (Tab)
-              </button>
-              <button class="tb-menu-item" onclick="tiptapOutdent();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="8" x2="21" y2="8"/><line x1="7" y1="12" x2="21" y2="12"/><line x1="7" y1="16" x2="21" y2="16"/><polyline points="5 12 3 14 5 16"/></svg>
-                Outdent (Shift+Tab)
-              </button>
-            </div>
-          </div>
-          <div class="tb-sep"></div>
-          
-          <!-- Alignment Dropdown -->
-          <div class="tb-dropdown">
-            <button class="tb" onclick="toggleToolbarDropdown(event, 'align-menu')" title="Text align">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="tb-menu" id="align-menu">
-              <button class="tb-menu-item" onclick="tiptapAlign('left');closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
-                Align Left
-              </button>
-              <button class="tb-menu-item" onclick="tiptapAlign('center');closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>
-                Align Center
-              </button>
-              <button class="tb-menu-item" onclick="tiptapAlign('right');closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
-                Align Right
-              </button>
-              <button class="tb-menu-item" onclick="tiptapAlign('justify');closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
-                Justify
-              </button>
-            </div>
-          </div>
-          <div class="tb-sep"></div>
-          
-          <!-- Insert Dropdown -->
-          <div class="tb-dropdown">
-            <button class="tb" onclick="toggleToolbarDropdown(event, 'insert-menu')" title="Insert">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="tb-menu" id="insert-menu">
-              <button class="tb-menu-item" onclick="tiptapBlockquote();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
-                Blockquote
-              </button>
-              <button class="tb-menu-item" onclick="tiptapCodeBlock();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-                Code Block
-              </button>
-              <button class="tb-menu-item" onclick="tiptapHR();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>
-                Horizontal Rule
-              </button>
-              <button class="tb-menu-item" onclick="tiptapInsertTable();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
-                Table
-              </button>
-              <button class="tb-menu-item" onclick="openLinkDialog();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                Link
-              </button>
-              <button class="tb-menu-item" onclick="openImageDialog();closeToolbarDropdown()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Image
-              </button>
-            </div>
-          </div>
-          
-          <!-- More options -->
-          <button class="tb" onclick="tiptapClearFormat()" title="Clear formatting">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-          
-          <!-- Desktop: chat toggle & AI fill -->
-          <div class="tb-spacer"></div>
-          <button class="tb desktop-only" onclick="toggleChat()" title="AI Chat" id="chat-toggle-btn">💬</button>
-          <div class="ai-drop desktop-only">
-            <button class="ai-btn" onclick="toggleAIMenu(event)">✦ AI Fill ▾</button>
-            <div class="ai-menu" id="ai-menu">
-              <button class="ai-item" onclick="aiAction('write');closeAIMenu()"><span class="ic">✍</span>Tulis dari
-                judul</button>
-              <button class="ai-item" onclick="aiAction('continue');closeAIMenu()"><span
-                  class="ic">→</span>Lanjutkan</button>
-              <button class="ai-item" onclick="aiAction('improve');closeAIMenu()"><span
-                  class="ic">✨</span>Perbaiki</button>
-              <button class="ai-item" onclick="aiAction('summarize');closeAIMenu()"><span
-                  class="ic">📝</span>Ringkas</button>
-              <button class="ai-item" onclick="aiAction('expand');closeAIMenu()"><span
-                  class="ic">↔</span>Perluas</button>
-              <button class="ai-item" onclick="aiAction('bullets');closeAIMenu()"><span class="ic">≡</span>Jadikan
-                bullets</button>
-              <button class="ai-item" onclick="aiAction('table');closeAIMenu()"><span class="ic">⊞</span>Jadikan
-                tabel</button>
-              <div style="border-top:1px solid var(--border);margin:4px 0;"></div>
-              <button class="ai-item" onclick="cleanEditorFormatting();closeAIMenu()"><span class="ic">🧹</span>Rapihkan Konten</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mobile Floating Toolbar -->
-        <div id="mobile-toolbar" class="mobile-toolbar">
-          <button class="mtb" onclick="tiptapUndo()" title="Undo">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
-          </button>
-          <button class="mtb" onclick="tiptapRedo()" title="Redo">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg>
-          </button>
-          <div class="mtb-sep"></div>
-
-          <!-- Text formatting direct buttons -->
-          <button class="mtb" onclick="tiptapBold()" title="Bold">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
-          </button>
-          <button class="mtb" onclick="tiptapItalic()" title="Italic">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
-          </button>
-          <button class="mtb" onclick="tiptapUnderline()" title="Underline">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
-          </button>
-          <button class="mtb" onclick="tiptapStrike()" title="Strikethrough">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.3 4.9c-2.3-.6-4.4-1-6.2-.9-2.7 0-5.3.7-5.3 3.6 0 1.5 1.8 3.3 3.6 3.9h.2m8.2 3.7c.3.4.4.8.4 1.3 0 2.9-2.7 3.6-6.2 3.6-2.3 0-4.4-.3-6.2-.9M4 11.5h16"/></svg>
-          </button>
-          <button class="mtb" onclick="tiptapCode()" title="Inline Code">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </button>
-          <div class="mtb-sep"></div>
-
-          <!-- Dropdown menus -->
-          <button class="mtb" onclick="toggleMobileMenu('heading')" title="Heading">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v16M18 4v16M8 12h8"/></svg>
-          </button>
-          <button class="mtb" onclick="toggleMobileMenu('list')" title="Lists">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </button>
-          <button class="mtb" onclick="toggleMobileMenu('align')" title="Align">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
-          </button>
-          <button class="mtb" onclick="openLinkDialog()" title="Link">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          </button>
-          <button class="mtb" onclick="toggleMobileMenu('more')" title="More">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-          </button>
-          
-          <!-- Mobile Toolbar Menus -->
-          <div id="mobile-menu-heading" class="mobile-menu">
-            <button class="mobile-menu-item" onclick="tiptapParagraph();closeMobileMenu()">¶ Paragraph</button>
-            <button class="mobile-menu-item" onclick="tiptapHeading(1);closeMobileMenu()"><strong>H1 Heading 1</strong></button>
-            <button class="mobile-menu-item" onclick="tiptapHeading(2);closeMobileMenu()"><strong>H2 Heading 2</strong></button>
-            <button class="mobile-menu-item" onclick="tiptapHeading(3);closeMobileMenu()"><strong>H3 Heading 3</strong></button>
-          </div>
-          
-          <div id="mobile-menu-list" class="mobile-menu">
-            <button class="mobile-menu-item" onclick="tiptapBulletList();closeMobileMenu()">• Bullet List</button>
-            <button class="mobile-menu-item" onclick="tiptapOrderedList();closeMobileMenu()">1. Numbered List</button>
-            <button class="mobile-menu-item" onclick="tiptapTaskList();closeMobileMenu()">☑ Task List</button>
-            <div style="border-top:1px solid var(--border);margin:4px 0;"></div>
-            <button class="mobile-menu-item" onclick="tiptapIndent();closeMobileMenu()">→ Indent (Nest)</button>
-            <button class="mobile-menu-item" onclick="tiptapOutdent();closeMobileMenu()">← Outdent (Un-nest)</button>
-          </div>
-
-          <div id="mobile-menu-align" class="mobile-menu">
-            <button class="mobile-menu-item" onclick="tiptapAlign('left');closeMobileMenu()">⬅ Align Left</button>
-            <button class="mobile-menu-item" onclick="tiptapAlign('center');closeMobileMenu()">↔ Align Center</button>
-            <button class="mobile-menu-item" onclick="tiptapAlign('right');closeMobileMenu()">➡ Align Right</button>
-            <button class="mobile-menu-item" onclick="tiptapAlign('justify');closeMobileMenu()">≡ Justify</button>
-          </div>
-          
-          <div id="mobile-menu-more" class="mobile-menu">
-            <button class="mobile-menu-item" onclick="tiptapBlockquote();closeMobileMenu()">" Blockquote</button>
-            <button class="mobile-menu-item" onclick="tiptapCodeBlock();closeMobileMenu()">⌨ Code Block</button>
-            <button class="mobile-menu-item" onclick="tiptapHR();closeMobileMenu()">― Divider</button>
-            <button class="mobile-menu-item" onclick="tiptapInsertTable();closeMobileMenu()">⊞ Table</button>
-            <button class="mobile-menu-item" onclick="openImageDialog();closeMobileMenu()">🖼 Image</button>
-            <button class="mobile-menu-item" onclick="tiptapClearFormat();closeMobileMenu()">✕ Clear Format</button>
-          </div>
-        </div>
-
-        <div id="editor-wrap">
-          <div id="editor"></div>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- RIGHT SIDEBAR (Assistant) -->
-    <div id="right-sidebar" class="hidden">
-      <!-- Assistant View -->
-      <div id="rs-chat" class="rs-view">
-        <div class="chat-header" style="justify-content:space-between;">
-          <div class="chat-title-row"><span class="chat-dot"></span>Assistant <span class="badge">beta</span></div>
-          <div style="display:flex;align-items:center;gap:4px;">
-            <button class="icon-btn" onclick="clearChat()">+ New</button>
-            <button class="rs-tab-close" onclick="toggleChat()" style="margin-left:4px;padding:4px 8px;">✕</button>
-          </div>
-        </div>
-        <div class="model-picker-wrap">
-          <select id="rs-model-picker" class="model-select" onchange="updateSelectedModel(this.value)"></select>
-        </div>
-        <div id="chat-messages">
-          <div id="chat-empty">Hi 👋. Buka note lalu tanya AI.<br>AI membaca isi note aktifmu.</div>
-        </div>
-        <div class="chat-input-area">
-          <div class="chips-row">
-            <button class="chip" onclick="quickAi('review')">Review</button>
-            <button class="chip" onclick="quickAi('analyze')">Analyze</button>
-            <button class="chip" onclick="quickAi('streamline')">Streamline</button>
-          </div>
-          <div class="chips-row" style="margin-top:4px;">
-            <button class="chip" onclick="aiAction('improve')">✨ Perbaiki</button>
-            <button class="chip" onclick="aiAction('summarize')">📝 Ringkas</button>
-            <button class="chip" onclick="aiAction('continue')">→ Lanjutkan</button>
-            <button class="chip" onclick="aiAction('bullets')">≡ Bullets</button>
-          </div>
-          <div class="chat-input-row">
-            <textarea class="chat-input" id="chat-input" placeholder="Ask anything..." rows="1"
-              oninput="autoResizeChat(this)"></textarea>
-            <button class="chat-send" onclick="sendChat()">↑</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATUS FOOTER -->
-    <div id="status-bar">
-      <div class="sb-left">
-        <span id="sb-proj-info">Project: General</span>
-        <span class="sb-sep">|</span>
-        <span id="sb-count">0 words · 0 characters</span>
-      </div>
-      <div class="sb-right">
-        <span id="sb-save-status">Cloud Sync Ready</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- MOBILE BOTTOM BAR -->
-  <div id="bottom-bar">
-    <button class="bb-btn" onclick="showDashboard()"><span class="bb-icon">🏠</span>Home</button>
-    <button class="bb-btn" onclick="toggleSidebar()"><span class="bb-icon">☰</span>Projects</button>
-    <button class="bb-new" onclick="newNote()">+</button>
-    <button class="bb-btn" onclick="toggleChat()"><span class="bb-icon">✦</span>Assistant</button>
-    <button class="bb-btn" onclick="openSettings()"><span class="bb-icon">⚙</span>Settings</button>
-  </div>
-
-  <!-- SETTINGS MODAL -->
-  <div class="modal-overlay" id="settings-modal" style="display:none" onclick="if(event.target===this)closeSettings()">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">Settings</div>
-        <button class="modal-close" onclick="closeSettings()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-section">
-          <div class="modal-section-title">Persona</div>
-          <div class="form-group"><label class="form-label">Nama</label><input class="form-input" id="s-name"></div>
-          <div class="form-group"><label class="form-label">Role</label><input class="form-input" id="s-role"></div>
-          <div class="form-group"><label class="form-label">Tentang</label><textarea class="form-textarea"
-              id="s-about"></textarea></div>
-          <div class="form-group"><label class="form-label">Gaya AI</label>
-            <select class="form-select" id="s-style">
-              <option value="casual">Santai & Friendly</option>
-              <option value="professional">Profesional & Formal</option>
-              <option value="concise">Singkat & To the Point</option>
-              <option value="detailed">Detail & Komprehensif</option>
-              <option value="creative">Kreatif & Eksploratif</option>
-            </select>
-          </div>
-          <div class="form-group"><label class="form-label">Bahasa</label>
-            <select class="form-select" id="s-lang">
-              <option value="id">Bahasa Indonesia</option>
-              <option value="en">English</option>
-              <option value="mixed">Mixed</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-section">
-          <div class="modal-section-title">AI Model (NVIDIA NIM)</div>
-          <div class="form-group"><label class="form-label">Model</label><select class="form-select" id="s-model"></select></div>
+          <button class="btn-primary" id="btn-email-signin">Masuk</button>
         </div>
         
-        <div class="modal-section" style="margin-bottom:12px;">
-          <div class="modal-section-title">Data & Sinkronisasi</div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;">
-            <button class="btn-secondary" style="flex:1;font-size:12px;padding:8px;" onclick="exportData()">↑ Export JSON</button>
-            <button class="btn-secondary" style="flex:1;font-size:12px;padding:8px;" onclick="document.getElementById('import-file').click()">↓ Import JSON</button>
-            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+        <!-- Register Form -->
+        <div id="register-form" class="auth-form" style="display: none;">
+          <input type="email" id="reg-email" class="auth-in" placeholder="Email" autocomplete="email">
+          <div class="pass-wrap">
+            <input type="password" id="reg-pass" class="auth-in" placeholder="Kata Sandi (min. 8 karakter)" autocomplete="new-password">
+            <button type="button" id="btn-toggle-reg-pass" class="pass-toggle" aria-label="Tampilkan kata sandi">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           </div>
-          <button class="btn-secondary" style="width:100%;color:var(--red);border-color:rgba(192,57,43,0.3);font-size:12px;padding:8px;background:rgba(192,57,43,0.05);" onclick="resetAllData()">Reset All Data</button>
+          <div class="pass-wrap">
+            <input type="password" id="reg-pass-confirm" class="auth-in" placeholder="Ulangi Kata Sandi" autocomplete="new-password">
+            <button type="button" id="btn-toggle-reg-confirm" class="pass-toggle" aria-label="Tampilkan kata sandi">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <button class="btn-primary" id="btn-email-signup">Daftar</button>
         </div>
-
-        <div style="margin-top:16px;">
-          <button class="btn-primary" style="width:100%" onclick="saveSettings()">Simpan Pengaturan</button>
+        
+        <div class="auth-divider">
+          <span>atau</span>
         </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- MOVE TO FOLDER MODAL -->
-  <div class="modal-overlay" id="move-modal" style="display:none"
-    onclick="if(event.target===this)document.getElementById('move-modal').style.display='none'">
-    <div class="modal" style="max-width:320px">
-      <div class="modal-header">
-        <div class="modal-title">Pindah ke Folder</div>
-        <button class="modal-close" onclick="document.getElementById('move-modal').style.display='none'">✕</button>
-      </div>
-      <div class="modal-body" id="move-modal-body"></div>
-    </div>
-  </div>
-
-  <!-- PROJECT MODAL (Formerly Folder Modal) -->
-  <div class="modal-overlay" id="folder-modal" style="display:none" onclick="if(event.target===this)closeFolderModal()">
-    <div class="modal" style="max-width:340px">
-      <div class="modal-header">
-        <div class="modal-title">New Project</div>
-        <button class="modal-close" onclick="closeFolderModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group"><label class="form-label" id="f-name-lbl">Project Name</label><input class="form-input"
-            id="f-name" placeholder="e.g. My Novel"></div>
-        <div class="form-group"><label class="form-label">Emoji Icon</label><input class="form-input" id="f-emoji"
-            placeholder="📦"></div>
-        <button class="btn-primary" id="f-submit-btn" onclick="saveFolder()">Create Project</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TEMPLATE MODAL -->
-  <div class="modal-overlay" id="tmpl-modal" style="display:none" onclick="if(event.target===this)closeTmplModal()">
-    <div class="modal" style="max-width:380px">
-      <div class="modal-header">
-        <div class="modal-title">Simpan Template</div>
-        <button class="modal-close" onclick="closeTmplModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group"><label class="form-label">Nama Template</label><input class="form-input" id="tmpl-name"
-            placeholder="e.g. Meeting Notes..."></div>
-        <div class="form-group"><label class="form-label">Deskripsi (opsional)</label><input class="form-input"
-            id="tmpl-desc" placeholder="Deskripsi singkat..."></div>
-        <button class="btn-primary" onclick="confirmSaveTemplate()">Simpan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- AI Overlay -->
-  <div id="ai-overlay">
-    <div class="ai-loader">
-      <div class="ai-spinner"></div>
-      <div class="ai-loader-txt" id="ai-ltxt">AI sedang menulis...</div>
-    </div>
-  </div>
-
-  <!-- Toast -->
-  <div id="toast"></div>
-
-  <!-- Image Lightbox -->
-  <div id="image-lightbox" class="lightbox-overlay" style="display:none" onclick="closeLightbox(event)">
-    <div class="lightbox-header">
-      <span class="lightbox-counter" id="lightbox-counter">1 / 1</span>
-      <div class="lightbox-actions">
-        <button class="lightbox-btn" onclick="downloadLightboxImage()" title="Download">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        
+        <button class="btn-google" id="btn-google-signin">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Google
         </button>
-        <button class="lightbox-btn" onclick="closeLightbox()" title="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        
+        <button class="btn-ghost" id="btn-guest">Lanjutkan sebagai Tamu</button>
+        <div class="auth-foot">v3.0.0 — Firebase Edition</div>
+      </div>
+    </div>
+
+    <!-- App Interface -->
+    <div id="app">
+      <div id="sb">
+        <div class="sb-head">
+          <div class="sb-logo" style="background: transparent; width: 32px; height: 32px;">
+            <img src="https://res.cloudinary.com/dkbm0b4nm/image/upload/v1774473638/logo-pm_j8wu6u.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+          <div class="sb-title" style="font-size: 14px; letter-spacing: 0; margin-left: 8px;">Persaudaraan Matahari</div>
+          <div class="sync-dot" id="syncdot"></div>
+          <button class="ib" id="btn-tsb-sidebar" title="Tutup Sidebar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="sb-user">
+          <div class="avatar" id="av"></div>
+          <div class="uname" id="uname">Guest</div>
+          <button class="ib" id="btn-edit-profile" title="Edit Profil">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+          </button>
+          <button class="ib" id="btn-signout" title="Sign Out">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="sb-search">
+          <div class="si-wrap">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input type="text" id="search" placeholder="Cari catatan..." autocomplete="off" />
+          </div>
+          <div id="sr"></div>
+        </div>
+
+        <div class="sb-acts">
+          <button class="sb-btn pri" id="btn-new" title="Catatan Baru (⌘N)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+          <button class="sb-btn" id="btn-folder" title="Folder Baru">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+              <line x1="12" y1="11" x2="12" y2="17" />
+              <line x1="9" y1="14" x2="15" y2="14" />
+            </svg>
+          </button>
+          <button class="sb-btn" id="btn-tpl" title="Template Catatan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="9" y1="9" x2="15" y2="9" />
+              <line x1="9" y1="13" x2="15" y2="13" />
+              <line x1="9" y1="17" x2="12" y2="17" />
+            </svg>
+          </button>
+          <button class="sb-btn" id="btn-dashboard" title="Dashboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+          </button>
+        </div>
+
+        <div id="sb-inline-create" class="sb-inline-create">
+          <input type="text" id="sb-inline-input" class="sb-inline-input" placeholder="Nama..." autocomplete="off">
+          <div class="sb-inline-acts">
+            <button id="sb-inline-cancel" class="sb-inline-btn cancel">Batal</button>
+            <button id="sb-inline-save" class="sb-inline-btn save">Buat</button>
+          </div>
+        </div>
+
+        <div class="sb-tree" id="tree"></div>
+      </div>
+
+      <div id="main">
+        <div id="top">
+          <button class="ib" id="btn-tsb">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="9" y1="3" x2="9" y2="21" />
+            </svg>
+          </button>
+          <div class="bc" id="bc">
+            <span style="color: var(--tx3)">Select a note</span>
+          </div>
+          <div class="top-r">
+            <button class="ib" id="btn-settings" title="Settings & Preferences">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.72V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.17a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+            <button class="ib" id="btn-pp" title="Toggle properties">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="guest-banner">
+          <span class="guest-banner-icon">💡</span>
+          <span class="guest-banner-text">Data hanya tersimpan lokal</span>
+          <button class="guest-banner-btn" id="guest-banner-login">Masuk</button>
+          <button class="guest-banner-close" id="guest-banner-close" title="Tutup">✕</button>
+        </div>
+
+        <div id="tb">
+          <button class="tbb" data-cmd="undo" title="Undo (⌘Z)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 14L4 9l5-5" />
+              <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11" />
+            </svg>
+          </button>
+          <button class="tbb" data-cmd="redo" title="Redo (⌘⇧Z)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 14l5-5-5-5" />
+              <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13" />
+            </svg>
+          </button>
+          <div class="sep"></div>
+          <select class="tbsel" id="tb-hd">
+            <option value="">Paragraph</option>
+            <option value="h1">H1</option>
+            <option value="h2">H2</option>
+            <option value="h3">H3</option>
+            <option value="h4">H4</option>
+            <option value="h5">H5</option>
+            <option value="h6">H6</option>
+          </select>
+          <!-- Custom Heading Button for Mobile -->
+          <button class="tbb" id="btn-heading-mobile" style="display: none;">
+            <span id="heading-label">Paragraph</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="sep"></div>
+          <button class="tbb" data-cmd="bold"><b>B</b></button>
+          <button class="tbb" data-cmd="italic"><i>I</i></button>
+          <button class="tbb" data-cmd="underline"><u>U</u></button>
+          <button class="tbb" data-cmd="strikeThrough"><s>S</s></button>
+          <div class="sep"></div>
+          <div class="csw" id="btn-tc" title="Text color" style="background: #ede8dc">
+            <div class="csw-bar" id="tc-bar" style="background: var(--ac)"></div>
+          </div>
+          <div class="csw" id="btn-hl" title="Highlight" style="background: rgba(212, 168, 75, 0.3)">
+            <div class="csw-bar" style="background: var(--ac); opacity: 0.6"></div>
+          </div>
+          <div class="sep"></div>
+          <button class="tbb" data-cmd="justifyLeft" title="Left">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="21" y1="6" x2="3" y2="6" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+              <line x1="17" y1="18" x2="3" y2="18" />
+            </svg>
+          </button>
+          <button class="tbb" data-cmd="justifyCenter" title="Center">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="21" y1="6" x2="3" y2="6" />
+              <line x1="17" y1="12" x2="7" y2="12" />
+              <line x1="19" y1="18" x2="5" y2="18" />
+            </svg>
+          </button>
+          <button class="tbb" data-cmd="justifyRight" title="Right">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="21" y1="6" x2="3" y2="6" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+              <line x1="21" y1="18" x2="7" y2="18" />
+            </svg>
+          </button>
+          <div class="sep"></div>
+          <button class="tbb" data-cmd="insertUnorderedList" title="Bullet list">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="9" y1="6" x2="20" y2="6" />
+              <line x1="9" y1="12" x2="20" y2="12" />
+              <line x1="9" y1="18" x2="20" y2="18" />
+              <circle cx="4" cy="6" r="1.5" fill="currentColor" />
+              <circle cx="4" cy="12" r="1.5" fill="currentColor" />
+              <circle cx="4" cy="18" r="1.5" fill="currentColor" />
+            </svg>
+          </button>
+          <button class="tbb" data-cmd="insertOrderedList" title="Numbered list">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M4 18h2.5c.6 0 1-.5 1-1s-.5-1-1-1H4c0-1 2-2 2-3s-1-1.5-2-1" />
+            </svg>
+          </button>
+          <button class="tbb" id="btn-task" title="Checklist (⌘⇧C)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+          </button>
+          <div class="sep"></div>
+          <button class="tbb" id="btn-quote" title="Blockquote">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+              <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
+            </svg>
+          </button>
+          <button class="tbb" id="btn-code" title="Code block">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
+          </button>
+          <button class="tbb" id="btn-hr" title="Divider">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="2" y1="12" x2="22" y2="12" />
+            </svg>
+          </button>
+          <div class="sep"></div>
+          <button class="tbb" id="btn-link" title="Insert link">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+            </svg>
+          </button>
+          <button class="tbb" id="btn-media" title="Insert media">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+          </button>
+          <button class="tbb" id="btn-table" title="Insert table">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="3" y1="9" x2="21" y2="9" />
+              <line x1="3" y1="15" x2="21" y2="15" />
+              <line x1="9" y1="3" x2="9" y2="21" />
+              <line x1="15" y1="3" x2="15" y2="21" />
+            </svg>
+          </button>
+          <button class="tbb" id="btn-backlink" title="Link to note [[">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+          </button>
+        </div>
+
+        <div id="ea">
+          <div id="ew">
+            <div id="ed" class="content-area" contenteditable="true" spellcheck="false"></div>
+          </div>
+          <aside id="ea-toc">
+            <div class="pp-lbl">Daftar Isi</div>
+            <div id="p-toc" class="pp-val">—</div>
+          </aside>
+          <div id="es">
+            <p>Statistik Catatan</p>
+                <button class="es-btn" onclick="createNote()">Buat Catatan Baru</button>
+            <div class="dash-grid">
+              <div class="dash-card">
+                <div class="dash-num" id="dash-notes">0</div>
+                <div class="dash-lbl">Catatan</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-num" id="dash-folders">0</div>
+                <div class="dash-lbl">Folder</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-num" id="dash-words">0</div>
+                <div class="dash-lbl">Kata</div>
+              </div>
+            </div>
+        
+          </div>
+        </div>
+
+        <div id="sb2">
+          <span id="st-words">0 words</span>
+          <span id="st-chars">0 chars</span>
+          <span id="st-saved"></span>
+        </div>
+      </div>
+
+      <!-- Properties Panel -->
+      <div id="pp">
+        <div class="pp-h">
+          Properties
+          <button class="ib" id="btn-cpp">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="pp-sec">
+          <div class="pp-lbl">Title</div>
+          <input type="text" class="pp-in" id="p-title" placeholder="Untitled" />
+        </div>
+        <div class="pp-sec">
+          <div class="pp-lbl">Folder</div>
+          <select class="pp-in" id="p-folder"></select>
+        </div>
+        <div class="pp-sec">
+          <div class="pp-lbl">Tags</div>
+          <div class="tag-list" id="p-tags"></div>
+          <div class="tag-row">
+            <input type="text" class="pp-in" id="p-tag-in" placeholder="Add tag…" />
+            <button class="add-tag" id="btn-add-tag">+</button>
+          </div>
+        </div>
+        <div class="pp-sec">
+          <div class="pp-lbl">Created</div>
+          <div class="pp-val" id="p-created">—</div>
+        </div>
+        <div class="pp-sec">
+          <div class="pp-lbl">Modified</div>
+          <div class="pp-val" id="p-modified">—</div>
+        </div>
+        <div class="pp-sec" id="pp-bl-sec" style="display: none">
+          <div class="pp-lbl">Backlinks</div>
+          <div id="pp-bl"></div>
+        </div>
+        <div class="pp-sec">
+          <div class="pp-lbl">Word Count</div>
+          <div class="pp-val" id="p-wc">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-bg" id="modal-tpl">
+      <div class="modal" style="width: 480px">
+        <div class="modal-t">Templates</div>
+        <div class="tpl-search-wrap">
+          <input type="text" id="tpl-search" class="tpl-search-in" placeholder="Cari template..." autocomplete="off" oninput="filterTemplates()">
+        </div>
+        <div class="tpl-grid" id="tpl-list"></div>
+        <div class="modal-acts">
+          <button class="btn-c" onclick="closeModal('modal-tpl')">Batal</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-bg" id="modal-media">
+      <div class="modal">
+        <div class="modal-t">Insert Media</div>
+        <div class="modal-tabs">
+          <button class="mtab on" data-mt="image" onclick="switchMediaTab('image')">Gambar</button>
+          <button class="mtab" data-mt="youtube" onclick="switchMediaTab('youtube')">YouTube</button>
+          <button class="mtab" data-mt="audio" onclick="switchMediaTab('audio')">Audio</button>
+        </div>
+        <div id="mt-image">
+          <input class="modal-in" id="m-img-url" placeholder="URL gambar" />
+          <div class="pp-lbl" style="margin: 10px 0 5px; opacity: 0.6;">Atau upload file</div>
+          <input class="modal-in" id="m-img-file" type="file" accept="image/*" />
+        </div>
+        <div id="mt-youtube" style="display:none">
+          <input class="modal-in" id="m-yt-url" placeholder="URL YouTube (contoh: https://youtu.be/xxx)" />
+        </div>
+        <div id="mt-audio" style="display:none">
+          <input class="modal-in" id="m-audio-label" placeholder="Judul audio" />
+          <input class="modal-in" id="m-audio-url" placeholder="URL audio" />
+          <div class="pp-lbl" style="margin: 10px 0 5px; opacity: 0.6;">Atau upload file</div>
+          <input class="modal-in" id="m-audio-file" type="file" accept="audio/*" />
+        </div>
+        <div class="modal-acts">
+          <button class="btn-c" onclick="closeModal('modal-media')">Cancel</button>
+          <button class="btn-ok" id="m-insert">Insert</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slash Menu -->
+    <div class="fpanel" id="slash">
+      <div class="si" data-t="h1"><span class="si-ico">H1</span><span class="si-lbl">Heading 1</span></div>
+      <div class="si" data-t="h2"><span class="si-ico">H2</span><span class="si-lbl">Heading 2</span></div>
+      <div class="si" data-t="h3"><span class="si-ico">H3</span><span class="si-lbl">Heading 3</span></div>
+      <div class="si" data-t="p"><span class="si-ico">P</span><span class="si-lbl">Paragraf</span></div>
+      <div class="si" data-t="quote"><span class="si-ico">❝</span><span class="si-lbl">Quote</span></div>
+      <div class="si" data-t="code"><span class="si-ico">{ }</span><span class="si-lbl">Code</span></div>
+      <div class="si" data-t="ul"><span class="si-ico">•</span><span class="si-lbl">Bullet List</span></div>
+      <div class="si" data-t="ol"><span class="si-ico">1.</span><span class="si-lbl">Numbered List</span></div>
+      <div class="si" data-t="task"><span class="si-ico">☐</span><span class="si-lbl">Task List</span></div>
+      <div class="si" data-t="table"><span class="si-ico">▦</span><span class="si-lbl">Table</span></div>
+      <div class="si" data-t="hr"><span class="si-ico">—</span><span class="si-lbl">Divider</span></div>
+      <div class="si" data-t="templates"><span class="si-ico">📄</span><span class="si-lbl">Templates</span></div>
+      <div class="si" data-t="image"><span class="si-ico">🖼</span><span class="si-lbl">Image</span></div>
+      <div class="si" data-t="youtube"><span class="si-ico">▶</span><span class="si-lbl">YouTube</span></div>
+      <div class="si" data-t="audio"><span class="si-ico">♪</span><span class="si-lbl">Audio</span></div>
+      <div class="si" data-t="backlink"><span class="si-ico">⛓</span><span class="si-lbl">Backlink</span></div>
+    </div>
+
+    <!-- Heading Menu (Custom for Mobile) -->
+    <div class="fpanel" id="heading-menu">
+      <div class="si" data-h=""><span class="si-ico">P</span><span class="si-lbl">Paragraph</span></div>
+      <div class="si" data-h="h1"><span class="si-ico">H1</span><span class="si-lbl">Heading 1</span></div>
+      <div class="si" data-h="h2"><span class="si-ico">H2</span><span class="si-lbl">Heading 2</span></div>
+      <div class="si" data-h="h3"><span class="si-ico">H3</span><span class="si-lbl">Heading 3</span></div>
+      <div class="si" data-h="h4"><span class="si-ico">H4</span><span class="si-lbl">Heading 4</span></div>
+      <div class="si" data-h="h5"><span class="si-ico">H5</span><span class="si-lbl">Heading 5</span></div>
+      <div class="si" data-h="h6"><span class="si-ico">H6</span><span class="si-lbl">Heading 6</span></div>
+    </div>
+
+    <!-- Floating UI Panels -->
+    <div class="fpanel cpop" id="cpop-t">
+      <button class="cp-sw" data-c="#ede8dc" style="background:#ede8dc"></button>
+      <button class="cp-sw" data-c="#d4a84b" style="background:#d4a84b"></button>
+      <button class="cp-sw" data-c="#7daf98" style="background:#7daf98"></button>
+      <button class="cp-sw" data-c="#9db4ff" style="background:#9db4ff"></button>
+      <button class="cp-sw" data-c="#ff9fb3" style="background:#ff9fb3"></button>
+      <input class="cp-ci" id="cp-t-in" placeholder="#rrggbb" />
+    </div>
+    <div class="fpanel cpop" id="cpop-h">
+      <button class="cp-sw" data-c="rgba(212,168,75,.25)" style="background:rgba(212,168,75,.25)"></button>
+      <button class="cp-sw" data-c="rgba(125,175,152,.25)" style="background:rgba(125,175,152,.25)"></button>
+      <button class="cp-sw" data-c="rgba(157,180,255,.25)" style="background:rgba(157,180,255,.25)"></button>
+      <button class="cp-sw" data-c="rgba(255,159,179,.25)" style="background:rgba(255,159,179,.25)"></button>
+      <button class="cp-sw" data-c="transparent" style="background:linear-gradient(135deg, transparent 45%, #c96e6e 45%, #c96e6e 55%, transparent 55%)"></button>
+      <input class="cp-ci" id="cp-h-in" placeholder="rgba(...) / #hex" />
+    </div>
+
+    <div id="toast"></div>
+
+    <!-- Modal Welcome -->
+    <div class="modal-bg" id="modal-welcome">
+      <div class="modal">
+        <div class="welcome-icon">☀️</div>
+        <div class="modal-t" id="welcome-msg">Selamat Datang!</div>
+        <div class="modal-acts">
+          <button class="btn-ok" id="welcome-close">Mulai Menulis</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Profile -->
+    <div class="modal-bg" id="modal-profile">
+      <div class="modal">
+        <div class="modal-t">Edit Profil</div>
+        <input type="text" id="profile-name" class="pp-in" placeholder="Nama Tampilan">
+        <div class="modal-acts">
+          <button class="btn-c" onclick="closeModal('modal-profile')">Batal</button>
+          <button class="btn-ok" id="profile-save">Simpan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="set-overlay"></div>
+    <div id="settings">
+      <div class="pp-h">
+        Settings
+        <button class="ib" id="btn-close-settings">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
       </div>
-    </div>
-    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1);event.stopPropagation()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
-    <div class="lightbox-content" onclick="event.stopPropagation()">
-      <img id="lightbox-img" src="" alt="">
-    </div>
-    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1);event.stopPropagation()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-  </div>
-
-  <!-- Image Upload Dialog -->
-  <div class="modal-overlay" id="image-upload-modal" style="display:none" onclick="if(event.target===this)closeImageUploadModal()">
-    <div class="modal" style="max-width:400px">
-      <div class="modal-header">
-        <div class="modal-title">Insert Image</div>
-        <button class="modal-close" onclick="closeImageUploadModal()">✕</button>
+      <div class="pp-sec">
+        <div class="pp-lbl">Tema</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="pill topt on" data-th="dark" onclick="setTheme('dark')">Dark</button>
+          <button class="pill topt" data-th="light" onclick="setTheme('light')">Light</button>
+          <button class="pill topt" data-th="auto" onclick="setTheme('auto')">Auto</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <button class="btn-primary" onclick="uploadImageCloudinary()" id="btn-cloudinary-upload" style="display:flex;align-items:center;justify-content:center;gap:8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Upload Image
-          </button>
-          <div style="text-align:center;color:var(--text3);font-size:12px;">atau</div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Image URL</label>
-            <input class="form-input" id="image-url-input" placeholder="https://...">
-          </div>
-          <button class="btn-secondary" onclick="insertImageFromUrl()">Insert from URL</button>
+      <div class="pp-sec">
+        <div class="pp-lbl">Preset</div>
+        <div class="accopts">
+          <button class="acopt" data-preset="matahari" onclick="setPreset('matahari')" title="Matahari"></button>
+          <button class="acopt" data-preset="sepia" onclick="setPreset('sepia')" title="Sepia"></button>
+          <button class="acopt" data-preset="forest" onclick="setPreset('forest')" title="Forest"></button>
+          <button class="acopt" data-preset="ocean" onclick="setPreset('ocean')" title="Ocean"></button>
+          <button class="acopt" data-preset="twilight" onclick="setPreset('twilight')" title="Twilight"></button>
+          <button class="acopt" data-preset="monochrome" onclick="setPreset('monochrome')" title="Monochrome"></button>
+          <button class="acopt" data-preset="lavender" onclick="setPreset('lavender')" title="Lavender"></button>
+          <button class="acopt" data-preset="coral" onclick="setPreset('coral')" title="Coral"></button>
+          <button class="acopt" data-preset="mint" onclick="setPreset('mint')" title="Mint"></button>
+          <button class="acopt" data-preset="rose" onclick="setPreset('rose')" title="Rose"></button>
+        </div>
+      </div>
+      <div class="pp-sec">
+        <div class="pp-lbl">Ukuran Teks</div>
+        <div class="range-wrap">
+          <input id="set-fs" type="range" min="13" max="22" step="1" oninput="applyEditorFS(this.value)">
+          <input id="set-fs-val" class="pp-in" readonly style="width: 50px; text-align: center; background: none; border: none; font-size: 11px; color: var(--tx3);" />
+        </div>
+      </div>
+      <div class="pp-sec">
+        <div class="pp-lbl">Line Height</div>
+        <div class="range-wrap">
+          <input id="set-lh" type="range" min="1.2" max="2.2" step="0.05" oninput="applyEditorLH(this.value)">
+          <input id="set-lh-val" class="pp-in" readonly style="width: 40px; text-align: center; background: none; border: none; font-size: 11px; color: var(--tx3);" />
+        </div>
+      </div>
+      <div class="pp-sec">
+        <div class="pp-lbl">Font Judul</div>
+        <select id="set-hf" class="pp-in" onchange="applyHeadingFont(this.value)">
+          <optgroup label="Sans-Serif">
+            <option value="'Fira Sans', sans-serif">Fira Sans</option>
+            <option value="'DM Sans', sans-serif">DM Sans</option>
+            <option value="'Inter', sans-serif">Inter</option>
+            <option value="'Roboto', sans-serif">Roboto</option>
+            <option value="'Nunito', sans-serif">Nunito</option>
+            <option value="'Open Sans', sans-serif">Open Sans</option>
+            <option value="'Montserrat', sans-serif">Montserrat</option>
+            <option value="'Lato', sans-serif">Lato</option>
+            <option value="'Raleway', sans-serif">Raleway</option>
+            <option value="Arial, sans-serif">Arial</option>
+          </optgroup>
+          <optgroup label="Serif">
+            <option value="'Playfair Display', serif">Playfair Display</option>
+            <option value="'EB Garamond', serif">EB Garamond</option>
+            <option value="'Lora', serif">Lora</option>
+            <option value="'Merriweather', serif">Merriweather</option>
+            <option value="'Crimson Text', serif">Crimson Text</option>
+            <option value="'Libre Baskerville', serif">Libre Baskerville</option>
+            <option value="'PT Serif', serif">PT Serif</option>
+            <option value="'Spectral', serif">Spectral</option>
+            <option value="'Roboto Slab', serif">Roboto Slab</option>
+            <option value="'Georgia', serif">Georgia</option>
+          </optgroup>
+          <optgroup label="Monospace">
+            <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+            <option value="'Fira Code', monospace">Fira Code</option>
+            <option value="'Courier Prime', monospace">Courier Prime</option>
+            <option value="'Roboto Mono', monospace">Roboto Mono</option>
+            <option value="'Space Mono', monospace">Space Mono</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="pp-sec">
+        <div class="pp-lbl">Font Isi</div>
+        <select id="set-bf" class="pp-in" onchange="applyBodyFont(this.value)">
+          <optgroup label="Sans-Serif">
+            <option value="'Fira Sans', sans-serif">Fira Sans</option>
+            <option value="'DM Sans', sans-serif">DM Sans</option>
+            <option value="'Nunito', sans-serif">Nunito</option>
+            <option value="'Inter', sans-serif">Inter</option>
+            <option value="'Roboto', sans-serif">Roboto</option>
+            <option value="'Open Sans', sans-serif">Open Sans</option>
+            <option value="'Montserrat', sans-serif">Montserrat</option>
+            <option value="'Lato', sans-serif">Lato</option>
+            <option value="'Raleway', sans-serif">Raleway</option>
+            <option value="Arial, sans-serif">Arial</option>
+          </optgroup>
+          <optgroup label="Serif">
+            <option value="'Lora', serif">Lora</option>
+            <option value="'Merriweather', serif">Merriweather</option>
+            <option value="'Playfair Display', serif">Playfair Display</option>
+            <option value="'EB Garamond', serif">EB Garamond</option>
+            <option value="'Crimson Text', serif">Crimson Text</option>
+            <option value="'Libre Baskerville', serif">Libre Baskerville</option>
+            <option value="'PT Serif', serif">PT Serif</option>
+            <option value="'Spectral', serif">Spectral</option>
+            <option value="'Roboto Slab', serif">Roboto Slab</option>
+          </optgroup>
+          <optgroup label="Monospace">
+            <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+            <option value="'Fira Code', monospace">Fira Code</option>
+            <option value="'Courier Prime', monospace">Courier Prime</option>
+            <option value="'Roboto Mono', monospace">Roboto Mono</option>
+            <option value="'Space Mono', monospace">Space Mono</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="pp-sec">
+        <div class="pp-lbl">Aksi</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-guest" onclick="exportMD()">Export MD</button>
+          <button class="btn-guest" onclick="exportHTML()">Export HTML</button>
+          <button class="btn-guest" onclick="exportPDF()">Export PDF</button>
+          <button class="btn-danger" onclick="resetAllData()">Reset All Data</button>
+        </div>
+      </div>
+      <div class="pp-sec" id="admin-section" style="display:none">
+        <div class="pp-lbl">Admin</div>
+        <button class="btn-guest" onclick="openAuditPanel()">Buka Panel Audit</button>
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="modal-bg" id="modal-lightbox">
+      <div class="modal" style="width:auto; max-width:90vw; padding:10px;">
+        <img id="lb-img" style="max-height:80vh; display:block; margin:auto;">
+        <div class="modal-acts">
+          <a id="lb-dl" class="btn-ok" style="text-decoration:none;">Download</a>
+          <button class="btn-c" onclick="closeModal('modal-lightbox')">Tutup</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="firebase-config.js"></script>
-  <script src="https://unpkg.com/tiptap-markdown@latest/dist/tiptap-markdown.umd.js"></script>
-  <script src="tiptap-setup.js"></script>
-  <script src="script.js"></script>
-</body>
+    <!-- Modal Folder -->
+    <div class="modal-bg" id="modal-folder">
+      <div class="modal">
+        <div class="modal-t">Folder Baru</div>
+        <input type="text" id="mf-in" class="pp-in" placeholder="Nama folder...">
+        <div class="modal-acts">
+          <button class="btn-c" onclick="closeModal('modal-folder')">Batal</button>
+          <button class="btn-ok" id="mf-ok">Buat</button>
+        </div>
+      </div>
+    </div>
 
+    <!-- Modal Move -->
+    <div class="modal-bg" id="modal-move">
+      <div class="modal">
+        <div class="modal-t">Pindahkan ke Folder</div>
+        <select id="move-list" class="pp-in"></select>
+        <div class="modal-acts">
+          <button class="btn-c" onclick="closeModal('modal-move')">Batal</button>
+          <button class="btn-ok" id="move-ok">Pindahkan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal New Note -->
+    <div class="modal-bg" id="modal-new-note">
+      <div class="modal">
+        <div class="modal-t">Catatan Baru</div>
+        <input type="text" id="mn-title-in" class="pp-in" placeholder="Judul catatan...">
+        <div class="modal-acts">
+          <button class="btn-c" onclick="closeModal('modal-new-note')">Batal</button>
+          <button class="btn-ok" id="mn-ok">Buat</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-bg" id="modal-bl">
+      <div class="modal">
+        <div class="modal-t">Pilih Catatan</div>
+        <input type="text" id="bl-search" class="modal-in" placeholder="Cari catatan..." oninput="filterBLNotes()">
+        <div id="bl-list" style="max-height:320px;overflow:auto"></div>
+        <div class="modal-acts">
+          <button class="btn-c" onclick="closeModal('modal-bl')">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-bg" id="modal-audit">
+      <div class="modal" style="width:min(1150px,94vw); padding: 40px; border-radius: 24px;">
+        <div class="modal-h-clean" style="margin-bottom: 24px;">
+          <h2 id="audit-title" style="font-family: var(--fhead); font-size: 28px; font-weight: 900; color: var(--tx); margin: 0;">Panel Audit</h2>
+          <div id="audit-count" class="pp-val" style="font-size: 13px; color: var(--tx3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">0 catatan</div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+          <input id="audit-search" class="tpl-search-in" placeholder="Cari judul, isi, pengguna, tag..." oninput="filterAuditData()" style="flex:1; margin-bottom: 0;">
+          <div style="display:flex; gap: 8px;">
+            <button class="btn-guest" onclick="exportAuditCSV()" style="margin-bottom: 0; padding: 10px 18px; display: flex; align-items: center; gap: 8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              CSV
+            </button>
+            <button class="btn-guest" onclick="exportAuditJSON()" style="margin-bottom: 0; padding: 10px 18px; display: flex; align-items: center; gap: 8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              JSON
+            </button>
+          </div>
+        </div>
+
+        <div id="audit-loading" class="pp-val" style="text-align: center; padding: 40px; color: var(--tx3);">
+          <span class="loader" style="margin-bottom: 12px; display: block; margin: 0 auto 10px;"></span>
+          Memuat data...
+        </div>
+
+        <div id="audit-table-wrap" style="display:none; max-height: 55vh;">
+          <table>
+            <thead>
+              <tr>
+                <th>Pengguna</th>
+                <th>Email</th>
+                <th>Judul</th>
+                <th>Folder</th>
+                <th>Tags</th>
+                <th>Dibuat</th>
+                <th>Diubah</th>
+                <th>Kata</th>
+              </tr>
+            </thead>
+            <tbody id="audit-body"></tbody>
+          </table>
+        </div>
+
+        <div class="modal-acts" style="margin-top: 24px; border-top: 1px solid var(--bd2); padding-top: 24px;">
+          <button class="btn-c" onclick="closeModal('modal-audit')" style="width: auto; padding: 12px 32px; margin-left: auto; display: block;">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-bg fullscreen" id="modal-audit-detail">
+      <div class="modal" id="audit-detail">
+        <div class="modal-h-clean">
+          <h2 id="audit-detail-title">Detail Catatan</h2>
+          <div class="modal-acts-clean">
+            <button class="btn-guest" onclick="exportAuditNoteMD()" title="Export Markdown">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              <span>MD</span>
+            </button>
+            <button class="btn-guest" onclick="exportAuditNotePDF()" title="Export PDF">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>PDF</span>
+            </button>
+            <button class="btn-c-circle" onclick="closeAuditDetail()" title="Tutup">✕</button>
+          </div>
+        </div>
+        <div id="audit-detail-content" class="content-area"></div>
+      </div>
+    </div>
+
+    <!-- Context Menus -->
+    <div class="fpanel" id="fctx">
+      <div class="ci" id="fctx-ren">Rename</div>
+      <div class="ci d" id="fctx-del">Hapus Folder</div>
+      <div class="ci d" id="fctx-del-all">Hapus Folder & Isinya</div>
+    </div>
+    <div class="fpanel" id="ctx">
+      <div class="ci" id="ctx-ren">Rename</div>
+      <div class="ci" id="ctx-dup">Duplicate</div>
+      <div class="ci" id="ctx-mov">Move to Folder</div>
+      <div class="ctx-sep"></div>
+      <div class="ci d" id="ctx-del">Delete</div>
+    </div>
+
+    <!-- Firebase SDK (compat mode v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Adapter -->
+    <script src="firebase-adapter.js"></script>
+
+    <!-- Main App -->
+    <script src="script.js"></script>
+  </body>
 </html>
