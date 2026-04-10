@@ -93,6 +93,40 @@ function _mapUser(fbUser) {
   };
 }
 
+function _formatEmailName(email) {
+  if (!email || typeof email !== 'string') return '';
+  const localPart = email.split('@')[0] || '';
+  const cleaned = localPart.replace(/[._-]+/g, ' ').trim();
+  if (!cleaned) return '';
+  return cleaned.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function _pickDisplayName(value, uid) {
+  if (typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === uid) return '';
+  return trimmed;
+}
+
+async function _ensureProfileDoc(fbUser) {
+  if (!fbUser?.uid) return;
+  const displayName =
+    _pickDisplayName(fbUser.displayName, fbUser.uid) ||
+    _formatEmailName(fbUser.email) ||
+    'Pengguna';
+
+  try {
+    await _db.collection('profiles').doc(fbUser.uid).set({
+      displayName,
+      email: fbUser.email || '',
+      photoURL: fbUser.photoURL || null,
+      updatedAt: Date.now(),
+    }, { merge: true });
+  } catch (err) {
+    console.warn('ensureProfileDoc warning:', err);
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // window._fb — Adapter publik yang digunakan oleh script.js
 // ═══════════════════════════════════════════════════════════════════════
@@ -107,18 +141,21 @@ window._fb = {
     provider.addScope('email');
     provider.addScope('profile');
     const result = await _auth.signInWithPopup(provider);
+    await _ensureProfileDoc(result.user);
     return _mapUser(result.user);
   },
 
   /** Login email + kata sandi */
   async signIn(email, pass) {
     const cred = await _auth.signInWithEmailAndPassword(email, pass);
+    await _ensureProfileDoc(cred.user);
     return _mapUser(cred.user);
   },
 
   /** Daftar akun baru dengan email + kata sandi */
   async signUp(email, pass) {
     const cred = await _auth.createUserWithEmailAndPassword(email, pass);
+    await _ensureProfileDoc(cred.user);
     return _mapUser(cred.user);
   },
 
@@ -130,6 +167,7 @@ window._fb = {
   /** Dengarkan perubahan status login (dipanggil saat page load) */
   onAuth(callback) {
     _auth.onAuthStateChanged((fbUser) => {
+      if (fbUser) _ensureProfileDoc(fbUser);
       callback(fbUser ? _mapUser(fbUser) : null);
     });
   },
@@ -149,7 +187,17 @@ window._fb = {
     if (!uid || !note?.id) return;
     const ref = _db.collection('users').doc(uid).collection('notes').doc(note.id);
     const userEmail = _auth.currentUser?.email || note._userEmail || '';
-    await ref.set({ ...note, _uid: uid, _userEmail: userEmail }, { merge: true });
+    const userName =
+      _pickDisplayName(_auth.currentUser?.displayName, uid) ||
+      _pickDisplayName(note._userName, uid) ||
+      _formatEmailName(userEmail) ||
+      'Pengguna';
+    await ref.set({
+      ...note,
+      _uid: uid,
+      _userEmail: userEmail,
+      _userName: userName,
+    }, { merge: true });
   },
 
   /** Hapus satu catatan */
@@ -248,20 +296,33 @@ window._admin = {
           _db.collection('profiles').doc(uid).get(),
           _db.collection('users').doc(uid).get(),
         ]);
+        const profileData = pSnap.exists ? (pSnap.data() || {}) : {};
+        const userData = uSnap.exists ? (uSnap.data() || {}) : {};
         profileMap[uid] = {
-          displayName: pSnap.exists ? (pSnap.data().displayName || uid) : uid,
-          folders:     uSnap.exists ? (uSnap.data().folders || []) : [],
+          displayName:
+            _pickDisplayName(profileData.displayName, uid) ||
+            _pickDisplayName(userData.displayName, uid) ||
+            _pickDisplayName(userData.name, uid) ||
+            _pickDisplayName(userData.fullName, uid) ||
+            _formatEmailName(profileData.email || userData.email) ||
+            '',
+          email: profileData.email || userData.email || '',
+          folders: userData.folders || [],
         };
       } catch {
-        profileMap[uid] = { displayName: uid, folders: [] };
+        profileMap[uid] = { displayName: '', email: '', folders: [] };
       }
     }));
 
     // Tambahkan metadata tampilan ke setiap catatan
     notes.forEach((n) => {
       const prof = profileMap[n._uid] || {};
-      n._userName   = prof.displayName || n._uid || 'Unknown';
-      n._userEmail  = n._userEmail || '';
+      n._userEmail  = n._userEmail || prof.email || '';
+      n._userName   =
+        prof.displayName ||
+        _pickDisplayName(n._userName, n._uid) ||
+        _formatEmailName(n._userEmail) ||
+        'Pengguna';
       const folder  = (prof.folders || []).find((f) => f.id === n.folder);
       n._folderName = folder ? folder.name : (n.folder ? n.folder : '—');
     });
