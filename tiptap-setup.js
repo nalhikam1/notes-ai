@@ -250,41 +250,10 @@ function initTiptap() {
         attributes: {
           class: 'tiptap',
         },
-        handleKeyDown(view, event) {
-          // Handle Tab/Shift+Tab for list indent/outdent
-          if (event.key === 'Tab') {
-            // Determine if cursor is inside any list
-            const { $from } = view.state.selection;
-            let listType = null;
-            
-            for (let d = $from.depth; d > 0; d--) {
-              const nodeName = $from.node(d).type.name;
-              if (nodeName === 'taskItem') {
-                listType = 'taskItem';
-                break;
-              }
-              if (nodeName === 'listItem') {
-                listType = 'listItem';
-                break;
-              }
-            }
-            
-            if (listType) {
-              event.preventDefault();
-              event.stopPropagation();
-              
-              if (event.shiftKey) {
-                // Outdent - try the detected type first, then fallback
-                editor.chain().focus().liftListItem(listType).run();
-              } else {
-                // Indent - try the detected type first, then fallback
-                editor.chain().focus().sinkListItem(listType).run();
-              }
-              return true;
-            }
-          }
-          return false;
-        },
+        // Tab/Shift+Tab for list indent/outdent is handled natively by
+        // ListItem (StarterKit) and TaskItem (nested:true) extensions.
+        // Do NOT add a custom handleKeyDown for Tab — it blocks the
+        // built-in Tiptap keyboard shortcuts.
       },
       onUpdate: ({ editor }) => {
         // Trigger auto-save and word count update
@@ -695,28 +664,19 @@ function tiptapTaskList() {
   }
 }
 
-// Indent / Outdent for all list types
+// Indent / Outdent for all list types (toolbar buttons)
 function tiptapIndent() {
   if (!useTiptap || !editor) return;
-  const { $from } = editor.state.selection;
-  for (let d = $from.depth; d > 0; d--) {
-    const nodeName = $from.node(d).type.name;
-    if (nodeName === 'taskItem' || nodeName === 'listItem') {
-      editor.chain().focus().sinkListItem(nodeName).run();
-      return;
-    }
+  // Try taskItem first, then listItem — one will succeed
+  if (!editor.commands.sinkListItem('taskItem')) {
+    editor.commands.sinkListItem('listItem');
   }
 }
 
 function tiptapOutdent() {
   if (!useTiptap || !editor) return;
-  const { $from } = editor.state.selection;
-  for (let d = $from.depth; d > 0; d--) {
-    const nodeName = $from.node(d).type.name;
-    if (nodeName === 'taskItem' || nodeName === 'listItem') {
-      editor.chain().focus().liftListItem(nodeName).run();
-      return;
-    }
+  if (!editor.commands.liftListItem('taskItem')) {
+    editor.commands.liftListItem('listItem');
   }
 }
 
