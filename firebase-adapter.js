@@ -75,8 +75,25 @@ try {
 const _auth = firebase.auth();
 const _db   = firebase.firestore();
 
-// Aktifkan persistensi offline (opsional, baik untuk PWA)
-_db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+// Gunakan transport yang lebih stabil di jaringan yang sering gagal pada WebChannel/QUIC.
+_db.settings({
+  experimentalForceLongPolling: true,
+  useFetchStreams: false,
+  ignoreUndefinedProperties: true,
+});
+
+// Aktifkan persistensi offline hanya untuk satu tab aktif agar tidak memicu perebutan lease.
+_db.enablePersistence().catch((err) => {
+  if (err?.code === 'failed-precondition') {
+    console.warn('Firestore persistence dimatikan di tab ini karena ada tab lain yang aktif.');
+    return;
+  }
+  if (err?.code === 'unimplemented') {
+    console.warn('Browser ini tidak mendukung Firestore persistence.');
+    return;
+  }
+  console.warn('Firestore persistence gagal diaktifkan:', err);
+});
 
 // ═══════════════════════════════════════════════════════════════════════
 // Helper internal
