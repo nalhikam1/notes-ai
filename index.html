@@ -317,6 +317,15 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 Task List
               </button>
+              <div style="border-top:1px solid rgba(255,255,255,0.12);margin:4px 0;"></div>
+              <button class="tb-menu-item" onclick="tiptapIndent();closeToolbarDropdown()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="8" x2="21" y2="8"/><line x1="7" y1="12" x2="21" y2="12"/><line x1="7" y1="16" x2="21" y2="16"/><polyline points="3 12 5 14 3 16"/></svg>
+                Indent (Tab)
+              </button>
+              <button class="tb-menu-item" onclick="tiptapOutdent();closeToolbarDropdown()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="8" x2="21" y2="8"/><line x1="7" y1="12" x2="21" y2="12"/><line x1="7" y1="16" x2="21" y2="16"/><polyline points="5 12 3 14 5 16"/></svg>
+                Outdent (Shift+Tab)
+              </button>
             </div>
           </div>
           <div class="tb-sep"></div>
@@ -470,6 +479,9 @@
             <button class="mobile-menu-item" onclick="tiptapBulletList();closeMobileMenu()">• Bullet List</button>
             <button class="mobile-menu-item" onclick="tiptapOrderedList();closeMobileMenu()">1. Numbered List</button>
             <button class="mobile-menu-item" onclick="tiptapTaskList();closeMobileMenu()">☑ Task List</button>
+            <div style="border-top:1px solid var(--border);margin:4px 0;"></div>
+            <button class="mobile-menu-item" onclick="tiptapIndent();closeMobileMenu()">→ Indent (Nest)</button>
+            <button class="mobile-menu-item" onclick="tiptapOutdent();closeMobileMenu()">← Outdent (Un-nest)</button>
           </div>
 
           <div id="mobile-menu-align" class="mobile-menu">

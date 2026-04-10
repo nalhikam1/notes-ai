@@ -160,7 +160,6 @@ function initTiptap() {
             class: 'code-block',
           },
         },
-        // Ensure markdown shortcuts are enabled (default is true)
         bulletList: {
           keepMarks: true,
           keepAttributes: false,
@@ -252,37 +251,34 @@ function initTiptap() {
           class: 'tiptap',
         },
         handleKeyDown(view, event) {
-          // Handle Tab/Shift+Tab for list nesting
+          // Handle Tab/Shift+Tab for list indent/outdent
           if (event.key === 'Tab') {
-            const { state, dispatch } = view;
-            const { $from } = state.selection;
+            // Determine if cursor is inside any list
+            const { $from } = view.state.selection;
+            let listType = null;
             
-            // Check if we're inside a list item
-            let inList = false;
             for (let d = $from.depth; d > 0; d--) {
-              const node = $from.node(d);
-              if (node.type.name === 'listItem' || node.type.name === 'taskItem') {
-                inList = true;
+              const nodeName = $from.node(d).type.name;
+              if (nodeName === 'taskItem') {
+                listType = 'taskItem';
+                break;
+              }
+              if (nodeName === 'listItem') {
+                listType = 'listItem';
                 break;
               }
             }
             
-            if (inList) {
+            if (listType) {
               event.preventDefault();
+              event.stopPropagation();
+              
               if (event.shiftKey) {
-                // Lift (outdent)
-                if (editor.can().liftListItem('listItem')) {
-                  editor.chain().focus().liftListItem('listItem').run();
-                } else if (editor.can().liftListItem('taskItem')) {
-                  editor.chain().focus().liftListItem('taskItem').run();
-                }
+                // Outdent - try the detected type first, then fallback
+                editor.chain().focus().liftListItem(listType).run();
               } else {
-                // Sink (indent)
-                if (editor.can().sinkListItem('listItem')) {
-                  editor.chain().focus().sinkListItem('listItem').run();
-                } else if (editor.can().sinkListItem('taskItem')) {
-                  editor.chain().focus().sinkListItem('taskItem').run();
-                }
+                // Indent - try the detected type first, then fallback
+                editor.chain().focus().sinkListItem(listType).run();
               }
               return true;
             }
@@ -696,6 +692,31 @@ function tiptapTaskList() {
     // Fallback: insert proper HTML task list
     const html = '<ul data-type="taskList"><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div>Task item</div></li></ul>';
     document.execCommand('insertHTML', false, html);
+  }
+}
+
+// Indent / Outdent for all list types
+function tiptapIndent() {
+  if (!useTiptap || !editor) return;
+  const { $from } = editor.state.selection;
+  for (let d = $from.depth; d > 0; d--) {
+    const nodeName = $from.node(d).type.name;
+    if (nodeName === 'taskItem' || nodeName === 'listItem') {
+      editor.chain().focus().sinkListItem(nodeName).run();
+      return;
+    }
+  }
+}
+
+function tiptapOutdent() {
+  if (!useTiptap || !editor) return;
+  const { $from } = editor.state.selection;
+  for (let d = $from.depth; d > 0; d--) {
+    const nodeName = $from.node(d).type.name;
+    if (nodeName === 'taskItem' || nodeName === 'listItem') {
+      editor.chain().focus().liftListItem(nodeName).run();
+      return;
+    }
   }
 }
 

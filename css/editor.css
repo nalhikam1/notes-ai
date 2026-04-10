@@ -588,7 +588,12 @@
 .tiptap li p,
 #editor[contenteditable="true"] li p {
   margin: 0;
-  display: inline;
+}
+
+/* Task item paragraphs need block display for proper Enter behavior */
+.tiptap li[data-type="taskItem"] > div > p {
+  margin: 0;
+  display: block;
 }
 
 /* Task List - Tiptap native TaskList/TaskItem */
@@ -819,18 +824,22 @@
   margin: 4px 0;
 }
 
-/* Nested task lists */
-.tiptap ul[data-type="taskList"] ul[data-type="taskList"] {
-  margin: 4px 0 4px 24px !important;
-}
-
-.tiptap ul[data-type="taskList"] ul[data-type="taskList"] ul[data-type="taskList"] {
-  margin: 4px 0 4px 24px !important;
+/* Nested task lists inside task items */
+.tiptap li[data-type="taskItem"] ul[data-type="taskList"] {
+  margin: 4px 0 4px 0 !important;
+  padding-left: 24px !important;
 }
 
 /* Nested list indentation */
 .tiptap ul:not([data-type="taskList"]) ul:not([data-type="taskList"]),
 .tiptap ol ol {
+  padding-left: 24px;
+}
+
+/* Nested regular lists inside task items */
+.tiptap li[data-type="taskItem"] ul:not([data-type="taskList"]),
+.tiptap li[data-type="taskItem"] ol {
+  margin: 4px 0;
   padding-left: 24px;
 }
 
