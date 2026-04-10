@@ -148,7 +148,8 @@ window._fb = {
   async saveNote(uid, note) {
     if (!uid || !note?.id) return;
     const ref = _db.collection('users').doc(uid).collection('notes').doc(note.id);
-    await ref.set({ ...note, _uid: uid }, { merge: true });
+    const userEmail = _auth.currentUser?.email || note._userEmail || '';
+    await ref.set({ ...note, _uid: uid, _userEmail: userEmail }, { merge: true });
   },
 
   /** Hapus satu catatan */
@@ -234,44 +235,41 @@ window._admin = {
    * Membutuhkan Firestore collectionGroup index dan rules yang sesuai.
    */
   async loadAllNotes() {
-    try {
-      const snap = await _db.collectionGroup('notes').get();
-      const notes = snap.docs.map((d) => d.data());
+    const snap = await _db.collectionGroup('notes').get();
+    const notes = snap.docs.map((d) => d.data());
 
-      // Kumpulkan UID unik supaya bisa fetch profil + folder sekaligus
-      const uids = [...new Set(notes.map((n) => n._uid).filter(Boolean))];
+    // Kumpulkan UID unik supaya bisa fetch profil + folder sekaligus
+    const uids = [...new Set(notes.map((n) => n._uid).filter(Boolean))];
 
-      const profileMap = {};
-      await Promise.all(uids.map(async (uid) => {
-        try {
-          const [pSnap, uSnap] = await Promise.all([
-            _db.collection('profiles').doc(uid).get(),
-            _db.collection('users').doc(uid).get(),
-          ]);
-          profileMap[uid] = {
-            displayName: pSnap.exists ? (pSnap.data().displayName || uid) : uid,
-            email:       '',
-            folders:     uSnap.exists ? (uSnap.data().folders || []) : [],
-          };
-        } catch {
-          profileMap[uid] = { displayName: uid, email: '', folders: [] };
-        }
-      }));
+    const profileMap = {};
+    await Promise.all(uids.map(async (uid) => {
+      try {
+        const [pSnap, uSnap] = await Promise.all([
+          _db.collection('profiles').doc(uid).get(),
+          _db.collection('users').doc(uid).get(),
+        ]);
+        profileMap[uid] = {
+          displayName: pSnap.exists ? (pSnap.data().displayName || uid) : uid,
+          folders:     uSnap.exists ? (uSnap.data().folders || []) : [],
+        };
+      } catch {
+        profileMap[uid] = { displayName: uid, folders: [] };
+      }
+    }));
 
-      // Tambahkan metadata tampilan ke setiap catatan
-      notes.forEach((n) => {
-        const prof = profileMap[n._uid] || {};
-        n._userName   = prof.displayName || n._uid || 'Unknown';
-        n._userEmail  = prof.email || '';
-        const folder  = (prof.folders || []).find((f) => f.id === n.folder);
-        n._folderName = folder ? folder.name : (n.folder ? n.folder : '—');
-      });
+    // Tambahkan metadata tampilan ke setiap catatan
+    notes.forEach((n) => {
+      const prof = profileMap[n._uid] || {};
+      n._userName   = prof.displayName || n._uid || 'Unknown';
+      n._userEmail  = n._userEmail || '';
+      const folder  = (prof.folders || []).find((f) => f.id === n.folder);
+      n._folderName = folder ? folder.name : (n.folder ? n.folder : '—');
+    });
 
-      return notes;
-    } catch (e) {
-      console.error('Admin loadAllNotes error:', e);
-      return [];
-    }
+    // Urutkan dari catatan terbaru
+    notes.sort((a, b) => (b.modified || 0) - (a.modified || 0));
+
+    return notes;
   },
 };
 

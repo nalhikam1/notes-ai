@@ -756,41 +756,105 @@
     </div>
 
     <div class="modal-bg" id="modal-audit">
-      <div class="modal" style="width:min(1150px,94vw); padding: 40px; border-radius: 24px;">
-        <div class="modal-h-clean" style="margin-bottom: 24px;">
-          <h2 id="audit-title" style="font-family: var(--fhead); font-size: 28px; font-weight: 900; color: var(--tx); margin: 0;">Panel Audit</h2>
-          <div id="audit-count" class="pp-val" style="font-size: 13px; color: var(--tx3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">0 catatan</div>
+      <div class="modal audit-modal">
+
+        <!-- Header -->
+        <div class="audit-header">
+          <div class="audit-header-left">
+            <div class="audit-icon">🔍</div>
+            <div>
+              <h2 class="audit-title-text">Panel Audit</h2>
+              <div id="audit-count" class="audit-subtitle">Memuat...</div>
+            </div>
+          </div>
+          <div class="audit-header-right">
+            <button class="audit-btn-icon" onclick="loadAuditData()" title="Muat Ulang">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            </button>
+            <button class="audit-btn-icon danger" onclick="closeModal('modal-audit')" title="Tutup">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
-          <input id="audit-search" class="tpl-search-in" placeholder="Cari judul, isi, pengguna, tag..." oninput="filterAuditData()" style="flex:1; margin-bottom: 0;">
-          <div style="display:flex; gap: 8px;">
-            <button class="btn-guest" onclick="exportAuditCSV()" style="margin-bottom: 0; padding: 10px 18px; display: flex; align-items: center; gap: 8px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        <!-- Stats Bar -->
+        <div id="audit-stats" class="audit-stats" style="display:none">
+          <div class="audit-stat-item">
+            <span class="audit-stat-num" id="stat-total">0</span>
+            <span class="audit-stat-lbl">Catatan</span>
+          </div>
+          <div class="audit-stat-div"></div>
+          <div class="audit-stat-item">
+            <span class="audit-stat-num" id="stat-users">0</span>
+            <span class="audit-stat-lbl">Pengguna</span>
+          </div>
+          <div class="audit-stat-div"></div>
+          <div class="audit-stat-item">
+            <span class="audit-stat-num" id="stat-folders">0</span>
+            <span class="audit-stat-lbl">Folder</span>
+          </div>
+          <div class="audit-stat-div"></div>
+          <div class="audit-stat-item">
+            <span class="audit-stat-num" id="stat-words">0</span>
+            <span class="audit-stat-lbl">Total Kata</span>
+          </div>
+        </div>
+
+        <!-- Toolbar: Search + Export -->
+        <div class="audit-toolbar">
+          <div class="audit-search-wrap">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="audit-search" class="audit-search-in" placeholder="Cari pengguna, judul, isi, tag..." oninput="filterAuditData()" autocomplete="off">
+          </div>
+          <div class="audit-toolbar-actions">
+            <button class="audit-export-btn" onclick="exportAuditCSV()" title="Export CSV">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
               CSV
             </button>
-            <button class="btn-guest" onclick="exportAuditJSON()" style="margin-bottom: 0; padding: 10px 18px; display: flex; align-items: center; gap: 8px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <button class="audit-export-btn" onclick="exportAuditJSON()" title="Export JSON">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
               JSON
             </button>
           </div>
         </div>
 
-        <div id="audit-loading" class="pp-val" style="text-align: center; padding: 40px; color: var(--tx3);">
-          <span class="loader" style="margin-bottom: 12px; display: block; margin: 0 auto 10px;"></span>
-          Memuat data...
+        <!-- Loading state -->
+        <div id="audit-loading" class="audit-loading-state">
+          <div class="audit-spinner"></div>
+          <p>Memuat semua catatan...</p>
+          <p class="audit-loading-sub">Memerlukan izin Firestore collectionGroup</p>
         </div>
 
-        <div id="audit-table-wrap" style="display:none; max-height: 55vh;">
+        <!-- Error state -->
+        <div id="audit-error" class="audit-error-state" style="display:none">
+          <div class="audit-error-icon">⚠️</div>
+          <p class="audit-error-msg">Terjadi kesalahan.</p>
+          <div class="audit-rules-box">
+            <p class="audit-rules-title">Pastikan Firestore Rules mencakup ini:</p>
+            <pre class="audit-rules-code">match /{path=**}/notes/{noteId} {
+  allow read: if request.auth != null
+    &amp;&amp; request.auth.uid in [
+      'GANTI_DENGAN_UID_ADMIN'
+    ];
+}</pre>
+          </div>
+          <button class="audit-export-btn" onclick="loadAuditData()" style="margin-top:12px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Coba Lagi
+          </button>
+        </div>
+
+        <!-- Table -->
+        <div id="audit-table-wrap" style="display:none">
           <table>
             <thead>
               <tr>
+                <th>#</th>
                 <th>Pengguna</th>
                 <th>Email</th>
                 <th>Judul</th>
                 <th>Folder</th>
                 <th>Tags</th>
-                <th>Dibuat</th>
                 <th>Diubah</th>
                 <th>Kata</th>
               </tr>
@@ -799,9 +863,6 @@
           </table>
         </div>
 
-        <div class="modal-acts" style="margin-top: 24px; border-top: 1px solid var(--bd2); padding-top: 24px;">
-          <button class="btn-c" onclick="closeModal('modal-audit')" style="width: auto; padding: 12px 32px; margin-left: auto; display: block;">Tutup</button>
-        </div>
       </div>
     </div>
 

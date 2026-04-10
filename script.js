@@ -3226,27 +3226,75 @@ document.addEventListener("click", (e) => {
 
 async function openAuditPanel() {
   closeSettings();
-  document.getElementById("modal-audit").classList.add("on");
-  toast("Memuat data audit...");
+  const modal = document.getElementById("modal-audit");
+  modal.classList.add("on");
+  // Reset search
+  const searchEl = document.getElementById("audit-search");
+  if (searchEl) searchEl.value = "";
+  // Reset stats
+  const statsEl = document.getElementById("audit-stats");
+  if (statsEl) statsEl.style.display = "none";
   await loadAuditData();
 }
 
 async function loadAuditData() {
   const loading = document.getElementById("audit-loading");
   const tableWrap = document.getElementById("audit-table-wrap");
+  const errorEl = document.getElementById("audit-error");
   loading.style.display = "";
   tableWrap.style.display = "none";
+  if (errorEl) errorEl.style.display = "none";
 
   if (!window._admin) {
-    toast("Modul admin tidak tersedia");
+    loading.style.display = "none";
+    if (errorEl) {
+      errorEl.style.display = "";
+      errorEl.querySelector(".audit-error-msg").textContent = "Modul admin tidak tersedia.";
+    }
     return;
   }
 
-  S.auditData = await window._admin.loadAllNotes();
-  loading.style.display = "none";
-  tableWrap.style.display = "";
-  renderAuditTable(S.auditData);
-  toast("Dimuat: " + S.auditData.length + " catatan dari semua pengguna", 3000);
+  try {
+    S.auditData = await window._admin.loadAllNotes();
+    loading.style.display = "none";
+    tableWrap.style.display = "";
+    renderAuditTable(S.auditData);
+    updateAuditStats(S.auditData);
+    if (S.auditData.length > 0) {
+      toast("Dimuat: " + S.auditData.length + " catatan dari semua pengguna", 3000);
+    }
+  } catch (e) {
+    loading.style.display = "none";
+    console.error("loadAuditData error:", e);
+    if (errorEl) {
+      errorEl.style.display = "";
+      let msg = e.message || "Terjadi kesalahan saat memuat data.";
+      if (msg.includes("permission") || msg.includes("PERMISSION_DENIED")) {
+        msg = "Akses ditolak. Pastikan Firestore Rules untuk collectionGroup sudah diatur dan UID admin sudah benar.";
+      } else if (msg.includes("index") || msg.includes("INDEX")) {
+        msg = "Index Firestore belum dibuat. Buka link di konsol browser untuk membuat index collectionGroup.";
+      }
+      errorEl.querySelector(".audit-error-msg").textContent = msg;
+    }
+  }
+}
+
+function updateAuditStats(notes) {
+  const statsEl = document.getElementById("audit-stats");
+  if (!statsEl) return;
+
+  const uniqueUsers = new Set(notes.map((n) => n._uid).filter(Boolean)).size;
+  const uniqueFolders = new Set(notes.map((n) => n._folderName).filter((f) => f && f !== "—")).size;
+  const totalWords = notes.reduce((acc, n) => {
+    const plain = (n.content || "").replace(/<[^>]*>/g, "").trim();
+    return acc + (plain ? plain.split(/\s+/).length : 0);
+  }, 0);
+
+  document.getElementById("stat-total").textContent = notes.length;
+  document.getElementById("stat-users").textContent = uniqueUsers;
+  document.getElementById("stat-folders").textContent = uniqueFolders;
+  document.getElementById("stat-words").textContent = totalWords.toLocaleString("id-ID");
+  statsEl.style.display = "";
 }
 
 function renderAuditTable(notes) {
@@ -3255,22 +3303,27 @@ function renderAuditTable(notes) {
   countEl.textContent = notes.length + " catatan";
 
   if (notes.length === 0) {
-    body.innerHTML = '<tr><td colspan="8" style="padding: 20px; text-align: center; color: var(--tx3); font-style: italic;">Tidak ada data</td></tr>';
+    body.innerHTML = `<tr><td colspan="8" class="audit-empty">
+      <div class="audit-empty-icon">📭</div>
+      <div>Tidak ada catatan ditemukan</div>
+      <div class="audit-empty-sub">Pastikan Firestore Rules mengizinkan akses collectionGroup untuk admin</div>
+    </td></tr>`;
     return;
   }
 
-  body.innerHTML = notes.map((n) => {
+  body.innerHTML = notes.map((n, i) => {
     const plainText = (n.content || "").replace(/<[^>]*>/g, "").trim();
     const wordCount = plainText ? plainText.split(/\s+/).length : 0;
+    const tags = (n.tags || []).map((t) => `<span class="audit-tag">${escapeHTML(t)}</span>`).join("") || '<span style="color:var(--tx3)">—</span>';
     return `<tr class="audit-row" onclick="showAuditDetail(this)" data-title="${escapeHTML(n.title || '')}" data-content="${encodeURIComponent(n.content || '')}">
-      <td>${escapeHTML(n._userName || n._uid)}</td>
-      <td>${escapeHTML(n._userEmail || '')}</td>
-      <td>${escapeHTML(n.title || 'Tanpa Judul')}</td>
+      <td class="audit-num">${i + 1}</td>
+      <td><span class="audit-user">${escapeHTML(n._userName || n._uid)}</span></td>
+      <td class="audit-email">${escapeHTML(n._userEmail || '—')}</td>
+      <td class="audit-note-title">${escapeHTML(n.title || 'Tanpa Judul')}</td>
       <td>${escapeHTML(n._folderName || '—')}</td>
-      <td>${(n.tags || []).map((t) => escapeHTML(t)).join(", ") || '—'}</td>
-      <td>${fmtD(n.created)}</td>
-      <td>${fmtD(n.modified)}</td>
-      <td>${wordCount}</td>
+      <td class="audit-tags-cell">${tags}</td>
+      <td class="audit-date">${fmtD(n.modified)}</td>
+      <td class="audit-words">${wordCount}</td>
     </tr>`;
   }).join("");
 }
