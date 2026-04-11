@@ -186,17 +186,23 @@ function subscribeCloud() {
   });
 
   S.unsub = window._fb.listenNotes(S.user.uid, (cloudNotes) => {
+    // Pisahkan tombstone (catatan yang dihapus di cloud) dari catatan aktif.
+    const cloudDeletedIds = new Set();
+    cloudNotes.forEach((n) => { if (n._deleted) cloudDeletedIds.add(n.id); });
+
     const localById = {};
     S.notes.forEach((n) => (localById[n.id] = n));
     const cloudById = {};
-    cloudNotes.forEach((n) => (cloudById[n.id] = n));
+    cloudNotes.forEach((n) => { if (!n._deleted) cloudById[n.id] = n; });
 
     // Dorong catatan lokal ke Firestore jika belum ada di cloud,
     // atau jika versi lokal lebih baru dari versi cloud.
+    // Jangan push balik catatan yang sudah dihapus di cloud.
     Object.keys(localById).forEach((id) => {
       const local = localById[id];
       const cloud = cloudById[id];
       if (!local) return;
+      if (cloudDeletedIds.has(id)) return; // sudah dihapus di cloud
       if (!cloud || (local.modified || 0) > (cloud.modified || 0)) {
         cloudSave(local);
       }
@@ -206,8 +212,14 @@ function subscribeCloud() {
       ...Object.keys(localById),
       ...Object.keys(cloudById),
     ]);
+    let activeDeleted = false;
     const merged = [];
     allIds.forEach((id) => {
+      // Jika catatan ini dihapus di cloud, hapus dari lokal juga
+      if (cloudDeletedIds.has(id)) {
+        if (id === S.active) activeDeleted = true;
+        return;
+      }
       const local = localById[id];
       const cloud = cloudById[id];
       // Jangan timpa catatan yang sedang diedit (hindari cursor lompat)
@@ -226,9 +238,14 @@ function subscribeCloud() {
     S.notes = merged;
     saveLocal();
     renderTree();
+    updateDashboardStats(); // Selalu update angka, bahkan saat editor terbuka
 
-    // Update dashboard counts after cloud data loads
-    if (!S.active) {
+    // Jika catatan yang sedang terbuka dihapus dari device lain, kembali ke dashboard
+    if (activeDeleted) {
+      S.active = null;
+      showEmpty(true);
+      showWelcomeIfNeeded();
+    } else if (!S.active) {
       showEmpty(true);
     }
 
@@ -2738,6 +2755,17 @@ function goToDashboard() {
   showEmpty(true);
 }
 
+function updateDashboardStats() {
+  document.getElementById("dash-notes").textContent = S.notes.length;
+  document.getElementById("dash-folders").textContent = S.folders.length;
+  let wc = 0;
+  S.notes.forEach(n => {
+    const text = (n.content || "").replace(/<[^>]*>/gm, " ").trim();
+    wc += text ? text.split(/\s+/).length : 0;
+  });
+  document.getElementById("dash-words").textContent = wc.toLocaleString("id-ID");
+}
+
 function showEmpty(v) {
   document.getElementById("ew").style.display = v ? "none" : "";
   document.getElementById("es").style.display = v ? "flex" : "none";
@@ -2747,14 +2775,7 @@ function showEmpty(v) {
   updatePlaceholderVisibility(); // Check placeholder when showing empty
 
   if (v) {
-    document.getElementById("dash-notes").textContent = S.notes.length;
-    document.getElementById("dash-folders").textContent = S.folders.length;
-    let wc = 0;
-    S.notes.forEach(n => {
-      const text = (n.content || "").replace(/<[^>]*>?/gm, " ").trim();
-      wc += text ? text.split(/\s+/).length : 0;
-    });
-    document.getElementById("dash-words").textContent = wc.toLocaleString("id-ID");
+    updateDashboardStats();
     document.getElementById("pp").classList.add("off");
   }
 }

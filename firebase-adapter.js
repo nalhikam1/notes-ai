@@ -75,10 +75,7 @@ try {
 const _auth = firebase.auth();
 const _db   = firebase.firestore();
 
-// Gunakan transport yang lebih stabil di jaringan yang sering gagal pada WebChannel/QUIC.
 _db.settings({
-  experimentalForceLongPolling: true,
-  useFetchStreams: false,
   ignoreUndefinedProperties: true,
 });
 
@@ -217,11 +214,11 @@ window._fb = {
     }, { merge: true });
   },
 
-  /** Hapus satu catatan */
+  /** Hapus satu catatan (soft delete — tombstone agar sync antar device berfungsi) */
   async deleteNote(uid, noteId) {
     if (!uid || !noteId) return;
     const ref = _db.collection('users').doc(uid).collection('notes').doc(noteId);
-    await ref.delete();
+    await ref.set({ _deleted: true, _deletedAt: Date.now() }, { merge: true });
   },
 
   /** Real-time listener semua catatan pengguna */
