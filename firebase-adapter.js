@@ -159,18 +159,14 @@ window._fb = {
     return _mapUser(result.user);
   },
 
-  /** Login email + kata sandi */
+  /** Login email + kata sandi (DINONAKTIFKAN) */
   async signIn(email, pass) {
-    const cred = await _auth.signInWithEmailAndPassword(email, pass);
-    await _ensureProfileDoc(cred.user);
-    return _mapUser(cred.user);
+    throw new Error('Email/password auth is disabled in this build. Use Google sign-in or Guest mode.');
   },
 
-  /** Daftar akun baru dengan email + kata sandi */
+  /** Daftar akun baru dengan email + kata sandi (DINONAKTIFKAN) */
   async signUp(email, pass) {
-    const cred = await _auth.createUserWithEmailAndPassword(email, pass);
-    await _ensureProfileDoc(cred.user);
-    return _mapUser(cred.user);
+    throw new Error('Email/password registration is disabled in this build. Use Google sign-in or Guest mode.');
   },
 
   /** Logout */

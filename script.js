@@ -286,20 +286,7 @@ function setBtnLoading(btn, loading, originalText) {
 }
 
 
-// Enter key untuk submit login/register — hanya pada input auth
-document.querySelectorAll(".auth-in").forEach((inp) => {
-  inp.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const isRegisterTab = document.querySelector('.auth-tab[data-tab="register"]').classList.contains("active");
-      if (isRegisterTab) {
-        document.getElementById("btn-email-signup")?.click();
-      } else {
-        document.getElementById("btn-email-signin")?.click();
-      }
-    }
-  });
-});
+// ...email/password UI handlers removed (Google + Guest only)
 
 const _btnGuest = document.getElementById("btn-guest");
 if (_btnGuest) {
@@ -308,86 +295,11 @@ if (_btnGuest) {
   };
 }
 
-// Tab switching for auth
-document.querySelectorAll('.auth-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    const tabName = tab.dataset.tab;
-    
-    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    
-    if (tabName === 'login') {
-      document.getElementById('login-form').style.display = 'flex';
-      document.getElementById('register-form').style.display = 'none';
-    } else {
-      document.getElementById('login-form').style.display = 'none';
-      document.getElementById('register-form').style.display = 'flex';
-    }
-  });
-});
+// auth tabs removed — only Google + Guest remain
 
-// Toggle password visibility - login
-const _btnTogglePass = document.getElementById("btn-toggle-pass");
-if (_btnTogglePass) {
-  _btnTogglePass.onclick = () => {
-    const inp = document.getElementById("auth-pass");
-    const svg = _btnTogglePass.querySelector('svg');
-    if (inp.type === "password") {
-      inp.type = "text";
-      svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-    } else {
-      inp.type = "password";
-      svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-    }
-  };
-}
+// password toggles removed
 
-// Toggle password visibility - register pass
-const _btnToggleRegPass = document.getElementById("btn-toggle-reg-pass");
-if (_btnToggleRegPass) {
-  _btnToggleRegPass.onclick = () => {
-    const inp = document.getElementById("reg-pass");
-    const svg = _btnToggleRegPass.querySelector('svg');
-    if (inp.type === "password") {
-      inp.type = "text";
-      svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-    } else {
-      inp.type = "password";
-      svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-    }
-  };
-}
-
-// Toggle password visibility - register confirm
-const _btnToggleRegConfirm = document.getElementById("btn-toggle-reg-confirm");
-if (_btnToggleRegConfirm) {
-  _btnToggleRegConfirm.onclick = () => {
-    const inp = document.getElementById("reg-pass-confirm");
-    const svg = _btnToggleRegConfirm.querySelector('svg');
-    if (inp.type === "password") {
-      inp.type = "text";
-      svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-    } else {
-      inp.type = "password";
-      svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-    }
-  };
-}
-
-// Enter key handling
-document.querySelectorAll('.auth-in').forEach(inp => {
-  inp.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const isRegisterTab = document.querySelector('.auth-tab[data-tab="register"]').classList.contains('active');
-      if (isRegisterTab) {
-        document.getElementById("btn-email-signup").click();
-      } else {
-        document.getElementById("btn-email-signin").click();
-      }
-    }
-  });
-});
+// enter-key handlers for email removed
 
 // Autentikasi Email / Kata Sandi
 const _btnGoogleSignIn = document.getElementById("btn-google-signin");
@@ -452,80 +364,7 @@ window.addEventListener("load", () => {
   }
 });
 
-const _btnSignIn = document.getElementById("btn-email-signin");
-
-if (_btnSignIn) {
-  _btnSignIn.onclick = async () => {
-    if (!window._pbReady) { 
-      toast("Backend belum dikonfigurasi", 3000); 
-      return; 
-    }
-    
-    const email = document.getElementById("auth-email").value.trim();
-    const pass = document.getElementById("auth-pass").value;
-    
-    if (!email || !pass) {
-      toast("Isi email dan kata sandi terlebih dahulu!", 3000); 
-      return; 
-    }
-    
-    setBtnLoading(_btnSignIn, true, "Masuk...");
-    
-    try {
-      const user = await window._fb.signIn(email, pass);
-      if (!user.displayName) user.displayName = email;
-      enterUser(user);
-      toast("Selamat datang, " + (user.displayName || email) + "!", 3000);
-    } catch (e) {
-      toast("Email atau kata sandi salah!", 4000);
-    } finally {
-      setBtnLoading(_btnSignIn, false);
-    }
-  };
-}
-
-const _btnSignUp = document.getElementById("btn-email-signup");
-
-if (_btnSignUp) {
-  _btnSignUp.onclick = async () => {
-    if (!window._pbReady) { 
-      toast("Backend belum dikonfigurasi", 4000); 
-      return; 
-    }
-    
-    const email = document.getElementById("reg-email").value.trim();
-    const pass = document.getElementById("reg-pass").value;
-    const passConfirm = document.getElementById("reg-pass-confirm").value;
-    
-    if (!email || !pass) {
-      toast("Isi email dan kata sandi terlebih dahulu!", 3000); 
-      return; 
-    }
-    
-    if (pass.length < 8) {
-      toast("Kata sandi minimal 8 karakter!", 3000);
-      return;
-    }
-    
-    if (pass !== passConfirm) {
-      toast("Kata sandi tidak sama!", 3000);
-      return;
-    }
-    
-    setBtnLoading(_btnSignUp, true, "Mendaftar...");
-    
-    try {
-      const user = await window._fb.signUp(email, pass);
-      if (!user.displayName) user.displayName = email;
-      enterUser(user);
-      toast("Akun berhasil dibuat! Selamat datang, " + email + "!", 4000);
-    } catch (e) {
-      toast("Email sudah terdaftar atau data tidak valid!", 4000);
-    } finally {
-      setBtnLoading(_btnSignUp, false);
-    }
-  };
-}
+// email sign-in / sign-up handlers removed (use Google or Guest)
 
 
 document.getElementById("btn-signout").onclick = async () => {
