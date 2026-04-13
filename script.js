@@ -1994,7 +1994,19 @@ async function uploadToCloudinary(file) {
 
     return url;
   } catch (err) {
-    toast("Upload Gagal: " + (err.message || err));
+    let msg = "";
+    if (!err) msg = "Unknown error";
+    else if (typeof err === "string") msg = err;
+    else if (err.message) msg = err.message;
+    else {
+      try {
+        msg = JSON.stringify(err);
+      } catch (e) {
+        msg = String(err);
+      }
+    }
+    console.error('uploadToCloudinary error:', err);
+    toast("Upload Gagal: " + msg);
     return null;
   }
 }
