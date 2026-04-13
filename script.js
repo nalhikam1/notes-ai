@@ -1951,7 +1951,7 @@ function switchMediaTab(t) {
 }
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dkbm0b4nm/auto/upload";
-const CLOUDINARY_PRESET = "pm-refleksi";
+const CLOUDINARY_PRESET = "notes";
 
 async function uploadToCloudinary(file) {
   const fd = new FormData();
