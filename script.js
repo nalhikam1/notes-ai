@@ -177,11 +177,15 @@ function subscribeCloud() {
   if (S.unsubF) S.unsubF();
 
   S.unsubF = window._fb.listenFolders(S.user.uid, (cloudFolders) => {
+    S._cloudFoldersReceived = true;
     if (cloudFolders && cloudFolders.length > 0) {
       S.folders = cloudFolders;
       saveLocal();
       renderFolderOpts();
       renderTree();
+      console.log('subscribeCloud: received folders', cloudFolders.length, cloudFolders);
+    } else {
+      console.log('subscribeCloud: received NO folders from cloud');
     }
   });
 
@@ -239,6 +243,7 @@ function subscribeCloud() {
     saveLocal();
     renderTree();
     updateDashboardStats(); // Selalu update angka, bahkan saat editor terbuka
+    console.log('subscribeCloud: merged notes', S.notes.length, S.notes.slice(0,3));
 
     // Jika catatan yang sedang terbuka dihapus dari device lain, kembali ke dashboard
     if (activeDeleted) {
@@ -265,6 +270,18 @@ function subscribeCloud() {
     }
     setSyncDot("ok");
   });
+
+  // If cloud folders didn't arrive shortly, and we have local folders, restore them to cloud
+  S._cloudFoldersReceived = false;
+  setTimeout(() => {
+    if (!S._cloudFoldersReceived) {
+      console.log('subscribeCloud: timeout waiting folders. local folders:', S.folders.length);
+      if (S.folders && S.folders.length > 0 && window._fb && S.user) {
+        console.log('subscribeCloud: restoring local folders to cloud');
+        window._fb.saveFolders(S.user.uid, S.folders).then(() => saveLocal()).catch((e) => console.error('restore folders failed', e));
+      }
+    }
+  }, 1500);
 }
 
 // Helper loading state untuk tombol auth
