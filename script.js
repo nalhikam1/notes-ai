@@ -2388,7 +2388,7 @@ function renderTree() {
     );
     html += `<div>
       <div class="folder-hd" onclick="toggleFolder('${f.id}')" oncontextmenu="showFolderCtx(event, '${f.id}')">
-        <span class="ftog o" id="ft-${f.id}">▶</span>
+        <span class="ftog" id="ft-${f.id}">▶</span>
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         <span style="flex:1">${escapeHTML(f.name)}</span>
         <span style="font-size:9px;color:var(--tx3)">${fn.length}</span>
@@ -2404,13 +2404,27 @@ function renderTree() {
    </button>
  </div>
       </div>
-      <div class="folder-notes" id="fn-${f.id}">${fn.map(noteHTML).join("")}${fn.length === 0 ? '<div style="padding:3px 8px;font-size:11px;color:var(--tx3);font-style:italic">Empty</div>' : ""}</div>
+      <div class="folder-notes h" id="fn-${f.id}">${fn.map(noteHTML).join("")}${fn.length === 0 ? '<div style="padding:3px 8px;font-size:11px;color:var(--tx3);font-style:italic'>Empty</div>' : ""}</div>
     </div>`;
   });
   if (!S.notes.length)
     html =
       '<div style="padding:14px;text-align:center;font-size:12px;color:var(--tx3);font-style:italic">No notes yet</div>';
   tree.innerHTML = html;
+}
+
+// Debounced render wrapper to avoid frequent rerenders during sync
+let _renderTreeTO = null;
+const renderTreeImmediate = renderTree; // keep reference to original (will be replaced below)
+function renderTree() {
+  clearTimeout(_renderTreeTO);
+  _renderTreeTO = setTimeout(() => {
+    try {
+      renderTreeImmediate();
+    } catch (e) {
+      console.error('renderTree debounce error', e);
+    }
+  }, 90);
 }
 
 function toggleFolder(id) {
@@ -3151,6 +3165,49 @@ document.getElementById("ed").addEventListener("keydown", (e) => {
     }
   }
 
+    // Backspace handling: if caret is inside an empty <pre><code>..</code></pre>, remove it and insert paragraph
+    if (e.key === "Backspace") {
+      try {
+        const codeEl = node && (node.nodeType === 3 ? node.parentNode : node).closest('code');
+        if (codeEl && codeEl.parentElement && codeEl.parentElement.tagName === 'PRE') {
+          const pre = codeEl.parentElement;
+          const codeText = (codeEl.textContent || '').trim();
+          const range = sel.rangeCount ? sel.getRangeAt(0) : null;
+          const atStart = range && range.collapsed && range.startOffset === 0;
+
+          if (codeText === '' && range && range.collapsed) {
+            e.preventDefault();
+            const p = document.createElement('p');
+            p.innerHTML = '<br>';
+            pre.replaceWith(p);
+            const newR = document.createRange();
+            newR.setStart(p, 0);
+            newR.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(newR);
+            ensureTrailingParagraph();
+            return;
+          }
+
+          // If code block contains only the placeholder text 'Enter code here', treat as empty
+          if (codeText.toLowerCase() === 'enter code here' && range && range.collapsed && atStart) {
+            e.preventDefault();
+            const p = document.createElement('p');
+            p.innerHTML = '<br>';
+            pre.replaceWith(p);
+            const newR = document.createRange();
+            newR.setStart(p, 0);
+            newR.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(newR);
+            ensureTrailingParagraph();
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('code-backspace handler error', err);
+      }
+    }
   // Blockquote handlers
   const bq = node && (node.nodeType === 3 ? node.parentNode : node).closest("blockquote");
 
