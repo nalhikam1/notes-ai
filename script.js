@@ -176,41 +176,44 @@ function subscribeCloud() {
   if (S.unsub) S.unsub();
   if (S.unsubF) S.unsubF();
 
-    S.unsubF = window._fb.listenFolders(S.user.uid, (cloudFolders) => {
-      try {
-        // If cloud provides non-empty folders, accept them.
-        if (Array.isArray(cloudFolders) && cloudFolders.length > 0) {
-          S.folders = cloudFolders;
-          saveLocal();
-          renderFolderOpts();
-          renderTree();
-          console.log('subscribeCloud: received folders', cloudFolders.length);
-          return;
-        }
-
-        // Cloud returned empty array. If we already have local folders, restore them to cloud once.
-        if (Array.isArray(cloudFolders) && cloudFolders.length === 0) {
-          console.log('subscribeCloud: cloud folders empty');
-          if (S.folders && S.folders.length > 0 && window._fb && S.user && !S._foldersRestoreDone) {
-            S._foldersRestoreDone = true;
-            console.log('subscribeCloud: restoring local folders to cloud', S.folders.length);
-            window._fb.saveFolders(S.user.uid, S.folders).then(() => saveLocal()).catch((e) => console.error('restore folders failed', e));
-          }
-          // Do not overwrite local folders with empty cloud result.
-          renderFolderOpts();
-          renderTree();
-          return;
-        }
-
-        // Fallback: if cloudFolders is falsy, just render current local state
+  S.unsubF = window._fb.listenFolders(S.user.uid, (cloudFolders) => {
+    try {
+      console.log('[folders] received:', Array.isArray(cloudFolders) ? cloudFolders.length : 'null/undefined');
+      // If cloud provides non-empty folders, accept them.
+      if (Array.isArray(cloudFolders) && cloudFolders.length > 0) {
+        S.folders = cloudFolders;
+        saveLocal();
+        console.log('[folders] set S.folders to cloud:', S.folders.length);
         renderFolderOpts();
         renderTree();
-      } catch (err) {
-        console.error('listenFolders handler error', err);
+        return;
       }
-    });
+
+      // Cloud returned empty array. If we already have local folders, restore them to cloud once.
+      if (Array.isArray(cloudFolders) && cloudFolders.length === 0) {
+        console.log('[folders] cloud is empty, local folders:', S.folders.length);
+        if (S.folders && S.folders.length > 0 && window._fb && S.user && !S._foldersRestoreDone) {
+          S._foldersRestoreDone = true;
+          console.log('[folders] restoring local folders to cloud');
+          window._fb.saveFolders(S.user.uid, S.folders).then(() => saveLocal()).catch((e) => console.error('restore folders failed', e));
+        }
+        // Do not overwrite local folders with empty cloud result.
+        renderFolderOpts();
+        renderTree();
+        return;
+      }
+
+      // Fallback: if cloudFolders is falsy, just render current local state
+      console.log('[folders] fallback render');
+      renderFolderOpts();
+      renderTree();
+    } catch (err) {
+      console.error('listenFolders handler error', err);
+    }
+  });
 
   S.unsub = window._fb.listenNotes(S.user.uid, (cloudNotes) => {
+    console.log('[notes] received from cloud:', cloudNotes.length, 'current local:', S.notes.length);
     // Pisahkan tombstone (catatan yang dihapus di cloud) dari catatan aktif.
     const cloudDeletedIds = new Set();
     cloudNotes.forEach((n) => { if (n._deleted) cloudDeletedIds.add(n.id); });
@@ -261,10 +264,10 @@ function subscribeCloud() {
       }
     });
     S.notes = merged;
+    console.log('[notes] merged result:', S.notes.length);
     saveLocal();
     renderTree();
     updateDashboardStats(); // Selalu update angka, bahkan saat editor terbuka
-    console.log('subscribeCloud: merged notes', S.notes.length);
 
     // Jika catatan yang sedang terbuka dihapus dari device lain, kembali ke dashboard
     if (activeDeleted) {
@@ -291,18 +294,6 @@ function subscribeCloud() {
     }
     setSyncDot("ok");
   });
-
-  // If cloud folders didn't arrive shortly, and we have local folders, restore them to cloud
-  S._cloudFoldersReceived = false;
-  setTimeout(() => {
-    if (!S._cloudFoldersReceived) {
-      console.log('subscribeCloud: timeout waiting folders. local folders:', S.folders.length);
-      if (S.folders && S.folders.length > 0 && window._fb && S.user) {
-        console.log('subscribeCloud: restoring local folders to cloud');
-        window._fb.saveFolders(S.user.uid, S.folders).then(() => saveLocal()).catch((e) => console.error('restore folders failed', e));
-      }
-    }
-  }, 1500);
 }
 
 // Helper loading state untuk tombol auth
@@ -2390,7 +2381,11 @@ function renderFolderOpts() {
 
 function renderTree() {
   const tree = document.getElementById("tree");
-  console.log('renderTree: notes=', S.notes.length, 'folders=', S.folders.length);
+  if (!tree) {
+    console.error('[renderTree] tree element not found!');
+    return;
+  }
+  console.log('[renderTree original] notes=', S.notes.length, 'folders=', S.folders.length);
   const q = (document.getElementById("search").value || "").toLowerCase();
 
   function noteHTML(n) {
@@ -2449,7 +2444,9 @@ function renderTree() {
   if (!S.notes.length)
     html =
       '<div style="padding:14px;text-align:center;font-size:12px;color:var(--tx3);font-style:italic">No notes yet</div>';
+  console.log('[renderTree original] setting innerHTML, html length=', html.length);
   tree.innerHTML = html;
+  console.log('[renderTree original] done, tree childCount=', tree.children.length);
 }
 
 // Debounced render wrapper to avoid frequent rerenders during sync
@@ -2459,6 +2456,7 @@ function renderTree() {
   clearTimeout(_renderTreeTO);
   _renderTreeTO = setTimeout(() => {
     try {
+      console.log('[renderTree] executing debounced, notes=', S.notes.length, 'folders=', S.folders.length);
       renderTreeImmediate();
     } catch (e) {
       console.error('renderTree debounce error', e);
