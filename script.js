@@ -2412,9 +2412,13 @@ function renderTree() {
           n.title.toLowerCase().includes(q) ||
           (n.content || "").toLowerCase().includes(q)),
     );
+    // Cek apakah folder ini berisi file yang sedang aktif
+    const hasActiveNote = fn.some((n) => n.id === S.active);
+    const isOpen = hasActiveNote; // Folder terbuka jika ada active note di dalamnya
+    
     html += `<div>
       <div class="folder-hd" onclick="toggleFolder('${f.id}')" oncontextmenu="showFolderCtx(event, '${f.id}')">
-        <span class="ftog" id="ft-${f.id}">▶</span>
+        <span class="ftog${isOpen ? " o" : ""}" id="ft-${f.id}">▶</span>
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         <span style="flex:1">${escapeHTML(f.name)}</span>
         <span style="font-size:9px;color:var(--tx3)">${fn.length}</span>
@@ -2430,7 +2434,7 @@ function renderTree() {
    </button>
  </div>
       </div>
-      <div class="folder-notes h" id="fn-${f.id}">${fn.map(noteHTML).join("")}${fn.length === 0 ? '<div style="padding:3px 8px;font-size:11px;color:var(--tx3);font-style:italic">Empty</div>' : ""}</div>
+      <div class="folder-notes${isOpen ? "" : " h"}" id="fn-${f.id}">${fn.map(noteHTML).join("")}${fn.length === 0 ? '<div style="padding:3px 8px;font-size:11px;color:var(--tx3);font-style:italic">Empty</div>' : ""}</div>
     </div>`;
   });
   if (!S.notes.length)
