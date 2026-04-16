@@ -3163,32 +3163,22 @@ document.getElementById("ed").addEventListener("keydown", (e) => {
     }
   }
 
-    // Backspace handling: if caret is inside an empty <pre><code>..</code></pre>, remove it and insert paragraph
-    if (e.key === "Backspace") {
+    // Backspace/Delete handling for <pre><code>..</code></pre>
+    if (e.key === "Backspace" || e.key === "Delete") {
       try {
         const codeEl = node && (node.nodeType === 3 ? node.parentNode : node).closest('code');
         if (codeEl && codeEl.parentElement && codeEl.parentElement.tagName === 'PRE') {
           const pre = codeEl.parentElement;
-          const codeText = (codeEl.textContent || '').trim();
+          const codeTextRaw = codeEl.textContent || '';
+          const codeText = codeTextRaw.trim();
           const range = sel.rangeCount ? sel.getRangeAt(0) : null;
           const atStart = range && range.collapsed && range.startOffset === 0;
+          const atEnd = range && range.collapsed && range.startOffset === (codeTextRaw || '').length;
 
-          if (codeText === '' && range && range.collapsed) {
-            e.preventDefault();
-            const p = document.createElement('p');
-            p.innerHTML = '<br>';
-            pre.replaceWith(p);
-            const newR = document.createRange();
-            newR.setStart(p, 0);
-            newR.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(newR);
-            ensureTrailingParagraph();
-            return;
-          }
+          const isEmptyLike = codeText === '' || codeText.toLowerCase() === 'enter code here' || /^\s*$/.test(codeTextRaw);
 
-          // If code block contains only the placeholder text 'Enter code here', treat as empty
-          if (codeText.toLowerCase() === 'enter code here' && range && range.collapsed && atStart) {
+          // If Delete at end of empty or Backspace at start of empty/placeholder, remove code block
+          if (range && range.collapsed && ((e.key === 'Backspace' && (isEmptyLike || atStart)) || (e.key === 'Delete' && (isEmptyLike || atEnd)))) {
             e.preventDefault();
             const p = document.createElement('p');
             p.innerHTML = '<br>';
@@ -3203,7 +3193,7 @@ document.getElementById("ed").addEventListener("keydown", (e) => {
           }
         }
       } catch (err) {
-        console.error('code-backspace handler error', err);
+        console.error('code-block delete handler error', err);
       }
     }
   // Blockquote handlers

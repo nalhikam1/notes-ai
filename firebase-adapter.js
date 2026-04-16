@@ -221,7 +221,7 @@ window._fb = {
   listenNotes(uid, callback) {
     const ref = _db.collection('users').doc(uid).collection('notes');
     return ref.onSnapshot((snap) => {
-      const notes = snap.docs.map((d) => d.data());
+      const notes = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       callback(notes);
     }, (err) => {
       console.error('listenNotes error:', err);
@@ -294,7 +294,7 @@ window._admin = {
    */
   async loadAllNotes() {
     const snap = await _db.collectionGroup('notes').get();
-    const notes = snap.docs.map((d) => d.data());
+    const notes = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
     // Kumpulkan UID unik supaya bisa fetch profil + folder sekaligus
     const uids = [...new Set(notes.map((n) => n._uid).filter(Boolean))];
