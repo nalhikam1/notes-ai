@@ -176,18 +176,39 @@ function subscribeCloud() {
   if (S.unsub) S.unsub();
   if (S.unsubF) S.unsubF();
 
-  S.unsubF = window._fb.listenFolders(S.user.uid, (cloudFolders) => {
-    S._cloudFoldersReceived = true;
-    if (cloudFolders && cloudFolders.length > 0) {
-      S.folders = cloudFolders;
-      saveLocal();
-      renderFolderOpts();
-      renderTree();
-      console.log('subscribeCloud: received folders', cloudFolders.length, cloudFolders);
-    } else {
-      console.log('subscribeCloud: received NO folders from cloud');
-    }
-  });
+    S.unsubF = window._fb.listenFolders(S.user.uid, (cloudFolders) => {
+      try {
+        // If cloud provides non-empty folders, accept them.
+        if (Array.isArray(cloudFolders) && cloudFolders.length > 0) {
+          S.folders = cloudFolders;
+          saveLocal();
+          renderFolderOpts();
+          renderTree();
+          console.log('subscribeCloud: received folders', cloudFolders.length);
+          return;
+        }
+
+        // Cloud returned empty array. If we already have local folders, restore them to cloud once.
+        if (Array.isArray(cloudFolders) && cloudFolders.length === 0) {
+          console.log('subscribeCloud: cloud folders empty');
+          if (S.folders && S.folders.length > 0 && window._fb && S.user && !S._foldersRestoreDone) {
+            S._foldersRestoreDone = true;
+            console.log('subscribeCloud: restoring local folders to cloud', S.folders.length);
+            window._fb.saveFolders(S.user.uid, S.folders).then(() => saveLocal()).catch((e) => console.error('restore folders failed', e));
+          }
+          // Do not overwrite local folders with empty cloud result.
+          renderFolderOpts();
+          renderTree();
+          return;
+        }
+
+        // Fallback: if cloudFolders is falsy, just render current local state
+        renderFolderOpts();
+        renderTree();
+      } catch (err) {
+        console.error('listenFolders handler error', err);
+      }
+    });
 
   S.unsub = window._fb.listenNotes(S.user.uid, (cloudNotes) => {
     // Pisahkan tombstone (catatan yang dihapus di cloud) dari catatan aktif.
@@ -243,7 +264,7 @@ function subscribeCloud() {
     saveLocal();
     renderTree();
     updateDashboardStats(); // Selalu update angka, bahkan saat editor terbuka
-    console.log('subscribeCloud: merged notes', S.notes.length, S.notes.slice(0,3));
+    console.log('subscribeCloud: merged notes', S.notes.length);
 
     // Jika catatan yang sedang terbuka dihapus dari device lain, kembali ke dashboard
     if (activeDeleted) {
@@ -2369,6 +2390,7 @@ function renderFolderOpts() {
 
 function renderTree() {
   const tree = document.getElementById("tree");
+  console.log('renderTree: notes=', S.notes.length, 'folders=', S.folders.length);
   const q = (document.getElementById("search").value || "").toLowerCase();
 
   function noteHTML(n) {
