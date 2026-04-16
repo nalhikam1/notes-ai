@@ -2404,7 +2404,7 @@ function renderTree() {
    </button>
  </div>
       </div>
-      <div class="folder-notes h" id="fn-${f.id}">${fn.map(noteHTML).join("")}${fn.length === 0 ? '<div style="padding:3px 8px;font-size:11px;color:var(--tx3);font-style:italic'>Empty</div>' : ""}</div>
+      <div class="folder-notes h" id="fn-${f.id}">${fn.map(noteHTML).join("")}${fn.length === 0 ? '<div style="padding:3px 8px;font-size:11px;color:var(--tx3);font-style:italic">Empty</div>' : ""}</div>
     </div>`;
   });
   if (!S.notes.length)
@@ -2698,9 +2698,7 @@ function renderTags(n) {
   const container = document.getElementById("p-tags");
   container.innerHTML = (n.tags || [])
     .map(
-      (t) => `
-    <div class="tag" data-tag="${escapeHTML(t)}">${escapeHTML(t)}<span class="tag-x">✕</span></div>
-  `,
+      (t) => `<div class="tag" data-tag="${escapeHTML(t)}">${escapeHTML(t)}<span class="tag-x">✕</span></div>`
     )
     .join("");
   container.querySelectorAll(".tag-x").forEach((el) => {
