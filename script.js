@@ -178,12 +178,10 @@ function subscribeCloud() {
 
   S.unsubF = window._fb.listenFolders(S.user.uid, (cloudFolders) => {
     try {
-      console.log('[folders] received:', Array.isArray(cloudFolders) ? cloudFolders.length : 'null/undefined');
       // If cloud provides non-empty folders, accept them.
       if (Array.isArray(cloudFolders) && cloudFolders.length > 0) {
         S.folders = cloudFolders;
         saveLocal();
-        console.log('[folders] set S.folders to cloud:', S.folders.length);
         renderFolderOpts();
         renderTree();
         return;
@@ -191,10 +189,8 @@ function subscribeCloud() {
 
       // Cloud returned empty array. If we already have local folders, restore them to cloud once.
       if (Array.isArray(cloudFolders) && cloudFolders.length === 0) {
-        console.log('[folders] cloud is empty, local folders:', S.folders.length);
         if (S.folders && S.folders.length > 0 && window._fb && S.user && !S._foldersRestoreDone) {
           S._foldersRestoreDone = true;
-          console.log('[folders] restoring local folders to cloud');
           window._fb.saveFolders(S.user.uid, S.folders).then(() => saveLocal()).catch((e) => console.error('restore folders failed', e));
         }
         // Do not overwrite local folders with empty cloud result.
@@ -204,7 +200,6 @@ function subscribeCloud() {
       }
 
       // Fallback: if cloudFolders is falsy, just render current local state
-      console.log('[folders] fallback render');
       renderFolderOpts();
       renderTree();
     } catch (err) {
@@ -213,7 +208,6 @@ function subscribeCloud() {
   });
 
   S.unsub = window._fb.listenNotes(S.user.uid, (cloudNotes) => {
-    console.log('[notes] received from cloud:', cloudNotes.length, 'current local:', S.notes.length);
     // Pisahkan tombstone (catatan yang dihapus di cloud) dari catatan aktif.
     const cloudDeletedIds = new Set();
     cloudNotes.forEach((n) => { if (n._deleted) cloudDeletedIds.add(n.id); });
@@ -264,7 +258,6 @@ function subscribeCloud() {
       }
     });
     S.notes = merged;
-    console.log('[notes] merged result:', S.notes.length);
     saveLocal();
     renderTree();
     updateDashboardStats(); // Selalu update angka, bahkan saat editor terbuka
@@ -2385,7 +2378,6 @@ function renderTree() {
     console.error('[renderTree] tree element not found!');
     return;
   }
-  console.log('[renderTree original] notes=', S.notes.length, 'folders=', S.folders.length);
   const q = (document.getElementById("search").value || "").toLowerCase();
 
   function noteHTML(n) {
@@ -2444,24 +2436,7 @@ function renderTree() {
   if (!S.notes.length)
     html =
       '<div style="padding:14px;text-align:center;font-size:12px;color:var(--tx3);font-style:italic">No notes yet</div>';
-  console.log('[renderTree original] setting innerHTML, html length=', html.length);
   tree.innerHTML = html;
-  console.log('[renderTree original] done, tree childCount=', tree.children.length);
-}
-
-// Debounced render wrapper to avoid frequent rerenders during sync
-let _renderTreeTO = null;
-const renderTreeImmediate = renderTree; // keep reference to original (will be replaced below)
-function renderTree() {
-  clearTimeout(_renderTreeTO);
-  _renderTreeTO = setTimeout(() => {
-    try {
-      console.log('[renderTree] executing debounced, notes=', S.notes.length, 'folders=', S.folders.length);
-      renderTreeImmediate();
-    } catch (e) {
-      console.error('renderTree debounce error', e);
-    }
-  }, 90);
 }
 
 function toggleFolder(id) {
